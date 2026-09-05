@@ -15,7 +15,9 @@ A zero-dependency Chrome / Edge extension. Click the banana in your toolbar to c
 
 This is a manual install, not a Chrome Web Store or Edge Add-ons listing.
 
-Click again to turn it off, or use **Restore page** in the floating controls. **More bananas** increases the shower; **Pause** freezes the celebration. Clicking the website tosses a little banana confetti without consuming the click.
+Click again to turn it off, or use **Restore page** in the floating controls. Each party invites a random brown capuchin, black-and-white capuchin, or golden monkey. **More bananas** increases the shower, brings a different monkey, and disguises more page elements; **Pause** freezes the animation. Clicking the website tosses a little banana confetti without consuming the click.
+
+Random visible images and short text elements temporarily look like bananas. Their original nodes, dimensions, and event listeners remain intact. Forms, links, navigation, live announcements, editable content, and keyboard-focusable elements are skipped. At most 12 elements are disguised; Restore page restores their previous opacity without overwriting unrelated site updates. Use `data-bananify-protect` on an element or container to keep it unchanged.
 
 The party is per-page and resets on navigation or reload. Browser settings, extension stores, and some built-in viewers don't allow extensions to modify them. A `!` badge and toolbar tooltip explain when a page can't be changed.
 
@@ -33,11 +35,11 @@ Open <http://127.0.0.1:4173>. This builds and serves the production site, includ
 
 - Only `activeTab` and `scripting` permissions; no always-on site access.
 - The extension makes no network requests and uses no analytics, storage, remote libraries, or audio. The website is hosted by GitHub Pages and loads its own static files.
-- Original vector banana and capuchin artwork, bundled locally.
-- An isolated Shadow DOM overlay leaves the website's content and styles untouched.
+- Original vector bananas and three monkey variants, bundled locally.
+- An isolated Shadow DOM overlay keeps decoration styles separate. Selected noninteractive elements temporarily receive `opacity: 0 !important`; their original opacity is restored when the party ends.
 - Only the small party control bar intercepts pointer input.
 - Reduced-motion preferences get a static banana party; hidden tabs suspend animation.
-- Particle counts are bounded. Removal cancels animation and removes event listeners.
+- Particle counts and transformed elements are bounded. Removal cancels animation, disconnects observers, restores disguises, and removes event listeners.
 - A website's fullscreen/top-layer dialogs may appear above the party. The extension does not alter those dialogs.
 
 ## Development

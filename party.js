@@ -54,6 +54,7 @@
   `;
 
   let party = null;
+  let lastMonkey;
   const random = (min, max) => min + Math.random() * (max - min);
 
   function start() {
@@ -73,7 +74,9 @@
     const speech = document.createElement("div");
     speech.className = "speech";
     speech.textContent = "My kind of website.";
-    friend.append(globalThis.bananaFeedArt.monkey(), speech);
+    let monkeyVariant = globalThis.bananaFeedArt.chooseMonkey(lastMonkey);
+    lastMonkey = monkeyVariant;
+    friend.append(globalThis.bananaFeedArt.monkey(monkeyVariant), speech);
     scene.append(canvas, friend);
 
     const dock = document.createElement("section");
@@ -112,6 +115,91 @@
     let stickers = [];
     let drops = [];
     let bursts = [];
+    let layoutFrame = 0;
+    const disguises = new Map();
+    const protectedElements = "a,button,input,textarea,select,label,form,nav,header,footer,summary,pre,code,[contenteditable]:not([contenteditable='false']),[tabindex],[role='button'],[role='link'],[role='navigation'],[role='menu'],[role='dialog'],[role='alertdialog'],[role='status'],[role='alert'],[aria-live],[aria-hidden='true'],[hidden],[inert],[data-bananify-protect]";
+
+    function requestPaint() {
+      if (removed || layoutFrame || frame || document.hidden) return;
+      layoutFrame = requestAnimationFrame(() => {
+        layoutFrame = 0;
+        paint();
+      });
+    }
+
+    const layoutObserver = new ResizeObserver(requestPaint);
+    const contentObserver = new MutationObserver(() => {
+      if (!host.isConnected) stop();
+      else requestPaint();
+    });
+
+    function ownsOpacity(node) {
+      return node.style.getPropertyValue("opacity") === "0" && node.style.getPropertyPriority("opacity") === "important";
+    }
+
+    function restoreElement(node, original) {
+      if (ownsOpacity(node)) {
+        if (original.opacity) node.style.setProperty("opacity", original.opacity, original.priority);
+        else node.style.removeProperty("opacity");
+        if (!original.hadStyle && node.style.length === 0) {
+          // Flush lazy CSSOM serialization so removing the attribute stays permanent.
+          node.getAttribute("style");
+          node.removeAttribute("style");
+        }
+      }
+      layoutObserver.unobserve(node);
+      disguises.delete(node);
+    }
+
+    function disguiseElements(count) {
+      if (!document.body || disguises.size >= 12) return;
+      const candidates = [];
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+      let visited = 0;
+      let node;
+      while ((node = walker.nextNode()) && visited++ < 2500 && candidates.length < 200) {
+        const image = node.localName === "img" || (node.localName === "svg" && !node.ownerSVGElement);
+        const text = /^(p|span|li|h2|h3|figcaption)$/.test(node.localName)
+          && node.childElementCount === 0 && node.textContent.trim().length > 0 && node.textContent.trim().length <= 140;
+        if ((!image && !text) || disguises.has(node) || node.closest(protectedElements)) continue;
+        if (node.contains(document.activeElement) || node.getClientRects().length !== 1) continue;
+        const rect = node.getBoundingClientRect();
+        if (rect.width < 20 || rect.height < 12 || rect.width > width * .85 || rect.height > height * .5
+          || rect.bottom <= 0 || rect.top >= height || rect.right <= 0 || rect.left >= width) continue;
+        const computed = getComputedStyle(node);
+        if (computed.visibility !== "visible" || Number(computed.opacity) === 0) continue;
+        candidates.push(node);
+      }
+      const total = Math.min(count, candidates.length, 12 - disguises.size);
+      for (let index = 0; index < total; index++) {
+        const chosen = index + Math.floor(Math.random() * (candidates.length - index));
+        [candidates[index], candidates[chosen]] = [candidates[chosen], candidates[index]];
+        const target = candidates[index];
+        disguises.set(target, {
+          opacity: target.style.getPropertyValue("opacity"),
+          priority: target.style.getPropertyPriority("opacity"),
+          hadStyle: target.hasAttribute("style"),
+        });
+        target.style.setProperty("opacity", "0", "important");
+        layoutObserver.observe(target);
+      }
+    }
+
+    function paintDisguises() {
+      for (const [node, original] of disguises) {
+        // If the site changes or removes an element, yield without resurrecting old DOM.
+        if (!node.isConnected || !ownsOpacity(node) || node.closest(protectedElements)) {
+          restoreElement(node, original);
+          continue;
+        }
+        const rect = node.getBoundingClientRect();
+        if (rect.bottom <= 0 || rect.top >= height || rect.right <= 0 || rect.left >= width) continue;
+        drawBanana({
+          x: rect.left + rect.width / 2, y: rect.top + rect.height / 2,
+          size: Math.min(130, rect.width, rect.height * 1.6), angle: -.22,
+        });
+      }
+    }
 
     const makeDrop = (initial = false) => ({
       x: random(0, width), y: initial ? random(-height, height) : random(-150, -50),
@@ -147,6 +235,7 @@
       stickers.forEach((item) => drawBanana(item, .8));
       drops.forEach((item) => drawBanana(item, .95));
       bursts.forEach((item) => drawBanana(item, Math.min(1, item.life)));
+      paintDisguises();
     }
 
     function animate(time) {
@@ -218,6 +307,10 @@
     function stop() {
       removed = true;
       cancelAnimationFrame(frame);
+      cancelAnimationFrame(layoutFrame);
+      contentObserver.disconnect();
+      layoutObserver.disconnect();
+      for (const [node, original] of disguises) restoreElement(node, original);
       events.abort();
       host.remove();
       party = null;
@@ -227,6 +320,10 @@
       const next = Math.min(showerCount + 18, 114);
       drops.push(...Array.from({ length: next - showerCount }, () => makeDrop(true)));
       showerCount = next;
+      monkeyVariant = globalThis.bananaFeedArt.chooseMonkey(monkeyVariant);
+      lastMonkey = monkeyVariant;
+      friend.querySelector(".capuchin").replaceWith(globalThis.bananaFeedArt.monkey(monkeyVariant));
+      disguiseElements(3);
       speech.textContent = next === 114 ? "Peak banana. No regrets." : "Yes. This is the life.";
       burst(width * .5, height * .55);
       paint();
@@ -242,11 +339,17 @@
       burst(event.clientX, event.clientY);
     }, { passive: true, signal: events.signal });
     window.addEventListener("resize", resize, { passive: true, signal: events.signal });
+    document.addEventListener("scroll", requestPaint, { capture: true, passive: true, signal: events.signal });
     document.addEventListener("visibilitychange", syncMotion, { signal: events.signal });
     motion.addEventListener("change", syncMotion, { signal: events.signal });
     window.addEventListener("pagehide", stop, { signal: events.signal });
-    party = { stop, host, get paused() { return paused; } };
+    party = { stop, host, get paused() { return paused; }, get monkeyVariant() { return monkeyVariant; } };
     resize();
+    disguiseElements(4);
+    if (document.body) {
+      layoutObserver.observe(document.body);
+    }
+    contentObserver.observe(document.documentElement, { childList: true, characterData: true, attributes: true, subtree: true });
     syncMotion();
   }
 
@@ -259,5 +362,6 @@
     stop() { party?.stop(); },
     get active() { return Boolean(party); },
     get paused() { return Boolean(party?.paused); },
+    get monkeyVariant() { return party?.monkeyVariant ?? null; },
   });
 })();
