@@ -10,7 +10,7 @@ import { createHash } from "node:crypto";
 test("production build publishes only the website and a complete extension download", async () => {
   const output = await buildSite();
   assert.deepEqual((await readdir(output)).sort(), [
-    ".nojekyll", "CNAME", "artwork.js", "downloads", "icons", "index.html",
+    ".nojekyll", "CNAME", "LICENSE", "artwork.js", "downloads", "icons", "index.html",
     "party.js", "preview.css", "preview.js", "robots.txt", "sitemap.xml", "social-card.png",
   ].sort());
   assert.equal((await readFile(join(output, "CNAME"), "utf8")).trim(), "bananify.online");
@@ -36,10 +36,11 @@ test("production build publishes only the website and a complete extension downl
   const zip = join(output, "downloads/bananify-extension.zip");
   const entries = execFileSync("unzip", ["-Z1", zip], { encoding: "utf8" }).trim().split("\n");
   assert.deepEqual(entries, [
-    "artwork.js", "background.js", "icons/banana-128.png", "icons/banana-16.png",
+    "LICENSE", "artwork.js", "background.js", "icons/banana-128.png", "icons/banana-16.png",
     "icons/banana-32.png", "icons/banana-48.png", "manifest.json", "party.js", "toggle.js",
   ].map((file) => `bananify/${file}`));
   const manifest = JSON.parse(execFileSync("unzip", ["-p", zip, "bananify/manifest.json"], { encoding: "utf8" }));
+  assert.equal(execFileSync("unzip", ["-p", zip, "bananify/LICENSE"], { encoding: "utf8" }), await readFile(join(output, "LICENSE"), "utf8"));
   assert.equal(manifest.name, "Bananify");
   assert.deepEqual(manifest.permissions, ["activeTab", "scripting"]);
   const first = await readFile(zip);
