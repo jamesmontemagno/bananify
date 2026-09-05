@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
+import { readReleaseVersion } from "./release-version.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const siteFiles = [
@@ -11,6 +12,7 @@ const siteFiles = [
 ];
 
 export async function buildSite() {
+  await readReleaseVersion();
   const output = join(root, "dist");
   const manifest = JSON.parse(await readFile(join(root, "manifest.json"), "utf8"));
   const icons = [...new Set(Object.values(manifest.icons))];

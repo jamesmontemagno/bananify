@@ -8,6 +8,8 @@
     "icons": "node scripts/generate-icons.mjs",
     "social": "node scripts/generate-social.mjs",
     "build": "node scripts/build.mjs",
+    "release:check": "node scripts/release-version.mjs",
+    "release:package": "node scripts/package-release.mjs",
     "check": "node --check background.js && node --check artwork.js && node --check party.js && node --check toggle.js && node --check preview.js",
     "test": "node --test tests/*.test.mjs",
     "test:browser": "node --test tests/browser/*.test.mjs"

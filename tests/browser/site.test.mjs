@@ -75,6 +75,17 @@ for (const viewport of [{ width: 1365, height: 1000 }, { width: 375, height: 812
       await page.evaluate(() => bananaFeed.stop());
       for (let count = 0; count < 5; count++) await page.evaluate(() => { bananaFeed.toggle(); bananaFeed.toggle(); });
       assert.equal(await page.locator("banana-feed-party").count(), 0);
+      // Keep CI independent of GitHub availability and whether this tag is published yet.
+      const releaseURL = "https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip";
+      await page.route(releaseURL, async (route) => {
+        const archive = await page.request.get(`${baseURL}/downloads/bananify-extension.zip`);
+        assert.equal(archive.status(), 200);
+        await route.fulfill({
+          status: 200, contentType: "application/zip",
+          headers: { "content-disposition": 'attachment; filename="bananify-extension.zip"' },
+          body: await archive.body(),
+        });
+      });
       const downloadReady = page.waitForEvent("download");
       await page.getByRole("link", { name: "Download Bananify for Chrome / Edge" }).click();
       const download = await downloadReady;
