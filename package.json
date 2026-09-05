@@ -1,0 +1,21 @@
+{
+  "name": "bananify",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A zero-dependency, one-click banana party browser extension.",
+  "scripts": {
+    "start": "node scripts/preview-server.mjs",
+    "icons": "node scripts/generate-icons.mjs",
+    "social": "node scripts/generate-social.mjs",
+    "build": "node scripts/build.mjs",
+    "check": "node --check background.js && node --check artwork.js && node --check party.js && node --check toggle.js && node --check preview.js",
+    "test": "node --test tests/*.test.mjs",
+    "test:browser": "node --test tests/browser/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

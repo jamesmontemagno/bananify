@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Bananify",
+  "version": "1.0.0",
+  "description": "One click. Bananas everywhere. A very happy capuchin. Click again to bring your website back.",
+  "permissions": ["activeTab", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Bananify: toggle the banana party",
+    "default_icon": {
+      "16": "icons/banana-16.png",
+      "32": "icons/banana-32.png",
+      "48": "icons/banana-48.png",
+      "128": "icons/banana-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/banana-16.png",
+    "32": "icons/banana-32.png",
+    "48": "icons/banana-48.png",
+    "128": "icons/banana-128.png"
+  }
+}

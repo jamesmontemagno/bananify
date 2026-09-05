@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bananify social image source</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; width: 1200px; height: 630px; background: #ffdc45; color: #263e2e; font-family: "Arial Rounded MT Bold", "Trebuchet MS", sans-serif; overflow: hidden; }
+    main { position: relative; width: 100%; height: 100%; padding: 52px 65px; }
+    .brand { font-size: 37px; font-weight: 900; letter-spacing: -1px; }
+    h1 { font-size: 87px; line-height: 1.02; letter-spacing: -3px; margin: 59px 0 23px; }
+    h1 span { color: #215c40; }
+    p { font: 23px/1.5 Arial, sans-serif; }
+    .monkey { position: absolute; right: 19px; top: 123px; width: 475px; transform: rotate(6deg); }
+    .monkey > svg { width: 100%; }
+    footer { position: absolute; bottom: 0; inset-inline: 0; padding: 20px 65px; background: #215c40; color: #ffdc45; display: flex; justify-content: space-between; font: 700 17px Arial, sans-serif; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand">bananify.</div>
+    <h1>The internet.<br>But <span>bananas.</span></h1>
+    <p>Bananas everywhere.<br>One very happy capuchin.</p>
+    <div class="monkey" id="monkey"></div>
+    <footer><span>bananify.online</span><span>Made by James Montemagno &amp; Mooch</span></footer>
+  </main>
+  <script src="../artwork.js"></script>
+  <script>document.getElementById("monkey").append(bananaFeedArt.monkey());</script>
+</body>
+</html>
