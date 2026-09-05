@@ -1,116 +1,78 @@
 # Bananify
 
-The internet. But bananas. Website: <https://bananify.online>.
+[![Bananify: The internet. But bananas. A happy capuchin holding a banana.](social-card.png)](https://bananify.online)
 
-A zero-dependency Chrome / Edge extension. Click the banana in your toolbar to cover the current website in bananas and invite a dancing capuchin.
+Turn everyday websites into a banana party. Bananify is a free, open-source **Chrome and Microsoft Edge extension** that fills your page with bananas and invites a dancing monkey to celebrate.
 
-## Install
+**[Try the live demo](https://bananify.online)** | **[Download Bananify](https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip)** | **[Release notes](https://github.com/jamesmontemagno/bananify/releases)**
 
-1. Download the extension ZIP from <https://bananify.online/#install> and extract it.
-2. Open `chrome://extensions` (Chrome) or `edge://extensions` (Edge).
+Made by **James Montemagno & Mooch**.
+
+## A little more banana, a little less ordinary
+
+- **Bananas everywhere.** A banana shower, floating decorations, and a little confetti when you click.
+- **A surprise party guest.** Each party invites a brown capuchin, black-and-white capuchin, or golden monkey.
+- **Your page, bananified.** Random images and short text temporarily look like bananas without moving the page layout. Forms, links, navigation, and editable content are left alone.
+- **Easy on, easy off.** Add more bananas, pause the animation, or restore the page. Reduced-motion preferences get a static party.
+
+Want a taste before installing? The [live demo](https://bananify.online) runs the same banana party right in your browser.
+
+## Install in Chrome or Edge
+
+Bananify is currently available as a **manual install**, not through the Chrome Web Store or Microsoft Edge Add-ons.
+
+1. [Download **bananify-extension.zip**](https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip) and extract it.
+2. Open `chrome://extensions` in Chrome or `edge://extensions` in Edge.
 3. Enable **Developer mode**.
-4. Click **Load unpacked** and select the extracted `bananify` folder containing `manifest.json` (or this repository's root when developing).
+4. Click **Load unpacked** and select the extracted **bananify** folder containing `manifest.json`.
 5. Pin **Bananify** from the browser's Extensions menu.
-6. Open a regular website and click the banana.
+6. Visit a regular website and click the banana in your toolbar.
 
-This is a manual install, not a Chrome Web Store or Edge Add-ons listing.
+Keep the extracted folder: the browser loads the extension from there. Use the release ZIP above, not GitHub's automatic source-code archives.
 
-The website download always points to the [latest published release](https://github.com/jamesmontemagno/bananify/releases/latest). [All releases](https://github.com/jamesmontemagno/bananify/releases) retain previous versions, release notes, and SHA-256 checksums. Download **bananify-extension.zip**, not GitHub's automatic source-code archives.
+### Let the party begin
 
-To update an unpacked installation, replace the files in its existing folder with the new release, click **Reload** on the browser's Extensions page, and refresh open website tabs. Unpacked extensions do not update automatically.
+Click the toolbar banana to start or stop the party. **More bananas** turns up the shower, brings a different monkey, and disguises more page elements. **Pause** freezes the animation; **Restore page** removes the party and restores the disguised elements.
 
-Click again to turn it off, or use **Restore page** in the floating controls. Each party invites a random brown capuchin, black-and-white capuchin, or golden monkey. **More bananas** increases the shower, brings a different monkey, and disguises more page elements; **Pause** freezes the animation. Clicking the website tosses a little banana confetti without consuming the click.
+The party stays on the page where you started it and resets when you navigate or reload. Browser settings, extension stores, and some built-in viewers cannot be bananified; a `!` badge and toolbar tooltip explain when a page is off-limits.
 
-Random visible images and short text elements temporarily look like bananas. Their original nodes, dimensions, and event listeners remain intact. Forms, links, navigation, live announcements, editable content, and keyboard-focusable elements are skipped. At most 12 elements are disguised; Restore page restores their previous opacity without overwriting unrelated site updates. Use `data-bananify-protect` on an element or container to keep it unchanged.
+### Updating
 
-The party is per-page and resets on navigation or reload. Browser settings, extension stores, and some built-in viewers don't allow extensions to modify them. A `!` badge and toolbar tooltip explain when a page can't be changed.
+Unpacked extensions do not update automatically. Download the [latest release](https://github.com/jamesmontemagno/bananify/releases/latest), replace the files in your existing extension folder, click **Reload** on the browser's Extensions page, and refresh your website tabs. Every release includes installation notes and a SHA-256 checksum.
 
-## Try it locally
+## Runs locally. No tracking.
 
-With Node.js 22 or newer and the `zip` command (included on macOS and Ubuntu):
+Bananify acts on the tab you choose when you click its toolbar button. It uses only `activeTab` and `scripting` permissions, with no always-on access to your websites.
 
-```sh
-npm start
-```
+The extension processes page content and click positions locally to place the bananas. It makes **no network requests**, sends no page content anywhere, and uses no analytics or persistent storage. The artwork is bundled with the extension. The separate demo website is hosted on GitHub Pages.
 
-Open <http://127.0.0.1:4173>. This builds and serves the production site. The main download points to the latest GitHub Release; the current development ZIP is available at <http://127.0.0.1:4173/downloads/bananify-extension.zip>. Restart the server to rebuild after changes. The preview runs the same artwork and party code as the extension; it does not need to be installed first.
+## Build your own banana party
 
-## Behavior and privacy
+Contributions and bug reports are welcome. [Open an issue](https://github.com/jamesmontemagno/bananify/issues) with your browser, what happened, and how to reproduce it.
 
-- Only `activeTab` and `scripting` permissions; no always-on site access.
-- The extension makes no network requests and uses no analytics, storage, remote libraries, or audio. The website is hosted by GitHub Pages and loads its own static files.
-- Original vector bananas and three monkey variants, bundled locally.
-- An isolated Shadow DOM overlay keeps decoration styles separate. Selected noninteractive elements temporarily receive `opacity: 0 !important`; their original opacity is restored when the party ends.
-- Only the small party control bar intercepts pointer input.
-- Reduced-motion preferences get a static banana party; hidden tabs suspend animation.
-- Particle counts and transformed elements are bounded. Removal cancels animation, disconnects observers, restores disguises, and removes event listeners.
-- A website's fullscreen/top-layer dialogs may appear above the party. The extension does not alter those dialogs.
-
-## Development
+For local development, use **Node.js 22+** and the **`zip` command**:
 
 ```sh
 npm ci
+npm start
+```
+
+Open <http://127.0.0.1:4173> for the demo. Restart the server to rebuild after changes. To develop the extension itself, load this repository's root folder using **Load unpacked**, then reload the extension and refresh your test page after edits.
+
+```sh
 npm run check
 npm test
 npm run build
 npx playwright install chromium
 npm run test:browser
-npm run icons
 ```
 
-The extension has no runtime dependencies or build step. Playwright is a development-only dependency for browser tests. On a Mac with Edge installed, `BROWSER_CHANNEL=msedge npm run test:browser` can use that browser instead of downloading Chromium.
+The extension has no runtime dependencies or build step. Playwright is only used for development. On a Mac with Edge installed, use `BROWSER_CHANNEL=msedge npm run test:browser` instead of downloading Chromium.
 
-After changing files, reload the extension on the Extensions page and refresh the test website.
+`artwork.js` contains the original SVG artwork; `party.js` handles the party and cleanup. Website authors can add `data-bananify-protect` to an element or container to keep it from being disguised.
 
-`artwork.js` supplies the shared original SVG art. `party.js` owns the overlay and its cleanup. `toggle.js` is the toolbar entry point injected by `background.js`. The HTML/CSS is the public website, not an extension popup.
+For project maintenance, see the [release and deployment guide](docs/maintaining.md) and [extension store publishing guide](docs/extension-store-publishing.md).
 
-## CI/CD
+## License
 
-`.github/workflows/pages.yml` runs on pull requests, pushes to `main`, version tags (`v*`), and manual dispatches. It checks version consistency and JavaScript, tests the extension and reproducible ZIP, builds an allowlisted `dist/` directory, and exercises the production site in Chromium at desktop and mobile sizes, including reduced motion, cleanup, and downloads. Screenshots and the extension ZIP are retained as run artifacts.
-
-Only passing builds on `main` deploy to GitHub Pages. Pull requests never deploy and receive read-only permissions. Deployment uses the `github-pages` environment and GitHub's short-lived OIDC token, not a stored personal access token. Actions are commit-pinned; Dependabot opens weekly dependency updates.
-
-Enable **Settings > Pages > Source > GitHub Actions**. The workflow uploads only `dist/`, never the repository, dependencies, or test files. To roll back, revert the unwanted commit on `main`; the pipeline rebuilds and redeploys it.
-
-## Publishing an extension release
-
-Push a stable version tag to run the same CI gates and publish a public GitHub Release:
-
-```sh
-# Set manifest.json's version to 1.2.0, then synchronize npm metadata:
-npm version 1.2.0 --no-git-tag-version
-npm run release:check
-npm test
-# Commit the version changes and push main before tagging.
-git tag -a v1.2.0 -m "Bananify 1.2.0"
-git push origin v1.2.0
-```
-
-Replace `1.2.0` with the version being released. The tag must exactly match `manifest.json`, `package.json`, and both root versions in `package-lock.json`. Stable three-part versions are supported; prerelease tags are rejected.
-
-After all checks pass, the workflow publishes **bananify-extension.zip**, **SHA256SUMS.txt**, installation/update instructions, and GitHub-generated change notes. It promotes the exact tested build artifact rather than rebuilding with publish permissions. Only the release job has `contents: write`; branch and PR builds cannot publish releases. Tag builds do not redeploy the website.
-
-The stable latest-download URL works without changing the website for each release:
-<https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip>
-
-Never move a published version tag or replace its assets. Fixes receive a new patch version. If a first-time publish fails after creating a draft, remove that unfinished draft before rerunning the failed job; an existing published release is never overwritten by this workflow.
-
-For a local release package, run `npm run build && npm run release:package`. The generated `release/` folder contains the ZIP, checksum, and release notes. CI artifacts are temporary; published GitHub Release assets persist until a maintainer deletes them.
-
-## Custom domain: Namecheap
-
-Set **Settings > Pages > Custom domain** to `bananify.online` in GitHub before pointing DNS at Pages. The source `CNAME` documents the intended domain, but Actions deployments use the domain in GitHub's Pages settings.
-
-In Namecheap, open **Domain List > Manage > Advanced DNS > Host Records** and set:
-
-| Type | Host | Value | TTL |
-| --- | --- | --- | --- |
-| A Record | @ | 185.199.108.153 | Automatic |
-| A Record | @ | 185.199.109.153 | Automatic |
-| A Record | @ | 185.199.110.153 | Automatic |
-| A Record | @ | 185.199.111.153 | Automatic |
-| CNAME Record | www | jamesmontemagno.github.io | Automatic |
-
-Replace conflicting parking/URL-redirect records at `@` and `www`; preserve unrelated email, TXT, and verification records. Do not add a wildcard record. If Advanced DNS is managed elsewhere, edit these records at the authoritative DNS provider instead; do not change nameservers without migrating existing records.
-
-GitHub redirects `www.bananify.online` to the apex domain after both are configured. DNS and certificate provisioning can take up to 24 hours. Enable **Enforce HTTPS** in Pages after GitHub issues the certificate. Account-level domain verification is recommended under <https://github.com/settings/pages>; publish the exact TXT record GitHub provides.
+[MIT](LICENSE). Original banana and monkey artwork included.
