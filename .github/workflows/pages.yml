@@ -1,8 +1,9 @@
-name: CI and GitHub Pages
+name: CI, Pages, and Releases
 
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -21,7 +22,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out source
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Set up Node.js
@@ -31,6 +32,10 @@ jobs:
           cache: npm
       - name: Install locked development dependencies
         run: npm ci
+      - name: Verify extension and release versions
+        env:
+          RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+        run: npm run release:check
       - name: Check JavaScript syntax
         run: npm run check
       - name: Test extension and production package
@@ -41,6 +46,8 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Test the published site on desktop and mobile
         run: npm run test:browser
+      - name: Package release ZIP, checksum, and installation notes
+        run: npm run release:package
       - name: Save browser screenshots
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -53,7 +60,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: bananify-extension
-          path: dist/downloads/bananify-extension.zip
+          path: release/
           if-no-files-found: error
       - name: Upload Pages site
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
@@ -79,3 +86,33 @@ jobs:
       - name: Deploy tested artifact
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5
+
+  release:
+    name: Publish extension release
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Download the tested release package
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: bananify-extension
+          path: release
+      - name: Verify the downloaded archive
+        working-directory: release
+        run: sha256sum --check SHA256SUMS.txt
+      - name: Publish versioned assets and release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$RELEASE_TAG" \
+            release/bananify-extension.zip release/SHA256SUMS.txt \
+            --verify-tag \
+            --title "Bananify $RELEASE_TAG" \
+            --notes-file release/RELEASE_NOTES.md \
+            --generate-notes
