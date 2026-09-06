@@ -177,7 +177,7 @@ function randomNonce() {
 
 function activate(context) {
   const decorations = new BananaDecorations();
-  const monkeys = new MonkeyViewProvider(context.extensionUri);
+  const monkeyViewProvider = new MonkeyViewProvider(context.extensionUri);
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 50);
   status.name = "Bananify";
   status.command = "bananify.toggle";
@@ -186,7 +186,7 @@ function activate(context) {
     const config = vscode.workspace.getConfiguration(section);
     const enabled = config.get(enabledKey, false);
     decorations.refresh();
-    monkeys.update();
+    monkeyViewProvider.update();
     status.text = enabled ? "$(sparkle) $(symbol-color) Bananas!" : "$(symbol-color) Bananify";
     status.tooltip = enabled ? "Restore the editor" : "Start a banana party";
     status.show();
@@ -195,7 +195,7 @@ function activate(context) {
   context.subscriptions.push(
     decorations,
     status,
-    vscode.window.registerWebviewViewProvider("bananify.monkeys", monkeys),
+    vscode.window.registerWebviewViewProvider("bananify.monkeys", monkeyViewProvider),
     vscode.commands.registerCommand("bananify.toggle", async () => {
       const config = vscode.workspace.getConfiguration(section);
       const enabled = !config.get(enabledKey, false);
@@ -234,7 +234,12 @@ function activate(context) {
     }),
     vscode.window.onDidChangeVisibleTextEditors(refresh),
     vscode.workspace.onDidChangeTextDocument((event) => {
-      if (vscode.window.visibleTextEditors.some((editor) => editor.document === event.document)) refresh();
+      const lineCountChanged = event.contentChanges.some((change) =>
+        change.text.includes("\n") || change.range.start.line !== change.range.end.line);
+      if (lineCountChanged
+        && vscode.window.visibleTextEditors.some((editor) => editor.document === event.document)) {
+        refresh();
+      }
     }),
   );
 
