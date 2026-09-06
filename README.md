@@ -19,7 +19,12 @@ Want a taste before installing? The [live demo](https://bananify.online) runs th
 
 ## Install in Chrome or Edge
 
-Bananify is currently available as a **manual install**, not through the Chrome Web Store or Microsoft Edge Add-ons.
+| Browser store | Availability |
+| --- | --- |
+| Chrome Web Store | Coming soon |
+| Microsoft Edge Add-ons | Coming soon |
+
+Store links will be added when the listings are available. **You can install manually now** using the ZIP below.
 
 1. [Download **bananify-extension.zip**](https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip) and extract it.
 2. Open `chrome://extensions` in Chrome or `edge://extensions` in Edge.
