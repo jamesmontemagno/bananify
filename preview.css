@@ -59,6 +59,7 @@ input::placeholder { color: #636e5d; }
 .store-listings { list-style: none; padding: 0; margin: 0 0 16px; font: 14px/1.6 system-ui, sans-serif; }
 .store-listings li { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; padding: 12px 0; margin: 0; border-bottom: 1px solid #d2d7c2; }
 .store-listings span { color: var(--green); }
+.store-listings a { color: var(--green); font-weight: 700; text-underline-offset: 4px; }
 ol { padding-left: 21px; margin-top: 0; }
 li { padding-left: 4px; margin-bottom: 8px; }
 code { font-size: 12px; overflow-wrap: anywhere; }

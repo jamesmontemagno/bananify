@@ -22,9 +22,11 @@ Want a taste before installing? The [live demo](https://bananify.online) runs th
 | Browser store | Availability |
 | --- | --- |
 | Chrome Web Store | Coming soon |
-| Microsoft Edge Add-ons | Coming soon |
+| Microsoft Edge Add-ons | [Get for Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/iidhiomigjipgnembnbcndbliniciijh) |
 
-Store links will be added when the listings are available. **You can install manually now** using the ZIP below.
+**Edge is available now:** open the store link above and choose **Get**. No Developer mode is needed. Remove or disable any unpacked copy before installing from the store to avoid running two copies.
+
+Chrome Web Store is coming soon. **Manual installation is available for both browsers** using the ZIP below.
 
 1. [Download **bananify-extension.zip**](https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip) and extract it.
 2. Open `chrome://extensions` in Chrome or `edge://extensions` in Edge.
@@ -42,6 +44,8 @@ Click the toolbar banana to start or stop the party. **More bananas** turns up t
 The party stays on the page where you started it and resets when you navigate or reload. Browser settings, extension stores, and some built-in viewers cannot be bananified; a `!` badge and toolbar tooltip explain when a page is off-limits.
 
 ### Updating
+
+Edge Add-ons installations receive updates through the browser automatically.
 
 Unpacked extensions do not update automatically. Download the [latest release](https://github.com/jamesmontemagno/bananify/releases/latest), replace the files in your existing extension folder, click **Reload** on the browser's Extensions page, and refresh your website tabs. Every release includes installation notes and a SHA-256 checksum.
 
