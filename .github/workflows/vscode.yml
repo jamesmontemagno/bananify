@@ -46,10 +46,14 @@ jobs:
         env:
           RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
         run: npm run release:check
+      - name: Lint JavaScript
+        run: npm run lint
       - name: Check JavaScript
         run: npm run check
       - name: Run tests
         run: npm test
+      - name: Test in VS Code Extension Host
+        run: xvfb-run -a npm run test:smoke
       - name: Package VSIX
         run: npm run package
       - name: Save tested VSIX
@@ -65,6 +69,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: write
     defaults:
       run:
         working-directory: vscode-extension
@@ -88,5 +94,27 @@ jobs:
           path: vscode-extension
       - name: Publish tested VSIX
         env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+          VSCE_PAT: ${{ secrets.VSCE_PAT || secrets.VSCE_TOKEN }}
         run: npm exec -- vsce publish --packagePath bananify-vscode.vsix --pat "$VSCE_PAT"
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
+        with:
+          files: vscode-extension/bananify-vscode.vsix
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+      - name: Check Open VSX publishing
+        id: open-vsx
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          if [ -n "$OVSX_PAT" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "OVSX_PAT is not configured; skipping Open VSX publish."
+          fi
+      - name: Publish tested VSIX to Open VSX
+        if: steps.open-vsx.outputs.enabled == 'true'
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: npm exec -- ovsx publish bananify-vscode.vsix --pat "$OVSX_PAT"

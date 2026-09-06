@@ -1,4 +1,5 @@
 .github/**
+eslint.config.js
 scripts/**
 tests/**
 node_modules/**

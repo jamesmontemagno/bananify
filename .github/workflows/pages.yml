@@ -36,6 +36,8 @@ jobs:
         env:
           RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
         run: npm run release:check
+      - name: Lint JavaScript
+        run: npm run lint
       - name: Check JavaScript syntax
         run: npm run check
       - name: Test extension and production package

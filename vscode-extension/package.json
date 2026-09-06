@@ -39,7 +39,8 @@
   ],
   "activationEvents": [
     "onStartupFinished",
-    "onView:bananify.monkeys"
+    "onView:bananify.monkeys",
+    "onView:bananify.partyExplorer"
   ],
   "contributes": {
     "commands": [
@@ -54,6 +55,24 @@
         "title": "More Bananas",
         "category": "Bananify",
         "icon": "$(add)"
+      },
+      {
+        "command": "bananify.openParty",
+        "title": "Open Banana Party Editor Tab",
+        "category": "Bananify",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "bananify.showPartyExplorer",
+        "title": "Show Banana Party in Explorer",
+        "category": "Bananify",
+        "icon": "$(files)"
+      },
+      {
+        "command": "bananify.pause",
+        "title": "Pause or Resume Banana Decorations",
+        "category": "Bananify",
+        "icon": "$(debug-pause)"
       },
       {
         "command": "bananify.restore",
@@ -82,14 +101,24 @@
       ],
       "view/title": [
         {
-          "command": "bananify.moreBananas",
+          "command": "bananify.openParty",
+          "when": "view == bananify.partyExplorer",
+          "group": "navigation@1"
+        },
+        {
+          "command": "bananify.openParty",
           "when": "view == bananify.monkeys",
           "group": "navigation@1"
         },
         {
+          "command": "bananify.moreBananas",
+          "when": "view == bananify.monkeys",
+          "group": "navigation@2"
+        },
+        {
           "command": "bananify.restore",
           "when": "view == bananify.monkeys && config.bananify.decorations.enabled",
-          "group": "navigation@2"
+          "group": "navigation@3"
         }
       ]
     },
@@ -103,6 +132,14 @@
       ]
     },
     "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "bananify.partyExplorer",
+          "name": "Banana Party",
+          "visibility": "collapsed"
+        }
+      ],
       "bananify": [
         {
           "type": "webview",
@@ -116,6 +153,21 @@
         "label": "Banana Grove",
         "uiTheme": "vs-dark",
         "path": "./themes/banana-grove-color-theme.json"
+      },
+      {
+        "label": "Banana Cream",
+        "uiTheme": "vs",
+        "path": "./themes/banana-cream-color-theme.json"
+      },
+      {
+        "label": "Midnight Banana",
+        "uiTheme": "vs-dark",
+        "path": "./themes/midnight-banana-color-theme.json"
+      },
+      {
+        "label": "Monkey Jungle",
+        "uiTheme": "vs-dark",
+        "path": "./themes/monkey-jungle-color-theme.json"
       }
     ],
     "configuration": {
@@ -128,7 +180,7 @@
         },
         "bananify.decorations.density": {
           "type": "integer",
-          "default": 2,
+          "default": 5,
           "minimum": 1,
           "maximum": 5,
           "description": "Set the number of banana decorations from a tasteful few to a full bunch."
@@ -142,23 +194,45 @@
             "golden"
           ],
           "enumDescriptions": [
-            "Brown capuchin",
-            "Black-and-white capuchin",
-            "Golden monkey"
+            "Mooch, the brown capuchin",
+            "Sebastian, the black-and-white capuchin",
+            "Henry, the golden monkey"
           ],
           "description": "Choose the monkey who lives in the Bananify panel."
+        },
+        "bananify.reducedMotion": {
+          "type": "boolean",
+          "default": false,
+          "description": "Reduce Bananify motion in native VS Code surfaces. Webviews also honor the operating system's reduced-motion preference."
+        },
+        "bananify.celebrations.onSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show a brief, non-intrusive celebration on visible Bananify surfaces after saving a file."
+        },
+        "bananify.celebrations.onSuccessfulTask": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show a brief, non-intrusive celebration on visible Bananify surfaces after a task exits successfully."
         }
       }
     }
   },
   "scripts": {
-    "check": "node --check extension.js && node --check core.js && node --check scripts/check-release.js",
+    "lint": "eslint --max-warnings 0 extension.js core.js artwork.js party-panel.js scripts/*.js tests/*.js tests/smoke/*.js",
+    "check": "node --check extension.js && node --check core.js && node --check artwork.js && node --check party-panel.js && node --check scripts/check-release.js",
     "test": "node --test tests/*.test.js",
+    "test:smoke": "node tests/smoke/run.js",
     "package": "vsce package --no-dependencies --out bananify-vscode.vsix",
     "release:check": "node scripts/check-release.js",
-    "vscode:prepublish": "npm run check && npm test"
+    "vscode:prepublish": "npm run lint && npm run check && npm test"
   },
   "devDependencies": {
-    "@vscode/vsce": "3.9.2"
+    "@eslint/js": "10.0.1",
+    "@vscode/test-electron": "3.1.0",
+    "@vscode/vsce": "3.9.2",
+    "eslint": "10.10.0",
+    "globals": "17.12.0",
+    "ovsx": "1.1.1"
   }
 }

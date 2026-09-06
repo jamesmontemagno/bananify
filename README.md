@@ -48,19 +48,21 @@ The extension processes page content and click positions locally to place the ba
 
 ## Bananify Visual Studio Code
 
-The repository also contains a companion [Visual Studio Code extension](vscode-extension/README.md). It adds opt-in banana editor decorations, the optional **Banana Grove** theme, and an interactive Activity Bar panel with three little monkey pals. It never changes source files and makes no network requests.
+The repository also contains a companion [Visual Studio Code extension](vscode-extension/README.md). It adds opt-in banana and illustrated monkey decorations across visible split editors, four optional color themes, shared Banana Party views in Explorer and an editor tab, and an interactive Activity Bar panel featuring Mooch, Sebastian, and Henry. It never changes source files and makes no network requests.
 
 Build and test it independently:
 
 ```sh
 cd vscode-extension
 npm ci
+npm run lint
 npm run check
 npm test
+npm run test:smoke
 npm run package
 ```
 
-Maintainers can publish the tested VSIX to the Visual Studio Marketplace by adding the `VSCE_PAT` repository secret, updating `vscode-extension/package.json`, and pushing a matching `vscode-vX.Y.Z` tag.
+Maintainers can publish the tested VSIX to the Visual Studio Marketplace by adding the `VSCE_PAT` or `VSCE_TOKEN` repository secret, updating `vscode-extension/package.json`, and pushing a matching `vscode-vX.Y.Z` tag. The workflow also creates a GitHub Release and optionally publishes to Open VSX when `OVSX_PAT` is configured.
 
 ## Build your own banana party
 
@@ -76,6 +78,7 @@ npm start
 Open <http://127.0.0.1:4173> for the demo. Restart the server to rebuild after changes. To develop the extension itself, load this repository's root folder using **Load unpacked**, then reload the extension and refresh your test page after edits.
 
 ```sh
+npm run lint
 npm run check
 npm test
 npm run build

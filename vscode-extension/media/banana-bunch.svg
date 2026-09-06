@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <g transform="translate(-3 7) rotate(-18 40 40)">
+    <path d="M19 12C24 39 44 50 68 25l5 4C63 66 28 77 13 50 6 37 8 24 14 13Z" fill="#ffda35" stroke="#58351e" stroke-width="3"/>
+  </g>
+  <g transform="translate(8 -2) rotate(12 40 40)">
+    <path d="M19 12C24 39 44 50 68 25l5 4C63 66 28 77 13 50 6 37 8 24 14 13Z" fill="#ffd126" stroke="#58351e" stroke-width="3"/>
+  </g>
+</svg>
