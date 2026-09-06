@@ -35,7 +35,7 @@ class BananaPartySurfaces {
         retainContextWhenHidden: true,
       },
     );
-    this.configureWebview(this.panel.webview);
+    this.configureWebview(this.panel.webview, "editor");
     this.panelDisposables.push(
       this.panel.onDidChangeViewState(() => {
         this.state.setVisible(this.anySurfaceVisible());
@@ -55,7 +55,7 @@ class BananaPartySurfaces {
   resolveExplorerView(view) {
     this.explorerView = view;
     view.webview.options = { enableScripts: true, localResourceRoots: [] };
-    this.configureWebview(view.webview);
+    this.configureWebview(view.webview, "explorer");
     this.explorerDisposables.push(
       view.onDidChangeVisibility(() => {
         this.state.setVisible(this.anySurfaceVisible());
@@ -93,8 +93,8 @@ class BananaPartySurfaces {
     this.update();
   }
 
-  configureWebview(webview) {
-    webview.html = partyHtml(webview);
+  configureWebview(webview, surface) {
+    webview.html = partyHtml(webview, surface);
     const disposables = webview === this.panel?.webview
       ? this.panelDisposables
       : this.explorerDisposables;
@@ -171,7 +171,7 @@ class BananaPartySurfaces {
   }
 }
 
-function partyHtml(webview) {
+function partyHtml(webview, surface) {
   const nonce = randomBytes(16).toString("hex");
   const monkeys = Object.keys(monkeyNames)
     .map((monkey) => monkeySvg(monkey, "party-monkey"))
@@ -190,7 +190,7 @@ function partyHtml(webview) {
     :root { color-scheme: light dark; }
     * { box-sizing: border-box; }
     body { min-height: 100vh; margin: 0; overflow: hidden; color: var(--vscode-foreground); background: var(--vscode-editor-background); font-family: var(--vscode-font-family); }
-    .sky { position: fixed; inset: 0; overflow: hidden; pointer-events: none; }
+    .sky, .bursts { position: fixed; inset: 0; overflow: hidden; pointer-events: none; }
     .banana-drop { position: absolute; top: -90px; left: calc(var(--x) * 1%); width: var(--size); opacity: .92; animation: fall var(--duration) linear var(--delay) infinite; will-change: transform, opacity; }
     .banana-drop.variety-1 { filter: hue-rotate(18deg) saturate(.82); }
     .banana-drop.variety-2 { transform: scaleX(-1); filter: brightness(1.08); }
@@ -200,6 +200,13 @@ function partyHtml(webview) {
       12% { opacity: .95; }
       88% { opacity: .95; }
       100% { opacity: 0; transform: translate3d(var(--drift), 118vh, 0) rotate(342deg); }
+    }
+    .burst { position: fixed; left: 0; top: 0; width: var(--size); opacity: 0; animation: burst .72s cubic-bezier(.16, 1, .3, 1) forwards; will-change: transform, opacity; }
+    .burst .banana-art { transform: rotate(var(--tilt)); }
+    @keyframes burst {
+      0% { opacity: 0; transform: translate3d(var(--x), var(--y), 0) scale(.35); }
+      18% { opacity: 1; }
+      100% { opacity: 0; transform: translate3d(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy)), 0) scale(1) rotate(var(--spin)); }
     }
     main { position: relative; z-index: 1; min-height: 100vh; display: grid; place-items: center; padding: clamp(12px, 5vw, 32px); }
     .party-card { width: min(720px, 100%); text-align: center; padding: clamp(18px, 6vw, 56px); border: 1px solid var(--vscode-panel-border); border-radius: 24px; background: color-mix(in srgb, var(--vscode-editor-background) 88%, transparent); box-shadow: 0 16px 48px #0004; }
@@ -227,10 +234,12 @@ function partyHtml(webview) {
     body:not(.active) [data-command="pause"], body.active [data-command="start"] { display: none; }
     body.reduced .motion-note { display: block; }
     body.paused .banana-drop, body.paused .party-monkey *, body.hidden .banana-drop, body.hidden .party-monkey *, body.reduced:not(.motion-override) .banana-drop, body.reduced:not(.motion-override) .party-monkey *, body.reduced:not(.motion-override) .party-card { animation-play-state: paused !important; }
+    body.reduced:not(.motion-override) .burst, body.paused .burst, body.hidden .burst { animation: none; opacity: .8; }
     body.celebrating:not(.reduced) .party-card, body.celebrating.motion-override .party-card { animation: celebrate .7s ease-out; }
     @keyframes celebrate { 45% { transform: translateY(-8px) scale(1.015); box-shadow: 0 24px 64px #0006; } }
     @media (prefers-reduced-motion: reduce) {
       body:not(.motion-override) .banana-drop, body:not(.motion-override) .party-monkey *, body:not(.motion-override) .party-card { animation-play-state: paused !important; }
+      body:not(.motion-override) .burst { animation: none; opacity: .8; }
       body:not(.motion-override) .motion-note { display: block; }
     }
     @media (max-width: 320px) {
@@ -241,10 +250,23 @@ function partyHtml(webview) {
       .message { font-size: 13px; margin-bottom: 14px; }
       .actions { display: grid; }
     }
+    body.explorer { min-height: 0; overflow: auto; }
+    body.explorer main { min-height: 0; display: block; padding: 6px; }
+    body.explorer .party-card { padding: 8px 8px 10px; border-radius: 10px; box-shadow: none; }
+    body.explorer .monkey-stage { display: flex; align-items: end; justify-content: center; width: 100%; height: 96px; padding: 0 4px; }
+    body.explorer .party-monkey { display: block; width: 34%; max-width: 108px; opacity: .62; transform: scale(.82); transform-origin: bottom center; }
+    body.explorer .party-monkey.selected { opacity: 1; transform: scale(1); }
+    body.explorer h1 { margin: 0 0 3px; font-size: 18px; }
+    body.explorer .message { min-height: 1.2em; margin-bottom: 7px; font-size: 12px; }
+    body.explorer .actions { display: flex; gap: 5px; }
+    body.explorer button { min-height: 28px; padding: 4px 8px; font-size: 11px; }
+    body.explorer .motion-note { margin-top: 6px; }
   </style>
 </head>
-<body class="hidden">
+<body class="hidden ${surface}">
   <div class="sky" aria-hidden="true">${bananas}</div>
+  <div class="bursts" aria-hidden="true"></div>
+  <template id="banana-template">${bananaSvg("banana-art")}</template>
   <main>
     <section class="party-card" aria-labelledby="party-title">
       <div class="monkey-stage">${monkeys}</div>
@@ -264,8 +286,13 @@ function partyHtml(webview) {
     const message = document.querySelector(".message");
     const pause = document.querySelector('[data-command="pause"]');
     const motionOverride = document.querySelector("[data-motion-override]");
+    const bursts = document.querySelector(".bursts");
+    const bananaTemplate = document.querySelector("#banana-template");
     const events = new AbortController();
+    const MAX_BURSTS = 30;
+    const burstTimers = new Set();
     let celebrating = false;
+    let celebrationTimer;
     let motionOverrideEnabled = false;
 
     function syncMotion() {
@@ -282,6 +309,32 @@ function partyHtml(webview) {
       if (button.hasAttribute("data-motion-override")) {
         motionOverrideEnabled = !motionOverrideEnabled;
         syncMotion();
+      }
+    }, { signal: events.signal });
+
+    document.addEventListener("pointerdown", (event) => {
+      if (!body.classList.contains("active") || event.button !== 0 || event.target.closest("button")) return;
+      const amount = body.classList.contains("explorer") ? 6 : 10;
+      for (let index = 0; index < amount; index += 1) {
+        while (bursts.childElementCount >= MAX_BURSTS) bursts.firstElementChild.remove();
+        const burst = document.createElement("span");
+        const angle = (-Math.PI * .9) + (Math.PI * .8 * index / Math.max(1, amount - 1));
+        const distance = 42 + ((index * 19) % 54);
+        burst.className = "burst";
+        burst.style.setProperty("--x", event.clientX + "px");
+        burst.style.setProperty("--y", event.clientY + "px");
+        burst.style.setProperty("--dx", Math.cos(angle) * distance + "px");
+        burst.style.setProperty("--dy", Math.sin(angle) * distance + "px");
+        burst.style.setProperty("--spin", ((index % 2 ? 1 : -1) * (90 + index * 23)) + "deg");
+        burst.style.setProperty("--tilt", ((index * 31) % 80 - 40) + "deg");
+        burst.style.setProperty("--size", (22 + (index % 4) * 5) + "px");
+        burst.append(bananaTemplate.content.firstElementChild.cloneNode(true));
+        bursts.append(burst);
+        const timer = setTimeout(() => {
+          burstTimers.delete(timer);
+          burst.remove();
+        }, 850);
+        burstTimers.add(timer);
       }
     }, { signal: events.signal });
 
@@ -305,14 +358,20 @@ function partyHtml(webview) {
       if (data.type === "celebrate" && !celebrating) {
         celebrating = true;
         body.classList.add("celebrating");
-        setTimeout(() => {
+        celebrationTimer = setTimeout(() => {
           body.classList.remove("celebrating");
           celebrating = false;
+          celebrationTimer = undefined;
         }, 700);
       }
     }, { signal: events.signal });
 
-    window.addEventListener("pagehide", () => events.abort(), { once: true });
+    window.addEventListener("pagehide", () => {
+      events.abort();
+      if (celebrationTimer) clearTimeout(celebrationTimer);
+      for (const timer of burstTimers) clearTimeout(timer);
+      burstTimers.clear();
+    }, { once: true });
   </script>
 </body>
 </html>`;

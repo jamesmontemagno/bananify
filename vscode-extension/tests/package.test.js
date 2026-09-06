@@ -91,3 +91,12 @@ test("themes declare readable editor and workbench colors", async () => {
     assert.ok(theme.tokenColors.length >= 5);
   }
 });
+
+test("Party surfaces keep Explorer compact and click bursts bounded", async () => {
+  const source = await readFile(path.join(root, "party-panel.js"), "utf8");
+  assert.match(source, /body\.explorer \.monkey-stage/);
+  assert.match(source, /body\.explorer \.party-monkey \{ display: block/);
+  assert.match(source, /const MAX_BURSTS = 30;/);
+  assert.match(source, /while \(bursts\.childElementCount >= MAX_BURSTS\)/);
+  assert.match(source, /event\.target\.closest\("button"\)/);
+});

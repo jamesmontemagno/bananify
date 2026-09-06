@@ -9,9 +9,10 @@ Give your editor a harmless banana party. Bananify adds stable banana and illust
   mixes of bananas, monkey flourishes, and illustrated gutter art. Choose a lower
   density in Settings when you want a quieter party.
 - Open the Bananify Activity Bar panel to meet Mooch, Sebastian, and Henry, choose a pal, or ask for encouragement.
-- Expand **Banana Party** in Explorer for a vscode-pets-style home beside your files,
-  or run **Bananify: Open Banana Party Editor Tab** for the larger editor version.
-  Both are opt-in, share pause/stop state, and use bounded falling bananas.
+- Expand the compact **Banana Party** section in Explorer for a three-monkey troop
+  beside your files, or run **Bananify: Open Banana Party Editor Tab** for the
+  larger version. Both are opt-in, share pause/stop state, use bounded falling
+  bananas, and burst a small illustrated bunch wherever you click inside the view.
 - Run **Bananify: Choose Banana Theme** to preview Banana Grove, Banana Cream, Midnight Banana, or Monkey Jungle. Bananify never changes your theme automatically.
 - Run **Restore Editor** to remove decorations, stop status animation, and close the Party tab. Source files are never modified.
 
