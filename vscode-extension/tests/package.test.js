@@ -51,6 +51,7 @@ test("manifest contributes commands, a monkey view, and optional themes", async 
   await Promise.all([
     access(path.join(root, manifest.main)),
     access(path.join(root, manifest.icon)),
+    access(path.join(root, "media", "bananify-vscode-screenshot.png")),
     access(path.join(root, manifest.contributes.viewsContainers.activitybar[0].icon)),
     ...manifest.contributes.themes.map(({ path: themePath }) =>
       access(path.join(root, themePath))),

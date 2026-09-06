@@ -2,6 +2,8 @@
 
 Give your editor a harmless banana party. Bananify adds stable banana and illustrated monkey decorations to every visible editor pane, four optional color themes, and a little troop of monkeys in the Activity Bar.
 
+![Bananify showing Sebastian in the Explorer Banana Party alongside banana editor and gutter decorations](media/bananify-vscode-screenshot.png)
+
 ## Features
 
 - Run **Bananify: Toggle Banana Party** from the Command Palette or click the banana status item.
