@@ -7,4 +7,6 @@ release/
 .env.*
 !.env.example
 test-results/
+.vscode-test/
+*.vsix
 .impeccable/

@@ -1,0 +1,7 @@
+.github/**
+eslint.config.js
+scripts/**
+tests/**
+node_modules/**
+package-lock.json
+*.vsix

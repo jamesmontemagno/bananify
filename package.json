@@ -11,6 +11,7 @@
     "build": "node scripts/build.mjs",
     "release:check": "node scripts/release-version.mjs",
     "release:package": "node scripts/package-release.mjs",
+    "lint": "eslint --max-warnings 0 *.js scripts/*.mjs tests/*.test.mjs tests/browser/*.test.mjs",
     "check": "node --check background.js && node --check artwork.js && node --check party.js && node --check toggle.js && node --check preview.js",
     "test": "node --test tests/*.test.mjs",
     "test:browser": "node --test tests/browser/*.test.mjs"
@@ -19,6 +20,9 @@
     "node": ">=22"
   },
   "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.10.0",
+    "globals": "17.12.0",
     "playwright": "1.63.0"
   }
 }

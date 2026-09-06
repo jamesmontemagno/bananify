@@ -1,0 +1,120 @@
+name: VS Code Extension
+
+on:
+  push:
+    branches: [main]
+    tags: ["vscode-v*"]
+    paths:
+      - "vscode-extension/**"
+      - ".github/workflows/vscode.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "vscode-extension/**"
+      - ".github/workflows/vscode.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vscode-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Test and package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: vscode-extension
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: vscode-extension/package-lock.json
+      - name: Install locked development dependencies
+        run: npm ci
+      - name: Verify release version
+        env:
+          RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+        run: npm run release:check
+      - name: Lint JavaScript
+        run: npm run lint
+      - name: Check JavaScript
+        run: npm run check
+      - name: Run tests
+        run: npm test
+      - name: Test in VS Code Extension Host
+        run: xvfb-run -a npm run test:smoke
+      - name: Package VSIX
+        run: npm run package
+      - name: Save tested VSIX
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: bananify-vscode
+          path: vscode-extension/bananify-vscode.vsix
+          if-no-files-found: error
+
+  publish:
+    name: Publish to Visual Studio Marketplace
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/vscode-v')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: vscode-extension
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: vscode-extension/package-lock.json
+      - name: Install locked development dependencies
+        run: npm ci
+      - name: Download tested VSIX
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: bananify-vscode
+          path: vscode-extension
+      - name: Publish tested VSIX
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT || secrets.VSCE_TOKEN }}
+        run: npm exec -- vsce publish --packagePath bananify-vscode.vsix --pat "$VSCE_PAT"
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
+        with:
+          files: vscode-extension/bananify-vscode.vsix
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+      - name: Check Open VSX publishing
+        id: open-vsx
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          if [ -n "$OVSX_PAT" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "OVSX_PAT is not configured; skipping Open VSX publish."
+          fi
+      - name: Publish tested VSIX to Open VSX
+        if: steps.open-vsx.outputs.enabled == 'true'
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: npm exec -- ovsx publish bananify-vscode.vsix --pat "$OVSX_PAT"

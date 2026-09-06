@@ -1,0 +1,238 @@
+{
+  "name": "bananify",
+  "displayName": "Bananify",
+  "version": "0.1.0",
+  "publisher": "vs-publisher-473885",
+  "description": "Bring a banana party, a warm optional theme, and a troop of tiny monkeys to Visual Studio Code.",
+  "author": "James Montemagno & Mooch",
+  "license": "MIT",
+  "icon": "media/banana-128.png",
+  "galleryBanner": {
+    "color": "#2f5d3a",
+    "theme": "dark"
+  },
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Themes",
+    "Other"
+  ],
+  "keywords": [
+    "banana",
+    "monkey",
+    "fun",
+    "theme",
+    "decorations"
+  ],
+  "homepage": "https://bananify.online",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jamesmontemagno/bananify"
+  },
+  "bugs": {
+    "url": "https://github.com/jamesmontemagno/bananify/issues"
+  },
+  "main": "./extension.js",
+  "extensionKind": [
+    "ui"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onView:bananify.monkeys",
+    "onView:bananify.partyExplorer"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "bananify.toggle",
+        "title": "Toggle Banana Party",
+        "category": "Bananify",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "bananify.moreBananas",
+        "title": "More Bananas",
+        "category": "Bananify",
+        "icon": "$(add)"
+      },
+      {
+        "command": "bananify.openParty",
+        "title": "Open Banana Party Editor Tab",
+        "category": "Bananify",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "bananify.showPartyExplorer",
+        "title": "Show Banana Party in Explorer",
+        "category": "Bananify",
+        "icon": "$(files)"
+      },
+      {
+        "command": "bananify.pause",
+        "title": "Pause or Resume Banana Decorations",
+        "category": "Bananify",
+        "icon": "$(debug-pause)"
+      },
+      {
+        "command": "bananify.restore",
+        "title": "Restore Editor",
+        "category": "Bananify",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "bananify.selectTheme",
+        "title": "Choose Banana Theme",
+        "category": "Bananify",
+        "icon": "$(symbol-color)"
+      },
+      {
+        "command": "bananify.cheer",
+        "title": "Ask a Monkey for Encouragement",
+        "category": "Bananify"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "bananify.toggle",
+          "group": "navigation@99"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "bananify.openParty",
+          "when": "view == bananify.partyExplorer",
+          "group": "navigation@1"
+        },
+        {
+          "command": "bananify.openParty",
+          "when": "view == bananify.monkeys",
+          "group": "navigation@1"
+        },
+        {
+          "command": "bananify.moreBananas",
+          "when": "view == bananify.monkeys",
+          "group": "navigation@2"
+        },
+        {
+          "command": "bananify.restore",
+          "when": "view == bananify.monkeys && config.bananify.decorations.enabled",
+          "group": "navigation@3"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "bananify",
+          "title": "Bananify",
+          "icon": "media/banana-activity.svg"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "bananify.partyExplorer",
+          "name": "Banana Party",
+          "visibility": "collapsed"
+        }
+      ],
+      "bananify": [
+        {
+          "type": "webview",
+          "id": "bananify.monkeys",
+          "name": "Monkey Business"
+        }
+      ]
+    },
+    "themes": [
+      {
+        "label": "Banana Grove",
+        "uiTheme": "vs-dark",
+        "path": "./themes/banana-grove-color-theme.json"
+      },
+      {
+        "label": "Banana Cream",
+        "uiTheme": "vs",
+        "path": "./themes/banana-cream-color-theme.json"
+      },
+      {
+        "label": "Midnight Banana",
+        "uiTheme": "vs-dark",
+        "path": "./themes/midnight-banana-color-theme.json"
+      },
+      {
+        "label": "Monkey Jungle",
+        "uiTheme": "vs-dark",
+        "path": "./themes/monkey-jungle-color-theme.json"
+      }
+    ],
+    "configuration": {
+      "title": "Bananify",
+      "properties": {
+        "bananify.decorations.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show banana decorations in visible text editors."
+        },
+        "bananify.decorations.density": {
+          "type": "integer",
+          "default": 5,
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Set the number of banana decorations from a tasteful few to a full bunch."
+        },
+        "bananify.monkey": {
+          "type": "string",
+          "default": "brown",
+          "enum": [
+            "brown",
+            "black-and-white",
+            "golden"
+          ],
+          "enumDescriptions": [
+            "Mooch, the brown capuchin",
+            "Sebastian, the black-and-white capuchin",
+            "Henry, the golden monkey"
+          ],
+          "description": "Choose the monkey who lives in the Bananify panel."
+        },
+        "bananify.reducedMotion": {
+          "type": "boolean",
+          "default": false,
+          "description": "Reduce Bananify motion in native VS Code surfaces. Webviews also honor the operating system's reduced-motion preference."
+        },
+        "bananify.celebrations.onSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show a brief, non-intrusive celebration on visible Bananify surfaces after saving a file."
+        },
+        "bananify.celebrations.onSuccessfulTask": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show a brief, non-intrusive celebration on visible Bananify surfaces after a task exits successfully."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "lint": "eslint --max-warnings 0 extension.js core.js artwork.js party-panel.js scripts/*.js tests/*.js tests/smoke/*.js",
+    "check": "node --check extension.js && node --check core.js && node --check artwork.js && node --check party-panel.js && node --check scripts/check-release.js",
+    "test": "node --test tests/*.test.js",
+    "test:smoke": "node tests/smoke/run.js",
+    "package": "vsce package --no-dependencies --out bananify-vscode.vsix",
+    "release:check": "node scripts/check-release.js",
+    "vscode:prepublish": "npm run lint && npm run check && npm test"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@vscode/test-electron": "3.1.0",
+    "@vscode/vsce": "3.9.2",
+    "eslint": "10.10.0",
+    "globals": "17.12.0",
+    "ovsx": "1.1.1"
+  }
+}

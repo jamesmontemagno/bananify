@@ -55,6 +55,24 @@ Bananify acts on the tab you choose when you click its toolbar button. It uses o
 
 The extension processes page content and click positions locally to place the bananas. It makes **no network requests**, sends no page content anywhere, and uses no analytics or persistent storage. The artwork is bundled with the extension. The separate demo website is hosted on GitHub Pages.
 
+## Bananify Visual Studio Code
+
+The repository also contains a companion [Visual Studio Code extension](vscode-extension/README.md). It adds opt-in banana and illustrated monkey decorations across visible split editors, four optional color themes, shared Banana Party views in Explorer and an editor tab, and an interactive Activity Bar panel featuring Mooch, Sebastian, and Henry. It never changes source files and makes no network requests.
+
+Build and test it independently:
+
+```sh
+cd vscode-extension
+npm ci
+npm run lint
+npm run check
+npm test
+npm run test:smoke
+npm run package
+```
+
+Maintainers can publish the tested VSIX to the Visual Studio Marketplace by adding the `VSCE_PAT` or `VSCE_TOKEN` repository secret, updating `vscode-extension/package.json`, and pushing a matching `vscode-vX.Y.Z` tag. The workflow also creates a GitHub Release and optionally publishes to Open VSX when `OVSX_PAT` is configured.
+
 ## Build your own banana party
 
 Contributions and bug reports are welcome. [Open an issue](https://github.com/jamesmontemagno/bananify/issues) with your browser, what happened, and how to reproduce it.
@@ -69,6 +87,7 @@ npm start
 Open <http://127.0.0.1:4173> for the demo. Restart the server to rebuild after changes. To develop the extension itself, load this repository's root folder using **Load unpacked**, then reload the extension and refresh your test page after edits.
 
 ```sh
+npm run lint
 npm run check
 npm test
 npm run build
