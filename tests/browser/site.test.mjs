@@ -38,6 +38,18 @@ for (const viewport of [{ width: 1365, height: 1000 }, { width: 375, height: 812
       await page.goto(baseURL);
       assert.match(await page.title(), /^Bananify /);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+      const stores = page.getByRole("list", { name: "Browser store availability" });
+      assert.deepEqual(await stores.getByRole("listitem").allTextContents(), [
+        "Chrome Web StoreComing soon", "Microsoft Edge Add-onsGet for Microsoft Edge",
+      ]);
+      assert.equal(await stores.getByRole("listitem").first().locator("a, button, [tabindex]").count(), 0);
+      assert.equal(await stores.getByRole("link").count(), 1);
+      assert.equal(await stores.getByRole("link", { name: "Get for Microsoft Edge" }).getAttribute("href"),
+        "https://microsoftedge.microsoft.com/addons/detail/iidhiomigjipgnembnbcndbliniciijh");
+      for (const row of await stores.getByRole("listitem").all()) {
+        const bounds = await row.boundingBox();
+        assert.ok(bounds && bounds.x >= 0 && bounds.x + bounds.width <= viewport.width);
+      }
       const body = await page.locator("body").innerHTML();
       await page.getByRole("button", { name: "Bananify this page" }).click();
       assert.equal(await page.evaluate(() => bananaFeed.active), true);

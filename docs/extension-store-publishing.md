@@ -19,7 +19,7 @@ This document is a publishing guide, not confirmation of a store submission. Sto
 | CI/CD | Checks, browser tests, Pages deployment, and tag-triggered GitHub Releases |
 | Store packaging | Separate root-manifest ZIP, CI artifact, and future release asset |
 | Store submission automation | Not implemented; upload packages manually |
-| Store accounts and listing IDs | Must be created or confirmed by James |
+| Store listing identifiers | Recorded in the [submission kit](../store/README.md#5-keep-these-non-secret-details-for-later-api-setup); Edge is live, Chrome public URL still pending |
 | Public privacy policy | Must be written, published, and linked before submission |
 
 **Use `bananify-store.zip` for store upload**, not the nested `bananify-extension.zip`. New builds create both; the already-published `v1.1.0` assets remain unchanged. The [store submission kit](../store/README.md) includes upload-sized graphics, runtime screenshots, listing text, and fields to fill in.

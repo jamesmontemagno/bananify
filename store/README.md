@@ -152,15 +152,21 @@ Fill these in after creating the listings. Never commit credentials.
 | Item | Your value |
 | --- | --- |
 | Chrome publisher ID | |
-| Chrome extension/item ID | |
-| Chrome public listing URL | |
+| Chrome extension/item ID | `ahlgjleaimihpbcpadijmmeeokpfnflc` |
+| Chrome public listing URL | Pending; confirm the live URL before linking from the website |
 | Google Cloud project ID for Chrome API | |
-| Edge product ID (Partner Center) | |
-| Edge public listing URL | |
+| Edge product ID (Partner Center) | `0RDCKCQWS0QS` |
+| Edge public listing URL | https://microsoftedge.microsoft.com/addons/detail/iidhiomigjipgnembnbcndbliniciijh |
 | Published privacy policy URL | |
 | First approved version in each store | |
 
 Later automation will need Chrome Web Store API v2 authorization and Edge Update API v1.1 credentials. Configure those directly in protected GitHub environment secrets when ready, not in this file. No API workflows, credentials, or automatic store submission are included now.
+
+### Replace the website placeholders when the stores are live
+
+The website and README link to the live **Microsoft Edge Add-ons** listing. **Chrome Web Store** still shows **Coming soon**, with no placeholder link. Edge's public add-on ID is `iidhiomigjipgnembnbcndbliniciijh`; its Partner Center product ID is separate. Chrome's supplied item ID alone does not establish public availability.
+
+Once each listing is publicly accessible, replace its entry in `index.html` (`.store-listings`) and the README availability table with the verified listing link. Update the corresponding browser assertions, this table, and installation guidance together. Keep the manual ZIP as an alternative, and warn existing unpacked-install users to remove or disable that copy before installing from a store. Do not change the other store to available until it is also live.
 
 ## Before you click Submit
 
