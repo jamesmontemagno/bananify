@@ -26,14 +26,16 @@ git push origin v1.2.0
 
 Replace `1.2.0` with the version being released. The tag must exactly match `manifest.json`, `package.json`, and both root versions in `package-lock.json`. Stable three-part versions are supported; prerelease tags are rejected.
 
-After all checks pass, the workflow publishes **bananify-extension.zip**, **SHA256SUMS.txt**, installation/update instructions, and GitHub-generated change notes. It promotes the exact tested build artifact rather than rebuilding with publish permissions. Only the release job has `contents: write`; branch and PR builds cannot publish releases. Tag builds do not redeploy the website.
+After all checks pass, the workflow publishes **bananify-extension.zip** (manual installation), **bananify-store.zip** (root-level manifest for store upload), **SHA256SUMS.txt** covering both ZIPs, installation/update instructions, and GitHub-generated change notes. It promotes the exact tested build artifact rather than rebuilding with publish permissions. Only the release job has `contents: write`; branch and PR builds cannot publish releases. Tag builds do not redeploy the website.
 
 The stable latest-download URL works without changing the website for each release:
 <https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip>
 
 Never move a published version tag or replace its assets. Fixes receive a new patch version. If a first-time publish fails after creating a draft, remove that unfinished draft before rerunning the failed job; an existing published release is never overwritten by this workflow.
 
-For a local release package, run `npm run build && npm run release:package`. The generated `release/` folder contains the ZIP, checksum, and release notes. CI artifacts are temporary; published GitHub Release assets persist until a maintainer deletes them.
+For local release packages, run `npm run build && npm run release:package`. The generated `release/` folder contains both ZIPs, checksums, and release notes. CI artifacts are temporary; published GitHub Release assets persist until a maintainer deletes them.
+
+The [store submission kit](../store/README.md) contains listing text and upload-sized assets. CI uploads it separately as `bananify-store-listing`; it is not included in the installable extension. No workflow calls a store API or submits for review. Existing releases, including `v1.1.0`, are not modified by these packaging changes.
 
 ## Local preview and artwork
 

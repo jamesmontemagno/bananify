@@ -1,5 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { deflateSync } from "node:zlib";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 // Rasterize an original crescent at 4x resolution; no build dependencies.
 function crc32(bytes) {
@@ -19,7 +21,7 @@ function chunk(name, data) {
   result.writeUInt32BE(crc32(Buffer.concat([type, data])), data.length + 8);
   return result;
 }
-function icon(size) {
+export function icon(size) {
   const scanlines = Buffer.alloc((size * 4 + 1) * size);
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
@@ -57,8 +59,10 @@ function icon(size) {
     chunk("IHDR", header), chunk("IDAT", deflateSync(scanlines)), chunk("IEND", Buffer.alloc(0)),
   ]);
 }
-await mkdir(new URL("../icons/", import.meta.url), { recursive: true });
-for (const size of [16, 32, 48, 128]) {
-  await writeFile(new URL(`../icons/banana-${size}.png`, import.meta.url), icon(size));
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await mkdir(new URL("../icons/", import.meta.url), { recursive: true });
+  for (const size of [16, 32, 48, 128]) {
+    await writeFile(new URL(`../icons/banana-${size}.png`, import.meta.url), icon(size));
+  }
+  console.log("Generated banana icons at 16, 32, 48, and 128px.");
 }
-console.log("Generated banana icons at 16, 32, 48, and 128px.");

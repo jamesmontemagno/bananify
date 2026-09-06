@@ -9,20 +9,38 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 export async function packageRelease() {
   const version = await readReleaseVersion(process.env.RELEASE_TAG || "");
-  const archive = join(root, "dist/downloads/bananify-extension.zip");
-  const packagedManifest = JSON.parse(execFileSync("unzip", ["-p", archive, "bananify/manifest.json"], { encoding: "utf8" }));
-  if (packagedManifest.name !== "Bananify" || packagedManifest.version !== version) {
-    throw new Error("The extension ZIP is stale. Run npm run build before packaging the release.");
+  const archives = [
+    ["bananify-extension.zip", "bananify/manifest.json"],
+    ["bananify-store.zip", "manifest.json"],
+  ];
+  for (const [name, manifestPath] of archives) {
+    const archive = join(root, "dist/downloads", name);
+    const packagedManifest = JSON.parse(execFileSync("unzip", ["-p", archive, manifestPath], { encoding: "utf8" }));
+    if (packagedManifest.name !== "Bananify" || packagedManifest.version !== version) {
+      throw new Error(`The ${name} ZIP is stale. Run npm run build before packaging the release.`);
+    }
   }
   const output = join(root, "release");
   await rm(output, { recursive: true, force: true });
   await mkdir(output);
-  await cp(archive, join(output, "bananify-extension.zip"));
-  const checksum = createHash("sha256").update(await readFile(archive)).digest("hex");
-  await writeFile(join(output, "SHA256SUMS.txt"), `${checksum}  bananify-extension.zip\n`);
+  const checksums = [];
+  for (const [name] of archives) {
+    const archive = join(root, "dist/downloads", name);
+    await cp(archive, join(output, name));
+    const checksum = createHash("sha256").update(await readFile(archive)).digest("hex");
+    checksums.push(`${checksum}  ${name}\n`);
+  }
+  await writeFile(join(output, "SHA256SUMS.txt"), checksums.join(""));
   await writeFile(join(output, "RELEASE_NOTES.md"), `## Bananify ${version}
 
 Download **bananify-extension.zip** from the assets below, not GitHub's automatic source-code archives.
+
+### Choose the right ZIP
+
+- **bananify-extension.zip** is for manual installation. Extract it to get a **bananify** folder, then load that folder as described below.
+- **bananify-store.zip** is for maintainers submitting manually to the **Chrome Web Store** or **Microsoft Edge Add-ons** dashboard. Upload this ZIP directly: \`manifest.json\` is at its root. It contains the same extension files as the manual-install ZIP, without the enclosing folder.
+
+CI only prepares these packages; it does not submit to either store or use store publishing APIs.
 
 ### Install in Chrome or Edge
 
@@ -37,7 +55,7 @@ Replace the files in your existing unpacked extension folder with this release, 
 
 This is a manual install, not a browser-store listing. Unpacked extensions do not update automatically.
 
-**SHA256SUMS.txt** contains the SHA-256 checksum of the extension ZIP.
+**SHA256SUMS.txt** contains the SHA-256 checksums of both ZIPs.
 
 [Try Bananify](https://bananify.online/) · [All releases](https://github.com/jamesmontemagno/bananify/releases)
 `);

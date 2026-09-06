@@ -1,12 +1,13 @@
 {
   "name": "bananify",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "description": "A zero-dependency, one-click banana party browser extension.",
   "scripts": {
     "start": "node scripts/preview-server.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "social": "node scripts/generate-social.mjs",
+    "store:assets": "node scripts/generate-store-assets.mjs",
     "build": "node scripts/build.mjs",
     "release:check": "node scripts/release-version.mjs",
     "release:package": "node scripts/package-release.mjs",

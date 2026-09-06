@@ -1,0 +1,15 @@
+{
+  "version": "1.1.1",
+  "source": "dist/downloads/bananify-store.zip",
+  "runtimeSHA256": {
+    "artwork.js": "f4b4a6d01a8ba8b81e3c17f8a2a918348ec02326dd89c42469e96b08937f04db",
+    "party.js": "72a7da4ee1400aa8ee5699c9e9e7416a9d6cf370477fad7efce0483619c6f441",
+    "toggle.js": "8fbcbbc60bb569cbcd989796950b51f253eb2e8ee26c016ed7494745a0b8c526"
+  },
+  "method": "Packaged artwork.js, party.js, and toggle.js executed on store/source/sample.html; toolbar and store installation are not shown.",
+  "screenshots": {
+    "width": 1280,
+    "height": 800
+  },
+  "monkey": "Randomly selected by the unmodified runtime."
+}

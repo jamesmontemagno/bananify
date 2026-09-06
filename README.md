@@ -71,7 +71,7 @@ The extension has no runtime dependencies or build step. Playwright is only used
 
 `artwork.js` contains the original SVG artwork; `party.js` handles the party and cleanup. Website authors can add `data-bananify-protect` to an element or container to keep it from being disguised.
 
-For project maintenance, see the [release and deployment guide](docs/maintaining.md) and [extension store publishing guide](docs/extension-store-publishing.md).
+For project maintenance, see the [release and deployment guide](docs/maintaining.md), [store submission kit with artwork and listing copy](store/README.md), and [extension store publishing guide](docs/extension-store-publishing.md).
 
 ## License
 

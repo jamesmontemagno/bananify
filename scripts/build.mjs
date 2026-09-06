@@ -1,4 +1,5 @@
 import { cp, mkdir, mkdtemp, readFile, rm, utimes, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -26,7 +27,6 @@ export async function buildSite() {
       await cp(join(root, file), join(output, file));
     }
     await writeFile(join(output, ".nojekyll"), "");
-    const archiveFiles = extensionFiles.map((file) => `bananify/${file}`).sort();
     for (const file of extensionFiles) {
       const destination = join(temporary, "bananify", file);
       await mkdir(dirname(destination), { recursive: true });
@@ -34,11 +34,22 @@ export async function buildSite() {
       // Stable timestamps and stripped metadata make the download reproducible.
       await utimes(destination, new Date("2000-01-01T00:00:00Z"), new Date("2000-01-01T00:00:00Z"));
     }
-    execFileSync("zip", ["-X", "-q", join(output, "downloads/bananify-extension.zip"), ...archiveFiles], {
-      cwd: temporary,
-      env: { ...process.env, TZ: "UTC" },
-      stdio: "pipe",
-    });
+    const checksums = [];
+    for (const [name, prefix] of [
+      ["bananify-extension.zip", "bananify/"],
+      ["bananify-store.zip", ""],
+    ]) {
+      const archive = join(output, "downloads", name);
+      const archiveFiles = extensionFiles.map((file) => `${prefix}${file}`).sort();
+      execFileSync("zip", ["-X", "-q", archive, ...archiveFiles], {
+        cwd: prefix ? temporary : join(temporary, "bananify"),
+        env: { ...process.env, TZ: "UTC" },
+        stdio: "pipe",
+      });
+      const checksum = createHash("sha256").update(await readFile(archive)).digest("hex");
+      checksums.push(`${checksum}  ${name}\n`);
+    }
+    await writeFile(join(output, "downloads/SHA256SUMS.txt"), checksums.join(""));
     return output;
   } finally {
     await rm(temporary, { recursive: true, force: true });
@@ -46,5 +57,5 @@ export async function buildSite() {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  console.log(`Built Bananify site and extension ZIP in ${await buildSite()}`);
+  console.log(`Built Bananify site, manual-install ZIP, and store ZIP in ${await buildSite()}`);
 }

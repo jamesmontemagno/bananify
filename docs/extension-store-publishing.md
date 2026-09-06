@@ -1,6 +1,6 @@
 # Publishing Bananify to extension stores
 
-Last reviewed: September 4, 2026.
+Last reviewed: September 6, 2026.
 
 This guide covers the **Chrome Web Store** and **Microsoft Edge Add-ons**. Publish the first version manually in each store, then automate updates after the listings and publisher accounts are established. GitHub Releases remain available for people who prefer installing an unpacked extension.
 
@@ -12,16 +12,17 @@ This document is a publishing guide, not confirmation of a store submission. Sto
 | --- | --- |
 | Website | <https://bananify.online> |
 | Source | <https://github.com/jamesmontemagno/bananify> |
-| Published GitHub release | [v1.1.0](https://github.com/jamesmontemagno/bananify/releases/tag/v1.1.0) |
+| GitHub releases | [Latest release](https://github.com/jamesmontemagno/bananify/releases/latest) |
 | Runtime | Manifest V3; all executable code and artwork bundled locally |
 | Permissions | `activeTab` and `scripting` |
 | License | MIT; include the existing `LICENSE` in all distributions |
 | CI/CD | Checks, browser tests, Pages deployment, and tag-triggered GitHub Releases |
-| Store submission automation | Not implemented |
+| Store packaging | Separate root-manifest ZIP, CI artifact, and future release asset |
+| Store submission automation | Not implemented; upload packages manually |
 | Store accounts and listing IDs | Must be created or confirmed by James |
 | Public privacy policy | Must be written, published, and linked before submission |
 
-**The current GitHub release ZIP is for manual installation, not direct store upload.** It contains `bananify/manifest.json`. Prepare a separate store ZIP with `manifest.json` at its root.
+**Use `bananify-store.zip` for store upload**, not the nested `bananify-extension.zip`. New builds create both; the already-published `v1.1.0` assets remain unchanged. The [store submission kit](../store/README.md) includes upload-sized graphics, runtime screenshots, listing text, and fields to fill in.
 
 ## 1. Set up publisher accounts
 
@@ -46,7 +47,7 @@ Account registration, payments, identity verification, and agreement acceptance 
 
 ## 2. Prepare the correct store package
 
-Build from the exact version intended for submission, ideally a clean checkout of its Git tag. For the initial release, that is `v1.1.0`. Do not upload a build containing unrelated uncommitted work.
+Build from the exact version intended for submission, ideally a clean checkout of a new Git tag that includes the store-packaging changes. Do not upload a build containing unrelated uncommitted work. The old `v1.1.0` tag predates automated store packaging.
 
 Run these commands from the repository root:
 
@@ -63,33 +64,7 @@ npm run release:package
 
 On a Mac with Edge installed, `BROWSER_CHANNEL=msedge npm run test:browser` can replace the Chromium installation/browser-test commands.
 
-The current build creates `release/bananify-extension.zip`. To repackage its tested extension files for the stores, run this in Bash or Zsh on macOS/Linux with `zip` and `unzip` installed:
-
-```sh
-(
-  set -eu
-  repo_root="$(pwd)"
-  version="$(node scripts/release-version.mjs)"
-  store_zip="$repo_root/release/bananify-store-$version.zip"
-  staging="$(mktemp -d)"
-  trap 'rm -rf "$staging"' EXIT
-
-  if [ -e "$store_zip" ]; then
-    printf 'Already exists: %s\nUse a fresh output path instead.\n' "$store_zip" >&2
-    exit 1
-  fi
-
-  unzip -q release/bananify-extension.zip -d "$staging"
-  (
-    cd "$staging/bananify"
-    zip -X -q -r "$store_zip" .
-  )
-  unzip -t "$store_zip"
-  unzip -Z1 "$store_zip"
-)
-```
-
-The output for version 1.1.0 is `release/bananify-store-1.1.0.zip`. This is a **manual preparation command**, not an existing store-upload CI job. The current `release:package` command rebuilds the `release/` directory, so create the store ZIP afterward.
+The build creates both ZIP layouts from the same allowlisted files. `release:package` copies them to `release/` and writes checksums for both. Upload **`release/bananify-store.zip`** to either dashboard. CI retains both in the `bananify-extension` artifact, and future tagged releases attach both. `release:package` recreates `release/`, so do not keep handwritten notes there.
 
 The store ZIP must contain:
 
@@ -113,7 +88,7 @@ Before submitting, extract this store ZIP into a separate temporary folder and l
 
 ## 3. Prepare listing assets
 
-Use the same original banana/capuchin artwork as the website. Show the actual extension operating on a page, not just the website's simulated demonstration.
+The [store assets folder](../store/assets/) contains the original banana/capuchin artwork at store sizes and before/after screenshots of the packaged runtime on a controlled sample page. The capture method is documented in the kit; no browser toolbar or store installation is depicted.
 
 | Asset | Chrome Web Store | Edge Add-ons |
 | --- | --- | --- |
@@ -123,18 +98,18 @@ Use the same original banana/capuchin artwork as the website. Show the actual ex
 | Marquee promotional tile | 1400 x 560, optional | Not needed for the initial Edge submission |
 | Promotional video | Optional | Not needed for the initial submission |
 
-`icons/banana-128.png` is available now; review it against store icon padding/visual-weight guidance. Render a larger original for Edge if desired rather than enlarging the small bitmap.
+The kit includes 128-pixel and 300-pixel icons rendered from the original icon generator, not upscaled bitmaps. Review dashboard previews for padding and visual weight.
 
-**Do not upload `social-card.png` as a store screenshot or small tile:** it is 1200 x 630 and serves a different purpose. The existing full-page CI screenshots also have the wrong dimensions. Capture new 1280 x 800 screenshots with no extra border or padding.
+**Do not upload `social-card.png` as a store screenshot or small tile:** it is 1200 x 630 and serves a different purpose. Use the kit's 1280 x 800 screenshots and 440 x 280 promotional tile instead.
 
-Suggested screenshot set:
+Optional additional screenshots beyond the included party/restored pair:
 
 1. Banana rain and a black-and-white capuchin on a normal page.
 2. The other monkey guests and **More bananas**.
 3. An image or short text disguised as a banana, followed by the restored page.
 4. Working controls and the paused party.
 
-Use a controlled sample page without personal information, private account details, or third-party imagery you cannot republish. Suggested future asset location: `docs/store-assets/`; these assets have not been generated by this guide.
+Use a controlled sample page without personal information, private account details, or third-party imagery you cannot republish. Run `npm run build` and `npm run store:assets` to refresh the included captures; see the kit for browser setup and provenance.
 
 ## 4. Prepare listing copy and URLs
 
@@ -257,9 +232,9 @@ Keep the current tag-driven GitHub Release workflow. An uploaded GitHub ZIP is *
 
 For each store update, increase the manifest version and synchronize npm metadata. This repository validates `manifest.json`, `package.json`, and both root versions in `package-lock.json`. Use a version higher than the previous uploaded store package; never replace an already-published tag or silently change its assets.
 
-Recommended next CI enhancement, not currently implemented:
+Package generation and checksums are implemented. Store API submission is intentionally deferred. Recommended next steps:
 
-1. Produce both `bananify-extension.zip` for manual installation and a store-rooted ZIP from the same tested release, with checksums.
+1. Use the existing `bananify-extension.zip` and `bananify-store.zip` from the tested release, with checksums.
 2. Add a manually approved store-publishing workflow that accepts an existing release tag and downloads/verifies that release's artifacts. Do not rebuild an unpinned `main` branch.
 3. Use separate protected GitHub environments for Chrome and Edge. Store credentials in environment secrets, not source or release assets, and never expose them to pull-request jobs.
 4. Upload packages and monitor upload status before submitting for review. Treat uploaded, in-review, approved, and publicly available as different states.

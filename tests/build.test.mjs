@@ -7,7 +7,7 @@ import { buildSite } from "../scripts/build.mjs";
 import { packageRelease } from "../scripts/package-release.mjs";
 import { createHash } from "node:crypto";
 
-test("production build publishes only the website and a complete extension download", async () => {
+test("production build publishes only the website and reproducible manual-install and store packages", async () => {
   const output = await buildSite();
   assert.deepEqual((await readdir(output)).sort(), [
     ".nojekyll", "CNAME", "LICENSE", "artwork.js", "downloads", "icons", "index.html",
@@ -33,21 +33,65 @@ test("production build publishes only the website and a complete extension downl
     if (path.startsWith("https:") || path.startsWith("#") || path === "./") continue;
     await readFile(join(output, path));
   }
-  const zip = join(output, "downloads/bananify-extension.zip");
-  const entries = execFileSync("unzip", ["-Z1", zip], { encoding: "utf8" }).trim().split("\n");
-  assert.deepEqual(entries, [
+  const extensionFiles = [
     "LICENSE", "artwork.js", "background.js", "icons/banana-128.png", "icons/banana-16.png",
     "icons/banana-32.png", "icons/banana-48.png", "manifest.json", "party.js", "toggle.js",
-  ].map((file) => `bananify/${file}`));
-  const manifest = JSON.parse(execFileSync("unzip", ["-p", zip, "bananify/manifest.json"], { encoding: "utf8" }));
-  assert.equal(execFileSync("unzip", ["-p", zip, "bananify/LICENSE"], { encoding: "utf8" }), await readFile(join(output, "LICENSE"), "utf8"));
-  assert.equal(manifest.name, "Bananify");
-  assert.deepEqual(manifest.permissions, ["activeTab", "scripting"]);
-  const first = await readFile(zip);
+  ];
+  const archives = [
+    ["bananify-extension.zip", "bananify/"],
+    ["bananify-store.zip", ""],
+  ];
+  assert.deepEqual((await readdir(join(output, "downloads"))).sort(), [
+    "SHA256SUMS.txt", "bananify-extension.zip", "bananify-store.zip",
+  ]);
+  const originalArchives = new Map();
+  const manualFiles = new Map();
+  const sourceManifest = JSON.parse(await readFile(new URL("../manifest.json", import.meta.url), "utf8"));
+  for (const [name, prefix] of archives) {
+    const zip = join(output, "downloads", name);
+    const entries = execFileSync("unzip", ["-Z1", zip], { encoding: "utf8" }).trim().split("\n");
+    assert.deepEqual(entries, extensionFiles.map((file) => `${prefix}${file}`));
+    const timestamps = execFileSync("unzip", ["-Z", "-T", zip], { encoding: "utf8" });
+    assert.equal([...timestamps.matchAll(/\b20000101\.000000\b/g)].length, extensionFiles.length);
+    for (const file of extensionFiles) {
+      const content = execFileSync("unzip", ["-p", zip, `${prefix}${file}`]);
+      assert.deepEqual(content, await readFile(new URL(`../${file}`, import.meta.url)), `${name}: ${file} matches source`);
+      if (prefix) manualFiles.set(file, content);
+      else assert.deepEqual(content, manualFiles.get(file), `${file} is identical in both ZIPs`);
+    }
+    const manifest = JSON.parse(execFileSync("unzip", ["-p", zip, `${prefix}manifest.json`], { encoding: "utf8" }));
+    assert.deepEqual(manifest, sourceManifest);
+    assert.equal(manifest.name, "Bananify");
+    assert.deepEqual(manifest.permissions, ["activeTab", "scripting"]);
+    originalArchives.set(name, await readFile(zip));
+  }
+  const expectedChecksums = archives.map(([name]) =>
+    `${createHash("sha256").update(originalArchives.get(name)).digest("hex")}  ${name}\n`
+  ).join("");
+  assert.equal(await readFile(join(output, "downloads/SHA256SUMS.txt"), "utf8"), expectedChecksums);
   const release = await packageRelease();
-  assert.deepEqual(await readFile(join(release, "bananify-extension.zip")), first);
-  assert.equal(await readFile(join(release, "SHA256SUMS.txt"), "utf8"), `${createHash("sha256").update(first).digest("hex")}  bananify-extension.zip\n`);
-  assert.match(await readFile(join(release, "RELEASE_NOTES.md"), "utf8"), /Unpacked extensions do not update automatically/);
+  assert.deepEqual((await readdir(release)).sort(), [
+    "RELEASE_NOTES.md", "SHA256SUMS.txt", "bananify-extension.zip", "bananify-store.zip",
+  ]);
+  for (const [name] of archives) {
+    assert.deepEqual(await readFile(join(release, name)), originalArchives.get(name));
+  }
+  assert.equal(await readFile(join(release, "SHA256SUMS.txt"), "utf8"), expectedChecksums);
+  const notes = await readFile(join(release, "RELEASE_NOTES.md"), "utf8");
+  assert.match(notes, /Unpacked extensions do not update automatically/);
+  assert.match(notes, /bananify-extension\.zip\*\* is for manual installation/);
+  assert.match(notes, /bananify-store\.zip\*\* is for maintainers submitting manually/);
+  assert.match(notes, /Chrome Web Store/);
+  assert.match(notes, /Microsoft Edge Add-ons/);
+  assert.match(notes, /`manifest\.json` is at its root/);
+  assert.match(notes, /does not submit to either store/);
   await buildSite();
-  assert.deepEqual(await readFile(zip), first);
+  await packageRelease();
+  for (const [name] of archives) {
+    assert.deepEqual(await readFile(join(output, "downloads", name)), originalArchives.get(name));
+    assert.deepEqual(await readFile(join(release, name)), originalArchives.get(name));
+  }
+  assert.equal(await readFile(join(output, "downloads/SHA256SUMS.txt"), "utf8"), expectedChecksums);
+  assert.equal(await readFile(join(release, "SHA256SUMS.txt"), "utf8"), expectedChecksums);
+  assert.equal(await readFile(join(release, "RELEASE_NOTES.md"), "utf8"), notes);
 });
