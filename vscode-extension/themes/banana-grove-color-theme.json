@@ -1,0 +1,85 @@
+{
+  "$schema": "vscode://schemas/color-theme",
+  "name": "Banana Grove",
+  "type": "dark",
+  "colors": {
+    "activityBar.background": "#173C2A",
+    "activityBar.foreground": "#FFE66B",
+    "activityBar.inactiveForeground": "#B6CDBF",
+    "activityBarBadge.background": "#FFDA35",
+    "activityBarBadge.foreground": "#322518",
+    "badge.background": "#FFDA35",
+    "badge.foreground": "#322518",
+    "button.background": "#B88720",
+    "button.foreground": "#FFFBE5",
+    "button.hoverBackground": "#D1A42D",
+    "editor.background": "#17221C",
+    "editor.foreground": "#E8F0E9",
+    "editorCursor.foreground": "#FFDA35",
+    "editorLineNumber.activeForeground": "#FFDA35",
+    "editorLineNumber.foreground": "#688876",
+    "editor.selectionBackground": "#725F2D99",
+    "editorIndentGuide.background1": "#2B4436",
+    "editorIndentGuide.activeBackground1": "#BE9A3A",
+    "focusBorder": "#FFDA35",
+    "inputOption.activeBorder": "#FFDA35",
+    "list.activeSelectionBackground": "#365C45",
+    "list.hoverBackground": "#294536",
+    "panel.border": "#3F634D",
+    "sideBar.background": "#1C2D24",
+    "sideBar.foreground": "#DCE8DF",
+    "sideBarSectionHeader.background": "#294536",
+    "statusBar.background": "#B88720",
+    "statusBar.foreground": "#FFFBE5",
+    "statusBar.noFolderBackground": "#765039",
+    "tab.activeBorderTop": "#FFDA35",
+    "tab.activeBackground": "#17221C",
+    "tab.inactiveBackground": "#1C2D24",
+    "terminal.ansiYellow": "#FFDA35"
+  },
+  "tokenColors": [
+    {
+      "scope": ["comment", "punctuation.definition.comment"],
+      "settings": {
+        "foreground": "#88A995",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "scope": ["string", "constant.other.symbol"],
+      "settings": {
+        "foreground": "#D9CD79"
+      }
+    },
+    {
+      "scope": ["keyword", "storage.type", "storage.modifier"],
+      "settings": {
+        "foreground": "#FFDA35"
+      }
+    },
+    {
+      "scope": ["entity.name.function", "support.function"],
+      "settings": {
+        "foreground": "#A9D6B6"
+      }
+    },
+    {
+      "scope": ["entity.name.type", "support.type", "support.class"],
+      "settings": {
+        "foreground": "#E6B95C"
+      }
+    },
+    {
+      "scope": ["variable", "meta.definition.variable.name"],
+      "settings": {
+        "foreground": "#F0E9D2"
+      }
+    },
+    {
+      "scope": ["constant.numeric", "constant.language"],
+      "settings": {
+        "foreground": "#E69A73"
+      }
+    }
+  ]
+}

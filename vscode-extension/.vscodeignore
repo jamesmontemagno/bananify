@@ -1,0 +1,6 @@
+.github/**
+scripts/**
+tests/**
+node_modules/**
+package-lock.json
+*.vsix

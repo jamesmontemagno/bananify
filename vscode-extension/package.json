@@ -1,0 +1,164 @@
+{
+  "name": "bananify",
+  "displayName": "Bananify",
+  "version": "0.1.0",
+  "publisher": "vs-publisher-473885",
+  "description": "Bring a banana party, a warm optional theme, and a troop of tiny monkeys to Visual Studio Code.",
+  "author": "James Montemagno & Mooch",
+  "license": "MIT",
+  "icon": "media/banana-128.png",
+  "galleryBanner": {
+    "color": "#2f5d3a",
+    "theme": "dark"
+  },
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Themes",
+    "Other"
+  ],
+  "keywords": [
+    "banana",
+    "monkey",
+    "fun",
+    "theme",
+    "decorations"
+  ],
+  "homepage": "https://bananify.online",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jamesmontemagno/bananify"
+  },
+  "bugs": {
+    "url": "https://github.com/jamesmontemagno/bananify/issues"
+  },
+  "main": "./extension.js",
+  "extensionKind": [
+    "ui"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onView:bananify.monkeys"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "bananify.toggle",
+        "title": "Toggle Banana Party",
+        "category": "Bananify",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "bananify.moreBananas",
+        "title": "More Bananas",
+        "category": "Bananify",
+        "icon": "$(add)"
+      },
+      {
+        "command": "bananify.restore",
+        "title": "Restore Editor",
+        "category": "Bananify",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "bananify.selectTheme",
+        "title": "Choose Banana Theme",
+        "category": "Bananify",
+        "icon": "$(symbol-color)"
+      },
+      {
+        "command": "bananify.cheer",
+        "title": "Ask a Monkey for Encouragement",
+        "category": "Bananify"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "bananify.toggle",
+          "group": "navigation@99"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "bananify.moreBananas",
+          "when": "view == bananify.monkeys",
+          "group": "navigation@1"
+        },
+        {
+          "command": "bananify.restore",
+          "when": "view == bananify.monkeys && config.bananify.decorations.enabled",
+          "group": "navigation@2"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "bananify",
+          "title": "Bananify",
+          "icon": "media/banana-activity.svg"
+        }
+      ]
+    },
+    "views": {
+      "bananify": [
+        {
+          "type": "webview",
+          "id": "bananify.monkeys",
+          "name": "Monkey Business"
+        }
+      ]
+    },
+    "themes": [
+      {
+        "label": "Banana Grove",
+        "uiTheme": "vs-dark",
+        "path": "./themes/banana-grove-color-theme.json"
+      }
+    ],
+    "configuration": {
+      "title": "Bananify",
+      "properties": {
+        "bananify.decorations.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show banana decorations in visible text editors."
+        },
+        "bananify.decorations.density": {
+          "type": "integer",
+          "default": 2,
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Set the number of banana decorations from a tasteful few to a full bunch."
+        },
+        "bananify.monkey": {
+          "type": "string",
+          "default": "brown",
+          "enum": [
+            "brown",
+            "black-and-white",
+            "golden"
+          ],
+          "enumDescriptions": [
+            "Brown capuchin",
+            "Black-and-white capuchin",
+            "Golden monkey"
+          ],
+          "description": "Choose the monkey who lives in the Bananify panel."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "check": "node --check extension.js && node --check core.js && node --check scripts/check-release.js",
+    "test": "node --test tests/*.test.js",
+    "package": "vsce package --no-dependencies --out bananify-vscode.vsix",
+    "release:check": "node scripts/check-release.js",
+    "vscode:prepublish": "npm run check && npm test"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "3.9.2"
+  }
+}

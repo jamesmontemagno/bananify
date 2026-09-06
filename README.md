@@ -46,6 +46,22 @@ Bananify acts on the tab you choose when you click its toolbar button. It uses o
 
 The extension processes page content and click positions locally to place the bananas. It makes **no network requests**, sends no page content anywhere, and uses no analytics or persistent storage. The artwork is bundled with the extension. The separate demo website is hosted on GitHub Pages.
 
+## Bananify Visual Studio Code
+
+The repository also contains a companion [Visual Studio Code extension](vscode-extension/README.md). It adds opt-in banana editor decorations, the optional **Banana Grove** theme, and an interactive Activity Bar panel with three little monkey pals. It never changes source files and makes no network requests.
+
+Build and test it independently:
+
+```sh
+cd vscode-extension
+npm ci
+npm run check
+npm test
+npm run package
+```
+
+Maintainers can publish the tested VSIX to the Visual Studio Marketplace by adding the `VSCE_PAT` repository secret, updating `vscode-extension/package.json`, and pushing a matching `vscode-vX.Y.Z` tag.
+
 ## Build your own banana party
 
 Contributions and bug reports are welcome. [Open an issue](https://github.com/jamesmontemagno/bananify/issues) with your browser, what happened, and how to reproduce it.
