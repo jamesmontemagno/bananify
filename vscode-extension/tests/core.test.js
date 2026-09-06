@@ -26,6 +26,7 @@ test("banana positions are deterministic and density only adds decorations", () 
     assert.equal(shouldDecorateLine(uri, line, 3), shouldDecorateLine(uri, line, 3));
   }
   assert.ok(high.size > low.size);
+  assert.ok([...low].every((line) => high.has(line)));
 });
 
 test("each monkey gives a named, known encouragement", () => {

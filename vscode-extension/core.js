@@ -28,8 +28,7 @@ function hash(value) {
 }
 
 function shouldDecorateLine(uri, line, density) {
-  const divisor = 14 - (clampDensity(density) * 2);
-  return hash(`${uri}:${line}`) % divisor === 0;
+  return hash(`${uri}:${line}`) % 100 < clampDensity(density) * 8;
 }
 
 function encouragement(monkey, seed = Date.now()) {
