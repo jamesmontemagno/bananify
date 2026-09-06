@@ -39,17 +39,34 @@ for (const viewport of [{ width: 1365, height: 1000 }, { width: 375, height: 812
       assert.match(await page.title(), /^Bananify /);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       const stores = page.getByRole("list", { name: "Browser store availability" });
-      assert.deepEqual(await stores.getByRole("listitem").allTextContents(), [
-        "Chrome Web StoreComing soon", "Microsoft Edge Add-onsGet for Microsoft Edge",
-      ]);
-      assert.equal(await stores.getByRole("listitem").first().locator("a, button, [tabindex]").count(), 0);
-      assert.equal(await stores.getByRole("link").count(), 1);
+      assert.equal(await stores.getByRole("listitem").count(), 2);
+      assert.equal(await stores.getByRole("link").count(), 2);
       assert.equal(await stores.getByRole("link", { name: "Get for Microsoft Edge" }).getAttribute("href"),
         "https://microsoftedge.microsoft.com/addons/detail/iidhiomigjipgnembnbcndbliniciijh");
+      const chrome = stores.getByRole("link", { name: "Download for Chrome" });
+      assert.equal(await chrome.getAttribute("href"),
+        "https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip");
+      assert.equal(await chrome.getAttribute("download"), "");
+      await page.getByText("Chrome Web Store is coming soon.", { exact: false }).waitFor();
       for (const row of await stores.getByRole("listitem").all()) {
         const bounds = await row.boundingBox();
         assert.ok(bounds && bounds.x >= 0 && bounds.x + bounds.width <= viewport.width);
       }
+      await page.getByRole("navigation", { name: "Get Bananify" }).getByRole("link", { name: "VS Code" }).click();
+      const vscode = page.getByRole("region", { name: "Your VS Code. Also bananas." });
+      await vscode.waitFor();
+      const marketplace = vscode.getByRole("link", { name: "Get for VS Code" });
+      assert.equal(await marketplace.getAttribute("href"),
+        "https://marketplace.visualstudio.com/items?itemName=vs-publisher-473885.bananify");
+      await marketplace.focus();
+      await page.keyboard.press("Tab");
+      await page.keyboard.press("Shift+Tab");
+      assert.equal(await marketplace.evaluate((node) => node.matches(":focus-visible")), true);
+      assert.equal(await marketplace.evaluate((node) => getComputedStyle(node).outlineStyle), "solid");
+      await vscode.getByRole("img").evaluate((node) => node.decode());
+      assert.equal(await vscode.getByRole("img").evaluate((node) => node.naturalWidth), 1400);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+      await page.screenshot({ path: `test-results/site-${viewport.width}.png`, fullPage: true });
       const body = await page.locator("body").innerHTML();
       await page.getByRole("button", { name: "Bananify this page" }).click();
       assert.equal(await page.evaluate(() => bananaFeed.active), true);
@@ -99,7 +116,7 @@ for (const viewport of [{ width: 1365, height: 1000 }, { width: 375, height: 812
         });
       });
       const downloadReady = page.waitForEvent("download");
-      await page.getByRole("link", { name: "Download Bananify for Chrome / Edge" }).click();
+      await page.getByRole("link", { name: "Download for Chrome" }).click();
       const download = await downloadReady;
       assert.equal(await download.failure(), null);
       const bytes = await readFile(await download.path());

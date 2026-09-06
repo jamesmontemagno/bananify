@@ -6,10 +6,11 @@ const { bananaSvg, monkeySvg } = require("./artwork");
 const { isPartyMessage, monkeyNames, PartyState } = require("./core");
 
 class BananaPartySurfaces {
-  constructor(getMonkey, getReducedMotion, setDecorationsEnabled) {
+  constructor(getMonkey, getReducedMotion, setDecorationsEnabled, iconPath) {
     this.getMonkey = getMonkey;
     this.getReducedMotion = getReducedMotion;
     this.setDecorationsEnabled = setDecorationsEnabled;
+    this.iconPath = iconPath;
     this.panel = undefined;
     this.explorerView = undefined;
     this.panelDisposables = [];
@@ -35,6 +36,7 @@ class BananaPartySurfaces {
         retainContextWhenHidden: true,
       },
     );
+    this.panel.iconPath = this.iconPath;
     this.configureWebview(this.panel.webview, "editor");
     this.panelDisposables.push(
       this.panel.onDidChangeViewState(() => {
@@ -191,6 +193,7 @@ function partyHtml(webview, surface) {
     * { box-sizing: border-box; }
     body { min-height: 100vh; margin: 0; overflow: hidden; color: var(--vscode-foreground); background: var(--vscode-editor-background); font-family: var(--vscode-font-family); }
     .sky, .bursts { position: fixed; inset: 0; overflow: hidden; pointer-events: none; }
+    .bursts { z-index: 2; }
     .banana-drop { position: absolute; top: -90px; left: calc(var(--x) * 1%); width: var(--size); opacity: .92; animation: fall var(--duration) linear var(--delay) infinite; will-change: transform, opacity; }
     .banana-drop.variety-1 { filter: hue-rotate(18deg) saturate(.82); }
     .banana-drop.variety-2 { transform: scaleX(-1); filter: brightness(1.08); }
@@ -201,7 +204,7 @@ function partyHtml(webview, surface) {
       88% { opacity: .95; }
       100% { opacity: 0; transform: translate3d(var(--drift), 118vh, 0) rotate(342deg); }
     }
-    .burst { position: fixed; left: 0; top: 0; width: var(--size); opacity: 0; animation: burst .72s cubic-bezier(.16, 1, .3, 1) forwards; will-change: transform, opacity; }
+    .burst { position: fixed; left: 0; top: 0; width: var(--size); opacity: 0; transform: translate3d(var(--x), var(--y), 0); animation: burst .72s cubic-bezier(.16, 1, .3, 1) forwards; will-change: transform, opacity; }
     .burst .banana-art { transform: rotate(var(--tilt)); }
     @keyframes burst {
       0% { opacity: 0; transform: translate3d(var(--x), var(--y), 0) scale(.35); }
@@ -225,6 +228,7 @@ function partyHtml(webview, surface) {
     .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
     button { min-height: 40px; border: 0; border-radius: 4px; padding: 9px 16px; color: var(--vscode-button-foreground); background: var(--vscode-button-background); cursor: pointer; font: inherit; }
     button:hover { background: var(--vscode-button-hoverBackground); }
+    button:disabled { opacity: .5; cursor: default; }
     button:focus-visible { outline: 2px solid var(--vscode-focusBorder); outline-offset: 2px; }
     .secondary { color: var(--vscode-button-secondaryForeground); background: var(--vscode-button-secondaryBackground); }
     .secondary:hover { background: var(--vscode-button-secondaryHoverBackground); }
@@ -232,6 +236,7 @@ function partyHtml(webview, surface) {
     body:not(.active) .sky { display: none; }
     body:not(.active) .party-monkey * { animation-play-state: paused !important; }
     body:not(.active) [data-command="pause"], body.active [data-command="start"] { display: none; }
+    body:not(.active) [data-burst] { display: none; }
     body.reduced .motion-note { display: block; }
     body.paused .banana-drop, body.paused .party-monkey *, body.hidden .banana-drop, body.hidden .party-monkey *, body.reduced:not(.motion-override) .banana-drop, body.reduced:not(.motion-override) .party-monkey *, body.reduced:not(.motion-override) .party-card { animation-play-state: paused !important; }
     body.reduced:not(.motion-override) .burst, body.paused .burst, body.hidden .burst { animation: none; opacity: .8; }
@@ -251,13 +256,14 @@ function partyHtml(webview, surface) {
       .actions { display: grid; }
     }
     body.explorer { min-height: 0; overflow: auto; }
-    body.explorer main { min-height: 0; display: block; padding: 6px; }
-    body.explorer .party-card { padding: 8px 8px 10px; border-radius: 10px; box-shadow: none; }
-    body.explorer .monkey-stage { display: flex; align-items: end; justify-content: center; width: 100%; height: 96px; padding: 0 4px; }
-    body.explorer .party-monkey { display: block; width: 34%; max-width: 108px; opacity: .62; transform: scale(.82); transform-origin: bottom center; }
+    body.explorer main { min-height: 0; display: block; padding: 4px; }
+    body.explorer .party-card { padding: 4px 4px 6px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+    body.explorer .monkey-stage { display: flex; align-items: end; justify-content: center; width: 100%; height: 60px; padding: 0 4px; filter: drop-shadow(0 3px 3px #0004); }
+    body.explorer .party-monkey { display: block; width: 30%; max-width: 62px; opacity: .72; transform: scale(.82); transform-origin: bottom center; }
     body.explorer .party-monkey.selected { opacity: 1; transform: scale(1); }
-    body.explorer h1 { margin: 0 0 3px; font-size: 18px; }
-    body.explorer .message { min-height: 1.2em; margin-bottom: 7px; font-size: 12px; }
+    body.explorer .banana-drop { width: calc(var(--size) * .55); }
+    body.explorer h1 { display: none; }
+    body.explorer .message { min-height: 1.2em; margin: 4px 0 6px; font-size: 11px; }
     body.explorer .actions { display: flex; gap: 5px; }
     body.explorer button { min-height: 28px; padding: 4px 8px; font-size: 11px; }
     body.explorer .motion-note { margin-top: 6px; }
@@ -274,8 +280,9 @@ function partyHtml(webview, surface) {
       <p class="message" aria-live="polite">The party is ready when you are.</p>
       <div class="actions">
         <button data-command="start">Start party</button>
-        <button data-command="pause">Pause animation</button>
-        <button class="secondary" data-command="stop">Stop party</button>
+        <button data-command="pause">${surface === "explorer" ? "Pause" : "Pause animation"}</button>
+        <button data-burst>More bananas</button>
+        <button class="secondary" data-command="stop">${surface === "explorer" ? "Stop" : "Stop party"}</button>
       </div>
       <button class="motion-note" data-motion-override>Animate anyway</button>
     </section>
@@ -288,9 +295,10 @@ function partyHtml(webview, surface) {
     const motionOverride = document.querySelector("[data-motion-override]");
     const bursts = document.querySelector(".bursts");
     const bananaTemplate = document.querySelector("#banana-template");
+    const moreBananas = document.querySelector("[data-burst]");
     const events = new AbortController();
     const MAX_BURSTS = 30;
-    const burstTimers = new Set();
+    const burstTimers = new Map();
     let celebrating = false;
     let celebrationTimer;
     let motionOverrideEnabled = false;
@@ -310,33 +318,55 @@ function partyHtml(webview, surface) {
         motionOverrideEnabled = !motionOverrideEnabled;
         syncMotion();
       }
+      if (button.hasAttribute("data-burst")) {
+        const stage = document.querySelector(".monkey-stage").getBoundingClientRect();
+        spawnBurst(stage.left + stage.width / 2, stage.top + stage.height / 2);
+      }
     }, { signal: events.signal });
 
     document.addEventListener("pointerdown", (event) => {
-      if (!body.classList.contains("active") || event.button !== 0 || event.target.closest("button")) return;
-      const amount = body.classList.contains("explorer") ? 6 : 10;
+      if (event.button !== 0 || event.target.closest("button")) return;
+      spawnBurst(event.clientX, event.clientY);
+    }, { signal: events.signal });
+
+    function clearBursts() {
+      for (const timer of burstTimers.values()) clearTimeout(timer);
+      burstTimers.clear();
+      bursts.replaceChildren();
+    }
+
+    function spawnBurst(x, y) {
+      if (!body.classList.contains("active") || body.classList.contains("paused") || body.classList.contains("hidden")) return;
+      const compact = body.classList.contains("explorer");
+      const amount = compact ? 6 : 10;
       for (let index = 0; index < amount; index += 1) {
-        while (bursts.childElementCount >= MAX_BURSTS) bursts.firstElementChild.remove();
+        while (bursts.childElementCount >= MAX_BURSTS) {
+          const oldest = bursts.firstElementChild;
+          clearTimeout(burstTimers.get(oldest));
+          burstTimers.delete(oldest);
+          oldest.remove();
+        }
         const burst = document.createElement("span");
         const angle = (-Math.PI * .9) + (Math.PI * .8 * index / Math.max(1, amount - 1));
-        const distance = 42 + ((index * 19) % 54);
+        const distance = (42 + ((index * 19) % 54)) * (compact ? .6 : 1);
+        const size = (compact ? 14 : 22) + (index % 4) * (compact ? 3 : 5);
         burst.className = "burst";
-        burst.style.setProperty("--x", event.clientX + "px");
-        burst.style.setProperty("--y", event.clientY + "px");
+        burst.style.setProperty("--x", Math.max(0, Math.min(innerWidth - size, x - size / 2)) + "px");
+        burst.style.setProperty("--y", Math.max(0, Math.min(innerHeight - size, y - size / 2)) + "px");
         burst.style.setProperty("--dx", Math.cos(angle) * distance + "px");
         burst.style.setProperty("--dy", Math.sin(angle) * distance + "px");
         burst.style.setProperty("--spin", ((index % 2 ? 1 : -1) * (90 + index * 23)) + "deg");
         burst.style.setProperty("--tilt", ((index * 31) % 80 - 40) + "deg");
-        burst.style.setProperty("--size", (22 + (index % 4) * 5) + "px");
+        burst.style.setProperty("--size", size + "px");
         burst.append(bananaTemplate.content.firstElementChild.cloneNode(true));
         bursts.append(burst);
         const timer = setTimeout(() => {
-          burstTimers.delete(timer);
+          burstTimers.delete(burst);
           burst.remove();
         }, 850);
-        burstTimers.add(timer);
+        burstTimers.set(burst, timer);
       }
-    }, { signal: events.signal });
+    }
 
     window.addEventListener("message", ({ data }) => {
       if (!data || typeof data !== "object") return;
@@ -348,7 +378,9 @@ function partyHtml(webview, surface) {
         body.classList.toggle("paused", data.paused);
         body.classList.toggle("hidden", !data.visible);
         body.classList.toggle("reduced", data.reducedMotion);
-        pause.textContent = data.paused ? "Resume animation" : "Pause animation";
+        pause.textContent = (data.paused ? "Resume" : "Pause") + (body.classList.contains("explorer") ? "" : " animation");
+        moreBananas.disabled = !data.active || data.paused || !data.visible;
+        if (!data.active || data.paused || !data.visible) clearBursts();
         message.textContent = data.active
           ? data.monkeyName + (data.paused ? " is saving some energy." : " brought the whole bunch.")
           : "The party is ready when you are.";
@@ -369,8 +401,7 @@ function partyHtml(webview, surface) {
     window.addEventListener("pagehide", () => {
       events.abort();
       if (celebrationTimer) clearTimeout(celebrationTimer);
-      for (const timer of burstTimers) clearTimeout(timer);
-      burstTimers.clear();
+      clearBursts();
     }, { once: true });
   </script>
 </body>

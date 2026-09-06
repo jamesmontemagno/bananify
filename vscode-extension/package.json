@@ -1,7 +1,7 @@
 {
   "name": "bananify",
   "displayName": "Bananify",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "vs-publisher-473885",
   "description": "Bring a banana party, a warm optional theme, and a troop of tiny monkeys to Visual Studio Code.",
   "author": "James Montemagno & Mooch",
@@ -199,6 +199,11 @@
             "Henry, the golden monkey"
           ],
           "description": "Choose the monkey who lives in the Bananify panel."
+        },
+        "bananify.fileBadges.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Add banana badges to workspace files currently visible in text editors while the banana party is active. Badges do not propagate to folders or change file colors."
         },
         "bananify.reducedMotion": {
           "type": "boolean",

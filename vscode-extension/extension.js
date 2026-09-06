@@ -18,6 +18,7 @@ const { BananaPartySurfaces } = require("./party-panel");
 const section = "bananify";
 const enabledKey = "decorations.enabled";
 const densityKey = "decorations.density";
+const fileBadgesKey = "fileBadges.enabled";
 const monkeyKey = "monkey";
 const reducedMotionKey = "reducedMotion";
 const saveCelebrationKey = "celebrations.onSave";
@@ -76,9 +77,11 @@ class BananaDecorations {
         density,
         gutterLimit,
       );
-      const decorations = selected.bananas.map((lineNumber) => ({
+      const decorateLine = (lineNumber) => ({
         range: editor.document.lineAt(lineNumber).range,
-      }));
+        hoverMessage: new vscode.MarkdownString().appendText(encouragement(monkey, lineNumber)),
+      });
+      const decorations = selected.bananas.map(decorateLine);
       const lineGroups = this.lineDecorations.map(() => []);
       for (const decoration of decorations) {
         const line = decoration.range.start.line;
@@ -96,7 +99,7 @@ class BananaDecorations {
         const kind = gutterKinds[
           decorationVariant(editor.document.uri.toString(), lineNumber, gutterKinds.length)
         ];
-        gutterGroups[kind].push({ range: editor.document.lineAt(lineNumber).range });
+        gutterGroups[kind].push(decorateLine(lineNumber));
       }
       for (const [variant, decoration] of Object.entries(this.gutterDecorations)) {
         editor.setDecorations(decoration, gutterGroups[variant]);
@@ -117,6 +120,42 @@ class BananaDecorations {
     this.clear();
     for (const decoration of this.lineDecorations) decoration.dispose();
     for (const decoration of Object.values(this.gutterDecorations)) decoration.dispose();
+  }
+}
+
+class BananaFileBadges {
+  constructor() {
+    this.files = new Map();
+    this.changed = new vscode.EventEmitter();
+    this.onDidChangeFileDecorations = this.changed.event;
+  }
+
+  refresh() {
+    const config = vscode.workspace.getConfiguration(section);
+    const next = new Map();
+    if (config.get(enabledKey, false) && config.get(fileBadgesKey, false)) {
+      for (const { document } of vscode.window.visibleTextEditors) {
+        if (!document.isUntitled && vscode.workspace.getWorkspaceFolder(document.uri)) {
+          next.set(document.uri.toString(), document.uri);
+        }
+      }
+    }
+    const affected = new Map([...this.files, ...next]);
+    this.files = next;
+    if (affected.size) this.changed.fire([...affected.values()]);
+  }
+
+  provideFileDecoration(uri) {
+    if (!this.files.has(uri.toString())) return undefined;
+    const monkey = vscode.workspace.getConfiguration(section).get(monkeyKey, "brown");
+    const badge = new vscode.FileDecoration("🍌", `Bananify: ${encouragement(monkey, 0)}`);
+    badge.propagate = false;
+    return badge;
+  }
+
+  dispose() {
+    this.files.clear();
+    this.changed.dispose();
   }
 }
 
@@ -287,6 +326,7 @@ function randomNonce() {
 
 function activate(context) {
   const decorations = new BananaDecorations(context.extensionUri);
+  const fileBadges = new BananaFileBadges();
   const celebrationGate = new CelebrationGate();
   const partySurfaces = new BananaPartySurfaces(
     () => vscode.workspace.getConfiguration(section).get(monkeyKey, "brown"),
@@ -296,6 +336,7 @@ function activate(context) {
       enabled,
       vscode.ConfigurationTarget.Global,
     ),
+    vscode.Uri.joinPath(context.extensionUri, "media", "banana-128.png"),
   );
   const monkeyViewProvider = new MonkeyViewProvider(
     context.extensionUri,
@@ -331,6 +372,7 @@ function activate(context) {
     const config = vscode.workspace.getConfiguration(section);
     const enabled = config.get(enabledKey, false);
     decorations.refresh();
+    fileBadges.refresh();
     monkeyViewProvider.update();
     partySurfaces.update();
     status.text = enabled ? "$(sparkle) $(symbol-color) Bananas!" : "$(symbol-color) Bananify";
@@ -353,6 +395,7 @@ function activate(context) {
     celebrationTimer = undefined;
     stopStatusAnimation();
     decorations.clear();
+    fileBadges.refresh();
     monkeyViewProvider.update();
     status.text = "$(symbol-color) Bananify";
   };
@@ -374,6 +417,8 @@ function activate(context) {
 
   context.subscriptions.push(
     decorations,
+    fileBadges,
+    vscode.window.registerFileDecorationProvider(fileBadges),
     partySurfaces,
     monkeyViewProvider,
     status,
@@ -450,6 +495,7 @@ function activate(context) {
       if (event.affectsConfiguration(section)) refresh();
     }),
     vscode.window.onDidChangeVisibleTextEditors(refresh),
+    vscode.workspace.onDidChangeWorkspaceFolders(() => fileBadges.refresh()),
     vscode.window.onDidChangeTextEditorVisibleRanges(({ textEditor }) => {
       if (vscode.window.visibleTextEditors.includes(textEditor)) decorations.refresh([textEditor]);
     }),

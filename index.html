@@ -11,14 +11,14 @@ FORM: Brief-pinned cartoon banana party. A live playground, not a marketing dash
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#ffdc45">
-  <title>Bananify - Free Banana Browser Extension for Chrome &amp; Edge</title>
-  <meta name="description" content="Bananify any website with banana showers and a dancing capuchin. Try it here, then download the free Chrome and Edge extension.">
+  <title>Bananify - Free Banana Extensions for Chrome, Edge &amp; VS Code</title>
+  <meta name="description" content="Bananify your browser and your editor. Try banana showers and a dancing capuchin, then get Bananify for Chrome, Edge, and Visual Studio Code.">
   <meta name="author" content="James Montemagno &amp; Mooch">
   <link rel="canonical" href="https://bananify.online/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bananify">
   <meta property="og:title" content="Bananify - The internet. But bananas.">
-  <meta property="og:description" content="Bananas everywhere. One very happy capuchin. Try the party and take it to any website.">
+  <meta property="og:description" content="Bananas everywhere. One very happy capuchin. Take the party to your browser and Visual Studio Code.">
   <meta property="og:url" content="https://bananify.online/">
   <meta property="og:image" content="https://bananify.online/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -26,7 +26,7 @@ FORM: Brief-pinned cartoon banana party. A live playground, not a marketing dash
   <meta property="og:image:alt" content="Bananify: The internet. But bananas. A happy capuchin celebrates with a banana.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Bananify - The internet. But bananas.">
-  <meta name="twitter:description" content="A free Chrome and Edge extension. Bananas everywhere. One very happy capuchin.">
+  <meta name="twitter:description" content="Free extensions for Chrome, Edge, and Visual Studio Code. Bananas everywhere. One very happy capuchin.">
   <meta name="twitter:image" content="https://bananify.online/social-card.png">
   <meta name="twitter:image:alt" content="Bananify: The internet. But bananas. A happy capuchin celebrates with a banana.">
   <script type="application/ld+json">
@@ -70,7 +70,10 @@ FORM: Brief-pinned cartoon banana party. A live playground, not a marketing dash
 <body>
   <header>
     <a class="wordmark" href="./" aria-label="Bananify home"><span data-banana></span>bananify<span class="wordmark-dot">.</span></a>
-    <a class="install-link" href="#install">Get the extension <span aria-hidden="true">&#8599;</span></a>
+    <nav class="install-nav" aria-label="Get Bananify">
+      <a class="install-link" href="#install">Chrome &amp; Edge</a>
+      <a class="install-link" href="#vscode">VS Code <span aria-hidden="true">&#8599;</span></a>
+    </nav>
   </header>
   <main>
     <section class="hero" aria-labelledby="headline">
@@ -102,13 +105,25 @@ FORM: Brief-pinned cartoon banana party. A live playground, not a marketing dash
       <div class="install" id="install">
         <h2>Take the party with you.</h2>
         <ul class="store-listings" aria-label="Browser store availability">
-          <li><strong>Chrome Web Store</strong><span>Coming soon</span></li>
-          <li><strong>Microsoft Edge Add-ons</strong><a href="https://microsoftedge.microsoft.com/addons/detail/iidhiomigjipgnembnbcndbliniciijh">Get for Microsoft Edge</a></li>
+          <li>
+            <a class="store-action store-action-primary" href="https://microsoftedge.microsoft.com/addons/detail/iidhiomigjipgnembnbcndbliniciijh">
+              <svg class="store-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="26" height="22" rx="4"/><path d="M3 12h26M8 8.5h2m3 0h2M11 20l3 3 7-7"/></svg>
+              <span class="store-copy"><strong>Get for Microsoft Edge</strong><span>Install from Edge Add-ons</span></span>
+              <span class="store-arrow" aria-hidden="true">&#8599;</span>
+            </a>
+          </li>
+          <li>
+            <a class="store-action" href="https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip" download>
+              <svg class="store-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="16" cy="16" r="13"/><circle cx="16" cy="16" r="5"/><path d="M16 11h12M11.7 18.5l-6-10.4M20.3 18.5l-6 10.4"/></svg>
+              <span class="store-copy"><strong>Download for Chrome</strong><span>ZIP download &#183; install manually</span></span>
+              <span class="store-arrow" aria-hidden="true">&#8595;</span>
+            </a>
+          </li>
         </ul>
-        <p class="install-note">Install from Edge Add-ons without Developer mode. Chrome Web Store is coming soon; the ZIP below is available for manual installation in either browser.</p>
+        <p class="install-note">Chrome Web Store is coming soon. For now, use the ZIP above in Chrome or Edge. Edge Add-ons installs without Developer mode.</p>
         <p class="install-note">Switching from a ZIP install? Remove or disable your unpacked copy before installing from Edge Add-ons to avoid running two copies.</p>
-        <p><a class="download-link" href="https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip" download>Download Bananify for Chrome / Edge <span aria-hidden="true">&#8595;</span></a></p>
         <p class="install-note"><a href="https://github.com/jamesmontemagno/bananify/releases">Release notes &amp; previous versions</a></p>
+        <h3>Installing the ZIP</h3>
         <ol>
           <li>Download the ZIP above and <strong>extract it</strong>.</li>
           <li>Open <code>chrome://extensions</code> or <code>edge://extensions</code>.</li>
@@ -118,6 +133,21 @@ FORM: Brief-pinned cartoon banana party. A live playground, not a marketing dash
         </ol>
         <p class="install-note">Free for desktop Chrome and Edge. More bananas brings a different monkey and transforms more of the page. Restore page brings it all back. ZIP installs do not update automatically. Browser settings and extension stores are off-limits.</p>
       </div>
+    </section>
+    <section class="vscode-section" id="vscode" aria-labelledby="vscode-heading">
+      <div class="vscode-copy">
+        <h2 id="vscode-heading">Your VS Code.<br>Also bananas.</h2>
+        <p>Bring the party to your editor with banana decorations, four optional color themes, and a little troop of monkeys to keep you company.</p>
+        <a class="marketplace-link" href="https://marketplace.visualstudio.com/items?itemName=vs-publisher-473885.bananify">Get for VS Code <span aria-hidden="true">&#8599;</span></a>
+        <p class="vscode-note">Free on the Visual Studio Marketplace. Your source files stay untouched.</p>
+        <p class="vscode-tip">Once installed, open the Command Palette and run <strong>Bananify: Toggle Banana Party</strong>.</p>
+      </div>
+      <figure class="vscode-preview">
+        <a href="vscode-extension/media/bananify-vscode-screenshot.png" aria-label="View full-size Bananify screenshot in VS Code">
+          <img src="vscode-extension/media/bananify-vscode-screenshot.png" width="1400" height="846" loading="lazy" decoding="async" alt="Bananify in VS Code with a cream-colored theme, Sebastian the monkey in Explorer, and banana decorations beside the code.">
+        </a>
+        <figcaption>A little monkey business. Right beside your code.</figcaption>
+      </figure>
     </section>
   </main>
   <footer><span>Made by <a href="https://github.com/jamesmontemagno">James Montemagno</a> &amp; Mooch.</span><a href="https://github.com/jamesmontemagno/bananify">View the source on GitHub</a></footer>
