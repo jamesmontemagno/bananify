@@ -1,6 +1,7 @@
 "use strict";
 
 const vscode = require("vscode");
+const { randomBytes } = require("node:crypto");
 const { clampDensity, encouragement, monkeyNames, shouldDecorateLine } = require("./core");
 
 const section = "bananify";
@@ -171,12 +172,7 @@ class MonkeyViewProvider {
 }
 
 function randomNonce() {
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let value = "";
-  for (let index = 0; index < 32; index += 1) {
-    value += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
-  }
-  return value;
+  return randomBytes(16).toString("hex");
 }
 
 function activate(context) {
