@@ -102,6 +102,7 @@ jobs:
           files: vscode-extension/bananify-vscode.vsix
           fail_on_unmatched_files: true
           generate_release_notes: true
+          make_latest: "false"
       - name: Check Open VSX publishing
         id: open-vsx
         env:

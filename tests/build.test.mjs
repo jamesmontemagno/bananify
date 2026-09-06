@@ -11,7 +11,7 @@ test("production build publishes only the website and reproducible manual-instal
   const output = await buildSite();
   assert.deepEqual((await readdir(output)).sort(), [
     ".nojekyll", "CNAME", "LICENSE", "artwork.js", "downloads", "icons", "index.html",
-    "party.js", "preview.css", "preview.js", "robots.txt", "sitemap.xml", "social-card.png",
+    "party.js", "preview.css", "preview.js", "robots.txt", "sitemap.xml", "social-card.png", "vscode-extension",
   ].sort());
   assert.equal((await readFile(join(output, "CNAME"), "utf8")).trim(), "bananify.online");
   const html = await readFile(join(output, "index.html"), "utf8");
@@ -19,6 +19,10 @@ test("production build publishes only the website and reproducible manual-instal
   assert.match(html, /href="https:\/\/bananify\.online\/"/);
   assert.match(html, /href="https:\/\/github\.com\/jamesmontemagno\/bananify\/releases\/latest\/download\/bananify-extension\.zip" download/);
   assert.match(html, /Release notes &amp; previous versions/);
+  const vscodePackage = JSON.parse(await readFile(new URL("../vscode-extension/package.json", import.meta.url), "utf8"));
+  assert.ok(html.includes(`href="https://marketplace.visualstudio.com/items?itemName=${vscodePackage.publisher}.${vscodePackage.name}"`));
+  assert.deepEqual(await readdir(join(output, "vscode-extension")), ["media"]);
+  assert.deepEqual(await readdir(join(output, "vscode-extension/media")), ["bananify-vscode-screenshot.png"]);
   assert.doesNotMatch(html, /Banana Feed|banana feed|banana-feed folder/);
   assert.match(html, /Made by.*James Montemagno.*&amp; Mooch/s);
   assert.match(html, /href="https:\/\/github\.com\/jamesmontemagno\/bananify"/);

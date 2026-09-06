@@ -42,6 +42,7 @@ test("manifest contributes commands, a monkey view, and optional themes", async 
     ["Banana Grove", "Banana Cream", "Midnight Banana", "Monkey Jungle"],
   );
   assert.equal(manifest.contributes.configuration.properties["bananify.decorations.density"].default, 5);
+  assert.equal(manifest.contributes.configuration.properties["bananify.fileBadges.enabled"].default, false);
   assert.equal(manifest.contributes.configuration.properties["bananify.celebrations.onSave"].default, false);
   assert.equal(
     manifest.contributes.configuration.properties["bananify.celebrations.onSuccessfulTask"].default,
@@ -91,6 +92,17 @@ test("themes declare readable editor and workbench colors", async () => {
     assert.ok(contrast(theme.colors["statusBar.foreground"], theme.colors["statusBar.background"]) >= 4.5);
     assert.ok(theme.tokenColors.length >= 5);
   }
+});
+
+test("Marketplace screenshot resolves inside the extension subfolder", async () => {
+  const readme = await readFile(path.join(root, "README.md"), "utf8");
+  const image = readme.match(/!\[[^\]]+\]\((https:[^)]+)\)/);
+  assert.ok(image, "README must include an absolute screenshot URL");
+  const url = new URL(image[1]);
+  assert.equal(url.origin, "https://raw.githubusercontent.com");
+  assert.equal(url.pathname, "/jamesmontemagno/bananify/main/vscode-extension/media/bananify-vscode-screenshot.png");
+  await access(path.join(root, "media", path.basename(url.pathname)));
+  assert.doesNotMatch(readme, /## Publishing|### Create a release|VSCE_PAT|VSCE_TOKEN|OVSX_PAT|vsce publish|ovsx publish/);
 });
 
 test("Party surfaces keep Explorer compact and click bursts bounded", async () => {

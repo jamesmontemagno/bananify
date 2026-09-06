@@ -10,6 +10,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const siteFiles = [
   "index.html", "preview.css", "preview.js", "artwork.js", "party.js",
   "CNAME", "robots.txt", "sitemap.xml", "social-card.png", "LICENSE",
+  "vscode-extension/media/bananify-vscode-screenshot.png",
 ];
 
 export async function buildSite() {
