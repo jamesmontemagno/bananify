@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'">
+  <title>Banana Party</title>
+  <link rel="stylesheet" href="party.css">
+  <script src="party.js" defer></script>
+</head>
+<body class="hidden compact">
+  <div class="sky" aria-hidden="true"></div>
+  <div class="bursts" aria-hidden="true"></div>
+  <template id="banana-template"><!-- BANANA --></template>
+  <main>
+    <section class="party-card" aria-labelledby="party-title">
+      <h1 id="party-title">Banana Party</h1>
+      <div class="monkey-stage" role="group" aria-label="Choose your monkey"><!-- MONKEYS --></div>
+      <p class="message" role="status" aria-live="polite">The party is ready when you are.</p>
+      <div class="actions">
+        <button data-command="start">Start party</button>
+        <button data-command="pause">Pause</button>
+        <button data-command="more">More bananas</button>
+        <button class="secondary" data-command="restore">Restore</button>
+      </div>
+      <p class="motion-note">Reduced motion is on. The bunch is taking it easy.</p>
+    </section>
+  </main>
+</body>
+</html>
