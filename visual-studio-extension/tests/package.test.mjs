@@ -32,6 +32,17 @@ test("native project remains isolated and uses Windows-only VSIX tooling", async
   assert.doesNotMatch(project, /vscode-extension/);
 });
 
+test("the party host JSON dependency is explicitly included despite VSSDK suppression", async () => {
+  const [project, verifier] = await Promise.all([
+    readFile(new URL("Bananify.csproj", source), "utf8"),
+    readFile(new URL("../Verify-Vsix.ps1", import.meta.url), "utf8"),
+  ]);
+  const reference = project.match(/<PackageReference\b[^>]*\bInclude="Newtonsoft\.Json"[^>]*\/>/)?.[0];
+  assert.ok(reference, "Missing direct Newtonsoft.Json dependency");
+  assert.match(reference, /\bForceIncludeInVSIX="true"/);
+  assert.ok(verifier.includes('"Newtonsoft.Json.dll"'), "Payload inspection must require the JSON assembly");
+});
+
 test("all four IDE themes have distinct identities and modern shell tokens", async () => {
   const directory = new URL("Themes/", source);
   const manifest = await readFile(new URL("source.extension.vsixmanifest", source), "utf8");

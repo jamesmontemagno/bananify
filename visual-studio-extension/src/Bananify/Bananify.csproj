@@ -22,7 +22,8 @@
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40265" ExcludeAssets="runtime" />
     <PackageReference Include="Community.VisualStudio.Toolkit.17" Version="17.0.551" ExcludeAssets="runtime" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4191.47" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <!-- VSSDK suppresses Newtonsoft.Json by default; the party host requires it in the payload. -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" ForceIncludeInVSIX="true" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="18.5.40034" PrivateAssets="all" Condition="'$(OS)' == 'Windows_NT'" />
   </ItemGroup>
   <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
