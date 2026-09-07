@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from Bananify's original palettes by scripts/generate-themes.cjs. -->
+<Themes>
+  <Theme Name="Banana Cream" GUID="{67f82e36-25f5-4de5-9bfd-d1875a01f387}" FallbackId="{de3dbbcd-f642-433c-8353-8f1df4370aba}">
+    <Category Name="Environment" GUID="{624ed9c3-bdfd-41fa-96c3-7c824ea32e3d}">
+      <Color Name="ToolWindowBackground">
+        <Background Type="CT_RAW" Source="FFFFF1BE" />
+      </Color>
+      <Color Name="ToolWindowText">
+        <Foreground Type="CT_RAW" Source="FF3D3325" />
+      </Color>
+      <Color Name="ToolWindowBorder">
+        <Background Type="CT_RAW" Source="FFC9B66E" />
+      </Color>
+      <Color Name="CommandBarGradientBegin">
+        <Background Type="CT_RAW" Source="FFFFF1BE" />
+      </Color>
+      <Color Name="CommandBarGradientEnd">
+        <Background Type="CT_RAW" Source="FFFFF1BE" />
+      </Color>
+      <Color Name="CommandBarTextActive">
+        <Foreground Type="CT_RAW" Source="FF3D3325" />
+      </Color>
+      <Color Name="CommandBarTextHover">
+        <Foreground Type="CT_RAW" Source="FF342A20" />
+      </Color>
+      <Color Name="CommandBarMenuBackgroundGradientBegin">
+        <Background Type="CT_RAW" Source="FFFFF1BE" />
+      </Color>
+      <Color Name="CommandBarMenuBackgroundGradientEnd">
+        <Background Type="CT_RAW" Source="FFFFF1BE" />
+      </Color>
+      <Color Name="CommandBarMenuBorder">
+        <Background Type="CT_RAW" Source="FFC9B66E" />
+      </Color>
+      <Color Name="StatusBarDefault">
+        <Background Type="CT_RAW" Source="FF765700" />
+        <Foreground Type="CT_RAW" Source="FFFFFFFF" />
+      </Color>
+      <Color Name="EnvironmentBackground">
+        <Background Type="CT_RAW" Source="FFF1C84B" />
+      </Color>
+    </Category>
+    <Category Name="Text Editor" GUID="{a27b4e24-a735-4d1d-b8e7-9716e1e3d8e0}">
+      <Color Name="Plain Text">
+        <Background Type="CT_RAW" Source="FFFFF8DF" />
+        <Foreground Type="CT_RAW" Source="FF342A20" />
+      </Color>
+      <Color Name="Selected Text">
+        <Background Type="CT_RAW" Source="FFEBD47F" />
+        <Foreground Type="CT_RAW" Source="FF342A20" />
+      </Color>
+      <Color Name="Inactive Selected Text">
+        <Background Type="CT_RAW" Source="FFF5E8B9" />
+        <Foreground Type="CT_RAW" Source="FF342A20" />
+      </Color>
+      <Color Name="Line Numbers">
+        <Foreground Type="CT_RAW" Source="FF796F5D" />
+      </Color>
+      <Color Name="Indicator Margin">
+        <Background Type="CT_RAW" Source="FFFFF8DF" />
+      </Color>
+      <Color Name="Comment">
+        <Foreground Type="CT_RAW" Source="FF626956" />
+      </Color>
+      <Color Name="String">
+        <Foreground Type="CT_RAW" Source="FF765900" />
+      </Color>
+      <Color Name="String - Verbatim">
+        <Foreground Type="CT_RAW" Source="FF765900" />
+      </Color>
+      <Color Name="Keyword">
+        <Foreground Type="CT_RAW" Source="FF8C3F10" />
+      </Color>
+      <Color Name="Control Keyword">
+        <Foreground Type="CT_RAW" Source="FF8C3F10" />
+      </Color>
+      <Color Name="Number">
+        <Foreground Type="CT_RAW" Source="FFA1332D" />
+      </Color>
+      <Color Name="Identifier">
+        <Foreground Type="CT_RAW" Source="FF342A20" />
+      </Color>
+      <Color Name="Operator">
+        <Foreground Type="CT_RAW" Source="FF342A20" />
+      </Color>
+      <Color Name="Punctuation">
+        <Foreground Type="CT_RAW" Source="FF342A20" />
+      </Color>
+      <Color Name="User Types">
+        <Foreground Type="CT_RAW" Source="FF663C91" />
+      </Color>
+      <Color Name="User Types - Classes">
+        <Foreground Type="CT_RAW" Source="FF663C91" />
+      </Color>
+      <Color Name="User Types - Interfaces">
+        <Foreground Type="CT_RAW" Source="FF663C91" />
+      </Color>
+      <Color Name="User Types - Enums">
+        <Foreground Type="CT_RAW" Source="FF663C91" />
+      </Color>
+      <Color Name="User Types - Structs">
+        <Foreground Type="CT_RAW" Source="FF663C91" />
+      </Color>
+      <Color Name="User Types - Delegates">
+        <Foreground Type="CT_RAW" Source="FF663C91" />
+      </Color>
+      <Color Name="User Members - Methods">
+        <Foreground Type="CT_RAW" Source="FF176247" />
+      </Color>
+      <Color Name="User Members - Extension Methods">
+        <Foreground Type="CT_RAW" Source="FF176247" />
+      </Color>
+      <Color Name="User Members - Properties">
+        <Foreground Type="CT_RAW" Source="FF342A20" />
+      </Color>
+      <Color Name="User Members - Fields">
+        <Foreground Type="CT_RAW" Source="FF342A20" />
+      </Color>
+      <Color Name="User Members - Events">
+        <Foreground Type="CT_RAW" Source="FF342A20" />
+      </Color>
+      <Color Name="User Members - Parameters">
+        <Foreground Type="CT_RAW" Source="FF342A20" />
+      </Color>
+      <Color Name="User Members - Local Variables">
+        <Foreground Type="CT_RAW" Source="FF342A20" />
+      </Color>
+      <Color Name="XML Doc Comment">
+        <Foreground Type="CT_RAW" Source="FF626956" />
+      </Color>
+      <Color Name="XML Doc Comment - Delimiter">
+        <Foreground Type="CT_RAW" Source="FF626956" />
+      </Color>
+      <Color Name="XML Doc Comment - Name">
+        <Foreground Type="CT_RAW" Source="FF663C91" />
+      </Color>
+      <Color Name="Preprocessor Keyword">
+        <Foreground Type="CT_RAW" Source="FF8C3F10" />
+      </Color>
+    </Category>
+    <Category Name="Shell" GUID="{73708ded-2d56-4aad-b8eb-73b20d3f4bff}">
+      <Color Name="AccentFillDefault">
+        <Background Type="CT_RAW" Source="FF8C3F10" />
+      </Color>
+      <Color Name="AccentFillSecondary">
+        <Background Type="CT_RAW" Source="E58C3F10" />
+      </Color>
+      <Color Name="AccentFillTertiary">
+        <Background Type="CT_RAW" Source="CC8C3F10" />
+      </Color>
+      <Color Name="TextOnAccentFillPrimary">
+        <Background Type="CT_RAW" Source="FFFFFFFF" />
+      </Color>
+      <Color Name="SolidBackgroundFillBase">
+        <Background Type="CT_RAW" Source="FFFFF8DF" />
+      </Color>
+      <Color Name="SolidBackgroundFillSecondary">
+        <Background Type="CT_RAW" Source="FFFFF1BE" />
+      </Color>
+      <Color Name="SolidBackgroundFillTertiary">
+        <Background Type="CT_RAW" Source="FFFFF1BE" />
+      </Color>
+      <Color Name="SolidBackgroundFillQuaternary">
+        <Background Type="CT_RAW" Source="FFF5E8B9" />
+      </Color>
+      <Color Name="SurfaceBackgroundFillDefault">
+        <Background Type="CT_RAW" Source="FFFFF1BE" />
+      </Color>
+      <Color Name="TextFillPrimary">
+        <Background Type="CT_RAW" Source="FF342A20" />
+      </Color>
+      <Color Name="TextFillSecondary">
+        <Background Type="CT_RAW" Source="FF3D3325" />
+      </Color>
+      <Color Name="TextFillTertiary">
+        <Background Type="CT_RAW" Source="FF626956" />
+      </Color>
+      <Color Name="ControlFillDefault">
+        <Background Type="CT_RAW" Source="FFFFF1BE" />
+      </Color>
+      <Color Name="ControlFillSecondary">
+        <Background Type="CT_RAW" Source="FFF5E8B9" />
+      </Color>
+      <Color Name="ControlFillTertiary">
+        <Background Type="CT_RAW" Source="FFEBD47F" />
+      </Color>
+      <Color Name="ControlStrokeDefault">
+        <Background Type="CT_RAW" Source="FFC9B66E" />
+      </Color>
+    </Category>
+    <Category Name="ShellInternal" GUID="{5af241b7-5627-4d12-bfb1-2b67d11127d7}">
+      <Color Name="EnvironmentHeader">
+        <Background Type="CT_RAW" Source="FFF1C84B" />
+      </Color>
+      <Color Name="EnvironmentTab">
+        <Background Type="CT_RAW" Source="FFFFF8DF" />
+      </Color>
+      <Color Name="EnvironmentBody">
+        <Background Type="CT_RAW" Source="FFFFF1BE" />
+      </Color>
+      <Color Name="EnvironmentBodyText">
+        <Background Type="CT_RAW" Source="FF3D3325" />
+      </Color>
+      <Color Name="EnvironmentBackground">
+        <Background Type="CT_RAW" Source="FFF1C84B" />
+      </Color>
+      <Color Name="EnvironmentHeaderInactive">
+        <Background Type="CT_RAW" Source="FFF7EBC2" />
+      </Color>
+      <Color Name="EnvironmentTabInactive">
+        <Background Type="CT_RAW" Source="FFF7EBC2" />
+      </Color>
+      <Color Name="StatusBarBackgroundFillRest">
+        <Background Type="CT_RAW" Source="FF765700" />
+      </Color>
+      <Color Name="EnvironmentBorder">
+        <Background Type="CT_RAW" Source="FFC9B66E" />
+      </Color>
+      <Color Name="EnvironmentIndicator">
+        <Background Type="CT_RAW" Source="FF8C3F10" />
+      </Color>
+      <Color Name="EnvironmentLogo">
+        <Background Type="CT_RAW" Source="FF2A2118" />
+      </Color>
+      <Color Name="EnvironmentLayeredBackground">
+        <Background Type="CT_RAW" Source="FFFFF1BE" />
+      </Color>
+    </Category>
+  </Theme>
+</Themes>

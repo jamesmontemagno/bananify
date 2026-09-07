@@ -1,0 +1,70 @@
+name: Visual Studio Extension
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "visual-studio-extension/**"
+      - ".github/workflows/visual-studio.yml"
+      - "vscode-extension/artwork.js"
+      - "vscode-extension/themes/**"
+      - "package.json"
+      - "package-lock.json"
+  pull_request:
+    paths:
+      - "visual-studio-extension/**"
+      - ".github/workflows/visual-studio.yml"
+      - "vscode-extension/artwork.js"
+      - "vscode-extension/themes/**"
+      - "package.json"
+      - "package-lock.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visual-studio-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Build and inspect VSIX (not an IDE runtime test)
+    runs-on: windows-2022
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
+      - name: Test portable behavior
+        run: dotnet test visual-studio-extension/tests/Bananify.Core.Tests/Bananify.Core.Tests.csproj --configuration Release --verbosity minimal
+      - name: Restore existing browser test dependencies
+        run: npm ci
+      - name: Install browser test runtime
+        run: npx playwright install chromium
+      - name: Check deterministic artwork and themes
+        run: node visual-studio-extension/scripts/check-generated.cjs
+      - name: Check package and browser party contracts
+        run: node --test visual-studio-extension/tests/package.test.mjs visual-studio-extension/scripts/party.test.mjs
+      - name: Build SDK-style C# and VB runtime fixtures
+        run: dotnet build visual-studio-extension/tests/Fixtures/BadgeFixture.sln --configuration Release --verbosity minimal
+      - name: Build native VSIX with Windows MSBuild
+        run: msbuild visual-studio-extension/src/Bananify/Bananify.csproj /restore /t:Rebuild /p:Configuration=Release /p:DeployExtension=false /p:VsixDeployOnDebug=false /v:minimal
+      - name: Inspect packaged payload
+        shell: pwsh
+        run: |
+          $packages = @(Get-ChildItem visual-studio-extension/src/Bananify/bin/Release -Filter *.vsix -Recurse)
+          if ($packages.Count -ne 1) { throw "Expected one native VSIX; found $($packages.Count)." }
+          ./visual-studio-extension/Verify-Vsix.ps1 -Path $packages[0].FullName
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: bananify-visual-studio
+          path: visual-studio-extension/src/Bananify/bin/Release/**/*.vsix
+          if-no-files-found: error
