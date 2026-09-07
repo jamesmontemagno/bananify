@@ -44,7 +44,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\..\..\icons\banana-128.png" Link="Resources\banana.png">
+    <Content Include="..\..\..\icons\banana-128.png" Link="Resources\banana-128.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

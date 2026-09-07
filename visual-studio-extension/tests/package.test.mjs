@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
+import { win32 } from "node:path";
 
 const source = new URL("../src/Bananify/", import.meta.url);
 
@@ -41,6 +42,26 @@ test("the party host JSON dependency is explicitly included despite VSSDK suppre
   assert.ok(reference, "Missing direct Newtonsoft.Json dependency");
   assert.match(reference, /\bForceIncludeInVSIX="true"/);
   assert.ok(verifier.includes('"Newtonsoft.Json.dll"'), "Payload inspection must require the JSON assembly");
+});
+
+test("manifest icon and license match linked VSIX content without renaming source files", async () => {
+  const [project, manifest, verifier] = await Promise.all([
+    readFile(new URL("Bananify.csproj", source), "utf8"),
+    readFile(new URL("source.extension.vsixmanifest", source), "utf8"),
+    readFile(new URL("../Verify-Vsix.ps1", import.meta.url), "utf8"),
+  ]);
+  for (const tag of ["Icon", "License"]) {
+    const path = manifest.match(new RegExp(`<${tag}>([^<]+)</${tag}>`))?.[1];
+    assert.ok(path, `Missing manifest ${tag}`);
+    const content = [...project.matchAll(/<Content\b([^>]+)>([\s\S]*?)<\/Content>/g)]
+      .find((match) => match[1].includes(`Link="${path}"`));
+    assert.ok(content, `Missing linked content for ${path}`);
+    const include = content[1].match(/\bInclude="([^"]+)"/)?.[1];
+    assert.ok(include);
+    assert.equal(win32.basename(path), win32.basename(include), "VSIX links cannot rename source files");
+    assert.match(content[2], /<IncludeInVSIX>true<\/IncludeInVSIX>/);
+    assert.ok(verifier.includes(`"${path.replaceAll("\\", "/")}"`), `Payload inspection must require ${path}`);
+  }
 });
 
 test("all four IDE themes have distinct identities and modern shell tokens", async () => {

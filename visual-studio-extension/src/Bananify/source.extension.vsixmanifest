@@ -6,7 +6,7 @@
     <Description xml:space="preserve">A local banana party for Visual Studio: editor decorations, three monkey companions, four optional themes, and opt-in badges for SDK-style C# and VB projects.</Description>
     <MoreInfo>https://bananify.online</MoreInfo>
     <License>LICENSE</License>
-    <Icon>Resources\banana.png</Icon>
+    <Icon>Resources\banana-128.png</Icon>
     <Tags>banana,monkey,theme,editor,fun</Tags>
   </Metadata>
   <Installation>

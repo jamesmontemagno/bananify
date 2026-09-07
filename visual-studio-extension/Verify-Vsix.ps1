@@ -6,7 +6,7 @@ try {
     $entries = @($archive.Entries | ForEach-Object { $_.FullName.Replace('\', '/') })
     foreach ($required in @("extension.vsixmanifest", "Bananify.VisualStudio.dll", "Bananify.Core.dll",
         "Community.VisualStudio.Toolkit.dll", "Microsoft.Web.WebView2.Core.dll", "Microsoft.Web.WebView2.Wpf.dll", "Newtonsoft.Json.dll",
-        "Web/party.html", "Web/party.css", "Web/party.js", "Resources/banana.png", "LICENSE",
+        "Web/party.html", "Web/party.css", "Web/party.js", "Resources/banana-128.png", "LICENSE",
         "Themes/BananaGrove.pkgdef", "Themes/BananaCream.pkgdef", "Themes/MidnightBanana.pkgdef", "Themes/MonkeyJungle.pkgdef",
         "runtimes/win-x64/native/WebView2Loader.dll", "runtimes/win-arm64/native/WebView2Loader.dll")) {
         if (-not ($entries | Where-Object { $_ -eq $required -or $_.EndsWith("/$required") })) {
@@ -19,6 +19,12 @@ try {
     $reader = [System.IO.StreamReader]::new($manifestEntry.Open())
     try { [xml]$manifest = $reader.ReadToEnd() }
     finally { $reader.Dispose() }
+    foreach ($metadataName in @("Icon", "License")) {
+        $metadataPath = ([string]$manifest.PackageManifest.Metadata.$metadataName).Replace('\', '/')
+        if (-not $metadataPath -or $entries -notcontains $metadataPath) {
+            throw "Manifest $metadataName is absent from the VSIX: $metadataPath"
+        }
+    }
     foreach ($asset in $manifest.PackageManifest.Assets.Asset) {
         $assetPath = ([string]$asset.Path).Replace('\', '/')
         if (-not $assetPath -or $entries -notcontains $assetPath) {
