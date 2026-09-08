@@ -63,6 +63,10 @@ test("workflow source restricts publishing to successful Visual Studio tag build
   assert.match(publish, /if: github.event_name == 'push' && startsWith\(github.ref, 'refs\/tags\/visualstudio-v'\)/);
   assert.match(publish, /needs: build/);
   assert.match(publish, /runs-on: windows-2022/);
+  assert.ok(publish.includes("dotnet restore visual-studio-extension/src/Bananify/Bananify.csproj"));
+  assert.ok(publish.includes("src/Bananify/obj/project.assets.json"));
+  assert.ok(publish.includes("Microsoft.VSSDK.BuildTools/*"));
+  assert.ok(publish.includes("/tools/vssdk/bin/VsixPublisher.exe"));
   assert.doesNotMatch(publish, /always\(\)|continue-on-error|msbuild|dotnet build/);
   assert.match(build, /RELEASE_TAG: \$\{\{ github.ref_type == 'tag' && github.ref_name \|\| '' \}\}/);
   assert.ok(build.indexOf("scripts/release-version.cjs") < build.indexOf("/t:Rebuild"));

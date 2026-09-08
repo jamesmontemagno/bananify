@@ -91,9 +91,14 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: "10.0.x"
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 24
+      - name: Restore pinned publishing SDK (no rebuild)
+        run: dotnet restore visual-studio-extension/src/Bananify/Bananify.csproj --verbosity minimal
       - name: Download tested VSIX
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
@@ -120,9 +125,15 @@ jobs:
           $publishManifest = (Resolve-Path vs-publish.json).Path
           $metadata = Get-Content $publishManifest -Raw | ConvertFrom-Json
           if ($metadata.publisher -ne 'vs-publisher-473885' -or $metadata.private -ne $false) { throw 'Expected the public Bananify Marketplace publisher configuration.' }
-          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
-          $publisher = & $vswhere -latest -products '*' -find 'VSSDK\VisualStudioIntegration\Tools\Bin\VsixPublisher.exe' | Select-Object -First 1
-          if ($LASTEXITCODE -ne 0 -or -not $publisher) { throw 'VsixPublisher.exe was not found in the installed Visual Studio SDK.' }
+          $assets = Get-Content src/Bananify/obj/project.assets.json -Raw | ConvertFrom-Json
+          $sdk = @($assets.libraries.PSObject.Properties | Where-Object { $_.Name -like 'Microsoft.VSSDK.BuildTools/*' })
+          if ($sdk.Count -ne 1) { throw 'Expected one restored Microsoft.VSSDK.BuildTools package.' }
+          $publisher = $null
+          foreach ($folder in $assets.packageFolders.PSObject.Properties) {
+            $candidate = Join-Path $folder.Name "$($sdk[0].Value.path)/tools/vssdk/bin/VsixPublisher.exe"
+            if (Test-Path -LiteralPath $candidate) { $publisher = $candidate; break }
+          }
+          if (-not $publisher) { throw 'VsixPublisher.exe was not found in the pinned SDK package.' }
           & $publisher publish -payload $env:VSIX_PATH -publishManifest $publishManifest -personalAccessToken $env:VSCE_PAT
           if ($LASTEXITCODE -ne 0) { throw "Marketplace publishing failed with exit code $LASTEXITCODE." }
       - name: Create GitHub release
