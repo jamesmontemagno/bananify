@@ -162,6 +162,8 @@ test("invalid native density snapshots leave the previous state untouched", asyn
 for (const [width, compact] of [[320, true], [1100, false]]) {
   test(`foreground paint order survives celebration and overlays do not intercept clicks at ${width}px`, async () => {
     const page = await open(width, compact);
+    const consoleErrors = [];
+    page.on("console", (message) => { if (message.type() === "error") consoleErrors.push(message.text()); });
     try {
       const inspect = async (celebrate) => page.evaluate(({ celebrate, compact }) => {
         if (celebrate) window.chrome.webview.dispatchEvent(new MessageEvent("message", { data: { type: "celebrate", reason: "save" } }));
@@ -178,7 +180,10 @@ for (const [width, compact] of [[320, true], [1100, false]]) {
           z: [stage, sky, bursts, ...nodes.slice(1)].map((node) => getComputedStyle(node).zIndex),
           pointerEvents: [sky, bursts].map((node) => getComputedStyle(node).pointerEvents),
         };
-        const saved = [sky, bursts].map((node) => node.getAttribute("style"));
+        const saved = [sky, bursts].map((node) => ({
+          value: node.style.getPropertyValue("pointer-events"),
+          priority: node.style.getPropertyPriority("pointer-events"),
+        }));
         try {
           // Expose the real stacking contexts to hit testing without changing z-index,
           // geometry, transforms, animations, or any foreground styles.
@@ -193,9 +198,10 @@ for (const [width, compact] of [[320, true], [1100, false]]) {
               targetIndex: painted.indexOf(node), skyIndex: painted.indexOf(sky), burstsIndex: painted.indexOf(bursts) };
           });
         } finally {
+          // Restore through CSSOM; assigning a style attribute is blocked by the page's CSP.
           [sky, bursts].forEach((node, index) => {
-            if (saved[index] === null) node.removeAttribute("style");
-            else node.setAttribute("style", saved[index]);
+            if (saved[index].value) node.style.setProperty("pointer-events", saved[index].value, saved[index].priority);
+            else node.style.removeProperty("pointer-events");
           });
         }
         result.restored = [sky, bursts].map((node) => getComputedStyle(node).pointerEvents);
@@ -233,6 +239,7 @@ for (const [width, compact] of [[320, true], [1100, false]]) {
         await button.click();
         assert.deepEqual(await page.evaluate((count) => window.chrome.webview.messages.slice(count), count), [expected]);
       }
+      assert.deepEqual(consoleErrors, [], "Paint inspection and cleanup must not violate CSP");
     } finally { await page.close(); }
   });
 }
@@ -687,7 +694,7 @@ for (const [width, compact] of [[160, true], [220, true], [240, true], [320, tru
           assert.equal(await page.locator(".banana-level").textContent(), `Banana level: ${density}/5`);
           const layout = await page.evaluate(() => ({
             viewport: innerWidth, document: document.documentElement.scrollWidth, body: document.body.scrollWidth,
-            boxes: [...document.querySelectorAll(".party-card, .message, .banana-level, .actions, .actions button, .monkey-choice")]
+            boxes: [...document.querySelectorAll(".party-card, .message, .banana-level, .actions, .actions button, .monkey-choice, .monkey-choice > span")]
               .filter((node) => node.getClientRects().length)
               .map((node) => { const rect = node.getBoundingClientRect(); return { name: node.className || node.textContent,
                 left: rect.left, right: rect.right, client: node.clientWidth, scroll: node.scrollWidth }; }),

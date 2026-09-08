@@ -44,6 +44,7 @@ button { min-height: 36px; padding: 7px 12px; border: 1px solid transparent; bor
 button:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 .secondary { background: var(--secondary); color: var(--secondary-text); border-color: var(--border); }
 .monkey-choice { background: transparent; color: var(--foreground); padding: 4px; width: 30%; max-width: 170px; border-bottom: 2px solid transparent; }
+.monkey-choice > span { display: block; overflow-wrap: anywhere; }
 .monkey-choice[aria-pressed="true"] { border-bottom-color: var(--focus); }
 button:hover:not(:disabled) { background: var(--hover); color: var(--hover-text); border-color: var(--focus); }
 button:active:not(:disabled) { background: var(--pressed); color: var(--pressed-text); }
