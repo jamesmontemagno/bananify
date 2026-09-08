@@ -137,7 +137,7 @@ public sealed class BananifyPackage : ToolkitPackage
     {
         ThreadHelper.ThrowIfNotOnUIThread();
         VsShellUtilities.ShowMessageBox(this,
-            PartySession.Instance.State.MonkeyName + " says: One small commit is still a big step forward.",
+            PartySession.Instance.Encourage(),
             "Bananify", OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
     }
 

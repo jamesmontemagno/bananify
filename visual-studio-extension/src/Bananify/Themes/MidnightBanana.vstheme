@@ -7,7 +7,7 @@
         <Background Type="CT_RAW" Source="FF151B29" />
       </Color>
       <Color Name="ToolWindowText">
-        <Foreground Type="CT_RAW" Source="FFE5E8F0" />
+        <Background Type="CT_RAW" Source="FFE5E8F0" />
       </Color>
       <Color Name="ToolWindowBorder">
         <Background Type="CT_RAW" Source="FF3B4561" />
@@ -19,10 +19,16 @@
         <Background Type="CT_RAW" Source="FF151B29" />
       </Color>
       <Color Name="CommandBarTextActive">
-        <Foreground Type="CT_RAW" Source="FFE5E8F0" />
+        <Background Type="CT_RAW" Source="FFE5E8F0" />
       </Color>
       <Color Name="CommandBarTextHover">
-        <Foreground Type="CT_RAW" Source="FFF3EBC7" />
+        <Background Type="CT_RAW" Source="FFF3EBC7" />
+      </Color>
+      <Color Name="CommandBarMouseOverBackgroundBegin">
+        <Background Type="CT_RAW" Source="FF252D42" />
+      </Color>
+      <Color Name="CommandBarMouseOverBackgroundEnd">
+        <Background Type="CT_RAW" Source="FF252D42" />
       </Color>
       <Color Name="CommandBarMenuBackgroundGradientBegin">
         <Background Type="CT_RAW" Source="FF151B29" />
@@ -32,6 +38,64 @@
       </Color>
       <Color Name="CommandBarMenuBorder">
         <Background Type="CT_RAW" Source="FF3B4561" />
+      </Color>
+      <Color Name="CommandBarMenuIconBackground">
+        <Background Type="CT_RAW" Source="FF151B29" />
+      </Color>
+      <Color Name="CommandBarMenuSeparator">
+        <Background Type="CT_RAW" Source="FF3B4561" />
+      </Color>
+      <Color Name="CommandBarMenuItemMouseOver">
+        <Background Type="CT_RAW" Source="FF252D42" />
+        <Foreground Type="CT_RAW" Source="FFF3EBC7" />
+      </Color>
+      <Color Name="FileTabBackground">
+        <Background Type="CT_RAW" Source="FF171D2D" />
+      </Color>
+      <Color Name="FileTabBorder">
+        <Background Type="CT_RAW" Source="FF171D2D" />
+      </Color>
+      <Color Name="FileTabText">
+        <Background Type="CT_RAW" Source="FFE5E8F0" />
+      </Color>
+      <Color Name="FileTabSelectedGradientTop">
+        <Background Type="CT_RAW" Source="FF101522" />
+      </Color>
+      <Color Name="FileTabSelectedGradientBottom">
+        <Background Type="CT_RAW" Source="FF101522" />
+      </Color>
+      <Color Name="FileTabSelectedBorder">
+        <Background Type="CT_RAW" Source="FF101522" />
+      </Color>
+      <Color Name="FileTabSelectedText">
+        <Background Type="CT_RAW" Source="FFF3EBC7" />
+      </Color>
+      <Color Name="FileTabDocumentBorderBackground">
+        <Background Type="CT_RAW" Source="FFFFD94A" />
+      </Color>
+      <Color Name="FileTabInactiveGradientTop">
+        <Background Type="CT_RAW" Source="FF171D2D" />
+      </Color>
+      <Color Name="FileTabInactiveGradientBottom">
+        <Background Type="CT_RAW" Source="FF171D2D" />
+      </Color>
+      <Color Name="FileTabInactiveBorder">
+        <Background Type="CT_RAW" Source="FF171D2D" />
+      </Color>
+      <Color Name="FileTabInactiveText">
+        <Background Type="CT_RAW" Source="FFE5E8F0" />
+      </Color>
+      <Color Name="FileTabHotGradientTop">
+        <Background Type="CT_RAW" Source="FF252D42" />
+      </Color>
+      <Color Name="FileTabHotGradientBottom">
+        <Background Type="CT_RAW" Source="FF252D42" />
+      </Color>
+      <Color Name="FileTabHotBorder">
+        <Background Type="CT_RAW" Source="FF252D42" />
+      </Color>
+      <Color Name="FileTabHotText">
+        <Background Type="CT_RAW" Source="FFF3EBC7" />
       </Color>
       <Color Name="StatusBarDefault">
         <Background Type="CT_RAW" Source="FF6D5200" />
@@ -47,15 +111,18 @@
         <Foreground Type="CT_RAW" Source="FFF3EBC7" />
       </Color>
       <Color Name="Selected Text">
-        <Background Type="CT_RAW" Source="FF333D59" />
+        <Background Type="CT_RAW" Source="FF453E29" />
         <Foreground Type="CT_RAW" Source="FFF3EBC7" />
       </Color>
       <Color Name="Inactive Selected Text">
         <Background Type="CT_RAW" Source="FF252D42" />
         <Foreground Type="CT_RAW" Source="FFF3EBC7" />
       </Color>
-      <Color Name="Line Numbers">
-        <Foreground Type="CT_RAW" Source="FF737C94" />
+      <Color Name="Line Number">
+        <Foreground Type="CT_RAW" Source="FF798297" />
+      </Color>
+      <Color Name="Selected Line Number">
+        <Foreground Type="CT_RAW" Source="FFFFD94A" />
       </Color>
       <Color Name="Indicator Margin">
         <Background Type="CT_RAW" Source="FF101522" />
@@ -225,6 +292,41 @@
       </Color>
       <Color Name="EnvironmentLayeredBackground">
         <Background Type="CT_RAW" Source="FF151B29" />
+      </Color>
+    </Category>
+    <Category Name="TreeView" GUID="{92ecf08e-8b13-4cf4-99e9-ae2692382185}">
+      <Color Name="Background">
+        <Background Type="CT_RAW" Source="FF151B29" />
+        <Foreground Type="CT_RAW" Source="FFE5E8F0" />
+      </Color>
+      <Color Name="SelectedItemActive">
+        <Background Type="CT_RAW" Source="FF333D59" />
+        <Foreground Type="CT_RAW" Source="FFE5E8F0" />
+      </Color>
+      <Color Name="SelectedItemInactive">
+        <Background Type="CT_RAW" Source="FF252D42" />
+        <Foreground Type="CT_RAW" Source="FFE5E8F0" />
+      </Color>
+      <Color Name="Glyph">
+        <Background Type="CT_RAW" Source="FFE5E8F0" />
+      </Color>
+      <Color Name="GlyphMouseOver">
+        <Background Type="CT_RAW" Source="FFE5E8F0" />
+      </Color>
+      <Color Name="SelectedItemActiveGlyph">
+        <Background Type="CT_RAW" Source="FFE5E8F0" />
+      </Color>
+      <Color Name="SelectedItemActiveGlyphMouseOver">
+        <Background Type="CT_RAW" Source="FFE5E8F0" />
+      </Color>
+      <Color Name="SelectedItemInactiveGlyph">
+        <Background Type="CT_RAW" Source="FFE5E8F0" />
+      </Color>
+      <Color Name="SelectedItemInactiveGlyphMouseOver">
+        <Background Type="CT_RAW" Source="FFE5E8F0" />
+      </Color>
+      <Color Name="FocusVisualBorder">
+        <Background Type="CT_RAW" Source="FFFFD94A" />
       </Color>
     </Category>
   </Theme>

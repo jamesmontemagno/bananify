@@ -41,6 +41,8 @@ public sealed class PartyHostControl : UserControl, IDisposable
         this.userDataRoot = userDataRoot ?? throw new ArgumentNullException(nameof(userDataRoot));
         SetResourceReference(BackgroundProperty, EnvironmentColors.ToolWindowBackgroundBrushKey);
         SetResourceReference(ForegroundProperty, EnvironmentColors.ToolWindowTextBrushKey);
+        retry.SetResourceReference(StyleProperty, VsResourceKeys.ButtonStyleKey);
+        restore.SetResourceReference(StyleProperty, VsResourceKeys.ButtonStyleKey);
         status.Text = "Preparing the bunch…";
         fallback.Children.Add(status);
         fallback.Children.Add(retry);
@@ -108,7 +110,11 @@ public sealed class PartyHostControl : UserControl, IDisposable
     private async void SystemSettingChanged(object? sender, PropertyChangedEventArgs e)
     {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-        if (!disposed) SendSnapshot();
+        if (!disposed)
+        {
+            SendTheme();
+            SendSnapshot();
+        }
     }
     [SuppressMessage("Usage", "VSTHRD100", Justification = "VS theme event; marshal to the IDE thread before reading theme resources.")]
     private async void ThemeChanged(ThemeChangedEventArgs e)
@@ -241,6 +247,10 @@ public sealed class PartyHostControl : UserControl, IDisposable
                 case "pause": PartySession.Instance.PauseOrResume(); break;
                 case "restore": PartySession.Instance.Restore(); break;
                 case "more": PartySession.Instance.More(); break;
+                case "encourage":
+                    if (ready && loaded && IsVisible)
+                        Post(new { type = "encouragement", text = PartySession.Instance.Encourage() });
+                    break;
                 default: RejectMessage("Unknown command."); break;
             }
         }
@@ -287,13 +297,28 @@ public sealed class PartyHostControl : UserControl, IDisposable
             button = Color(EnvironmentColors.SystemHighlightColorKey),
             buttonText = Color(EnvironmentColors.SystemHighlightTextColorKey),
             focus = Color(EnvironmentColors.SystemHighlightColorKey),
-            secondary = Color(EnvironmentColors.CommandBarGradientBeginColorKey)
+            secondary = Color(EnvironmentColors.CommandBarGradientBeginColorKey),
+            secondaryText = Color(EnvironmentColors.CommandBarTextActiveColorKey),
+            hover = Color(EnvironmentColors.CommandBarMouseOverBackgroundBeginColorKey),
+            hoverText = Color(EnvironmentColors.CommandBarTextHoverColorKey),
+            pressed = Color(EnvironmentColors.CommandBarMouseDownBackgroundBeginColorKey),
+            pressedText = Color(EnvironmentColors.CommandBarTextMouseDownColorKey),
+            disabled = Color(EnvironmentColors.CommandBarGradientBeginColorKey),
+            disabledText = Color(EnvironmentColors.CommandBarTextInactiveColorKey),
+            highContrast = SystemParameters.HighContrast
         });
     }
 
-    private void Celebrated(object? sender, EventArgs e)
+    private void Celebrated(object? sender, CelebrationEventArgs e)
     {
-        if (loaded && IsVisible) Post(new { type = "celebrate" });
+        var reason = e.Kind switch
+        {
+            CelebrationKind.Save => "save",
+            CelebrationKind.Build => "build",
+            CelebrationKind.More => "more",
+            _ => throw new ArgumentOutOfRangeException(nameof(e)),
+        };
+        if (loaded && IsVisible) Post(new { type = "celebrate", reason });
     }
 
     private void Post(object value)

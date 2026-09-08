@@ -8,17 +8,27 @@
   const sky = document.querySelector(".sky");
   const bursts = document.querySelector(".bursts");
   const template = document.querySelector("#banana-template");
+  const level = document.querySelector(".banana-level");
   const message = document.querySelector(".message");
   const pause = document.querySelector('[data-command="pause"]');
   const more = document.querySelector('[data-command="more"]');
   const motion = matchMedia("(prefers-reduced-motion: reduce)");
+  const contrast = matchMedia("(forced-colors: active)");
   const events = new AbortController();
   const timers = new Map();
   const names = { brown: "Mooch", "black-and-white": "Sebastian", golden: "Henry" };
+  const celebrations = { save: "Save completed! One more bit of progress safely tucked away.",
+    build: "Build succeeded! A whole bunch of good work.", more: "More bananas! Thanks for growing the bunch." };
   const MAX_RAIN = 28;
   const MAX_BURSTS = 30;
   let state = { active: false, paused: false, visible: false, reducedMotion: true, density: 0, monkey: "brown" };
   let celebrationTimer;
+  let feedback = "";
+
+  function showFeedback(text) {
+    feedback = text;
+    message.textContent = text;
+  }
 
   function clearBursts() {
     for (const timer of timers.values()) clearTimeout(timer);
@@ -28,7 +38,7 @@
     body.classList.remove("celebrating");
   }
   function running() { return state.active && !state.paused && state.visible && !document.hidden; }
-  function reduced() { return state.reducedMotion || motion.matches; }
+  function reduced() { return state.reducedMotion || motion.matches || contrast.matches || body.classList.contains("high-contrast"); }
   function sync() {
     body.classList.toggle("active", state.active);
     body.classList.toggle("paused", state.paused);
@@ -36,12 +46,13 @@
     body.classList.toggle("reduced", reduced());
     pause.textContent = state.paused ? "Resume" : "Pause";
     more.disabled = !running();
+    level.textContent = `Banana level: ${state.density}/5`;
     document.querySelectorAll(".monkey-choice").forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.monkey === state.monkey));
     });
-    message.textContent = state.active
+    message.textContent = feedback || (state.active
       ? names[state.monkey] + (state.paused ? " is saving some energy." : " brought the whole bunch.")
-      : "The party is ready when you are.";
+      : "The party is ready when you are.");
     if (!running() || reduced()) clearBursts();
     const count = running() && !reduced() ? Math.min(MAX_RAIN, Math.max(0, state.density) * 6) : 0;
     while (sky.childElementCount > count) sky.lastElementChild.remove();
@@ -60,7 +71,7 @@
   function burst(x, y) {
     if (!running()) return;
     if (reduced()) {
-      message.textContent = names[state.monkey] + " says: a whole bunch of thanks!";
+      showFeedback(names[state.monkey] + " says: a whole bunch of thanks!");
       return;
     }
     const compact = body.classList.contains("compact");
@@ -92,16 +103,26 @@
     if (data.type === "snapshot") {
       if (!["active", "paused", "visible", "reducedMotion", "compact"].every((key) => typeof data[key] === "boolean")
         || !Object.hasOwn(names, data.monkey) || !Number.isInteger(data.density) || data.density < 1 || data.density > 5) return;
+      if (["active", "paused", "monkey", "visible"].some((key) => state[key] !== data[key])) feedback = "";
       state = data;
       body.classList.toggle("compact", data.compact);
       sync();
+    } else if (data.type === "encouragement" && state.visible && !document.hidden) {
+      if (typeof data.text !== "string" || data.text.length === 0 || data.text.length > 512) return;
+      showFeedback(data.text);
     } else if (data.type === "theme") {
-      const keys = ["background", "foreground", "border", "button", "buttonText", "focus", "secondary"];
-      if (!keys.every((key) => typeof data[key] === "string" && /^#[0-9a-f]{6}$/i.test(data[key]))) return;
-      for (const key of keys) document.documentElement.style.setProperty(`--${key === "buttonText" ? "button-text" : key}`, data[key]);
-    } else if (data.type === "celebrate" && running()) {
+      const keys = ["background", "foreground", "border", "button", "buttonText", "focus", "secondary", "secondaryText",
+        "hover", "hoverText", "pressed", "pressedText", "disabled", "disabledText"];
+      if (typeof data.highContrast !== "boolean" || !keys.every((key) => typeof data[key] === "string" && /^#[0-9a-f]{6}$/i.test(data[key]))) return;
+      for (const key of keys) document.documentElement.style.setProperty(`--${key.replace(/[A-Z]/g, (letter) => "-" + letter.toLowerCase())}`, data[key]);
+      const [r, g, b] = data.background.slice(1).match(/../g).map((hex) => parseInt(hex, 16));
+      document.documentElement.style.colorScheme = .2126 * r + .7152 * g + .0722 * b > 128 ? "light" : "dark";
+      body.classList.toggle("high-contrast", data.highContrast);
+      sync();
+    } else if (data.type === "celebrate" && running() && Object.hasOwn(celebrations, data.reason)) {
       const rect = document.querySelector(".monkey-stage").getBoundingClientRect();
       burst(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      showFeedback(names[state.monkey] + " says: " + celebrations[data.reason]);
       if (!reduced() && !body.classList.contains("celebrating")) {
         body.classList.add("celebrating");
         celebrationTimer = setTimeout(() => body.classList.remove("celebrating"), 700);
@@ -114,15 +135,16 @@
     if (!button || button.disabled) return;
     if (Object.hasOwn(names, button.dataset.monkey || "")) {
       bridge.postMessage({ command: "monkey", monkey: button.dataset.monkey });
-    } else if (["start", "pause", "more", "restore"].includes(button.dataset.command)) {
+    } else if (["start", "pause", "more", "restore", "encourage"].includes(button.dataset.command)) {
       bridge.postMessage({ command: button.dataset.command });
     }
   }, { signal: events.signal });
   document.addEventListener("pointerdown", (event) => {
     if (event.button === 0 && !event.target.closest("button")) burst(event.clientX, event.clientY);
   }, { signal: events.signal });
-  document.addEventListener("visibilitychange", sync, { signal: events.signal });
+  document.addEventListener("visibilitychange", () => { feedback = ""; sync(); }, { signal: events.signal });
   motion.addEventListener("change", sync, { signal: events.signal });
+  contrast.addEventListener("change", sync, { signal: events.signal });
   window.addEventListener("pagehide", () => {
     events.abort();
     bridge.removeEventListener("message", receive);

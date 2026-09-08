@@ -1,4 +1,7 @@
-param([Parameter(Mandatory = $true)][string]$Path)
+param(
+    [Parameter(Mandatory = $true)][string]$Path,
+    [string]$ReleaseTag = $env:RELEASE_TAG
+)
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $archive = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path $Path))
@@ -19,6 +22,11 @@ try {
     $reader = [System.IO.StreamReader]::new($manifestEntry.Open())
     try { [xml]$manifest = $reader.ReadToEnd() }
     finally { $reader.Dispose() }
+    if ($ReleaseTag) {
+        $version = [string]$manifest.PackageManifest.Metadata.Identity.Version
+        & node (Join-Path $PSScriptRoot 'scripts/release-version.cjs') $version $ReleaseTag
+        if ($LASTEXITCODE -ne 0) { throw "Packaged VSIX version does not match the release source/tag." }
+    }
     foreach ($metadataName in @("Icon", "License")) {
         $metadataPath = ([string]$manifest.PackageManifest.Metadata.$metadataName).Replace('\', '/')
         if (-not $metadataPath -or $entries -notcontains $metadataPath) {

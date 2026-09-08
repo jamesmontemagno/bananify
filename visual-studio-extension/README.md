@@ -12,6 +12,10 @@ Decorations never edit source text, dirty a document or add undo records. Illust
 
 **Pause** removes native decorations and badges while pausing the party. **Restore Editor** stops the party and hides its larger native window. Starting a new IDE session restores the enabled preference but not a transient paused state. **More Bananas** cycles density from 1 through 5 and back to 1; the party's burst control remains bounded.
 
+Both **Monkey Business** and **Banana Party** show the current **Banana level: N/5**, synchronized with settings and commands. Rain falls in front of the monkeys without intercepting clicks or obscuring the action buttons and messages.
+
+Use **Encourage me** in either panel for an inline phrase from the selected monkey, or **Tools > Bananify > Ask a Monkey for Encouragement** for a dialog. Both share 40 local phrases and avoid consecutive repeats. Encouragement works while paused or disabled and never starts decorations. Messages remain through unrelated state/theme updates; another message, a change of monkey, Start/Pause/Restore, or a visibility change replaces or clears them.
+
 Choose **Banana Grove**, **Banana Cream**, **Midnight Banana**, or **Monkey Jungle** through Visual Studio's theme settings. Installing or starting Bananify never changes the selected theme. Restoring the editor does not undo a theme you deliberately selected.
 
 ## Settings
@@ -25,10 +29,20 @@ Open **Tools > Options > Bananify > General**.
 | Monkey | `brown` | `brown` (Mooch), `black-and-white` (Sebastian), `golden` (Henry). |
 | Reduce motion | Off | Windows animation settings and high contrast also disable party motion. |
 | Enable file badges | Off | Visible editor files in supported SDK-style C#/VB project trees only. |
-| Celebrate completed saves | Off | A brief celebration on existing party surfaces. |
-| Celebrate successful solution builds | Off | Ignores failed/canceled builds and clean-only operations. |
+| Celebrate completed saves | Off | Shows **Save completed!** feedback after a document has saved in a visible party panel. |
+| Celebrate successful solution builds | Off | Shows **Build succeeded!** feedback; ignores failed/canceled builds and clean-only operations. |
 
-Automatic celebrations require an active, unpaused party, share a five-second cooldown, and never open or focus a window. No audio, typing capture, usage tracking or all-tests-passed inference is included.
+Automatic celebrations require an active, unpaused party and a visible **Monkey Business** or **Banana Party** panel. They share a five-second cooldown and never open or focus a window. Hidden panels do not replay missed celebrations. A save just before a build can consume the shared cooldown, so a fast build may not produce a second celebration. With motion enabled, feedback includes a brief banana burst and monkey bounce; reduced motion and high contrast use readable text without movement. **More bananas** has its own manual feedback and does not consume the automatic cooldown. No audio, typing capture, usage tracking or all-tests-passed inference is included.
+
+To check celebrations in a VS2026 experimental instance:
+
+1. Choose **Tools > Bananify > Open Banana Party** to open **Monkey Business**, keep it visible, and ensure the party is not paused. Enable both celebration settings in **Tools > Options > Bananify > General**.
+2. Edit a source file and save it. Look for **Save completed!** in the panel; an unchanged file may not trigger a completed-save event.
+3. Wait more than five seconds, then build an already-saved project/solution that actually performs a build. Look for **Build succeeded!**. Avoid a pre-build save inside the cooldown when checking this separately.
+4. Repeat with **Reduce motion** enabled: messages still appear, but particles and bounce do not. Pause or hide the panel to check suppression; restoring visibility must not replay an old event.
+5. Check a failed build, a canceled build, and a clean-only operation: none should announce build success. Verify that rapid saves/builds share the cooldown.
+
+The native save listener exposes the documented `IVsRunningDocTableEvents3` fallback for modern RDT save notifications. Browser and core tests verify message handling and cooldown logic, not actual Visual Studio callback delivery.
 
 ### Badge support boundary
 
@@ -89,7 +103,31 @@ Open `tests/Fixtures/BadgeFixture.sln` inside the VS2026 experimental instance f
 
 `.github/workflows/visual-studio.yml` is independent of the browser and VS Code pipelines. Its `windows-2022` build image supplies Windows MSBuild; this is not a claim the image runs VS2026. A green package build cannot satisfy the experimental-instance checklist.
 
-No Marketplace publication or release upload is automated here. After runtime qualification, prepare a **Visual Studio** Marketplace listing (not VS Code), use an independent version/tag namespace such as `visualstudio-v0.1.0`, and publish the exact inspected artifact. If signing is used, follow Microsoft's current Sign CLI guidance rather than deprecated VSIXSignTool instructions. Keep signing/publisher credentials outside source control.
+Pushing a **`visualstudio-vX.Y.Z`** tag runs the build, tests, and package inspection, then **publishes publicly** to the Visual Studio Marketplace and attaches the same VSIX to a GitHub release. Tags and listing identity are separate from the VS Code product. Branch pushes, pull requests, and manual workflow runs only build and validate; they do not publish.
+
+Before pushing a release tag:
+
+1. Complete the Windows release checklist above and review the Marketplace overview/screenshots. A tag is the maintainer's release decision; CI does not automate the VS2026 UI checks.
+2. Set `Identity.Version` in `src/Bananify/source.extension.vsixmanifest` and `Version` in `Directory.Build.props` to the same release version. Keep the About-box version in `BananifyPackage.cs` current as well. Commit the changes and tag that commit, normally after merging it to `main`.
+3. Use an exact matching tag, for example **`visualstudio-v0.1.1`** for version **`0.1.1`**. Three or four numeric components are supported, without leading zeros or prerelease/build suffixes. CI validates the source before building and checks the version inside the built and downloaded VSIX. It fails on mismatches instead of silently stamping another version.
+4. Ensure the existing **`VSCE_PAT`** repository secret (or fallback **`VSCE_TOKEN`**) is available to this workflow. It must have **Marketplace > Manage** scope and publishing access to **`vs-publisher-473885`**. This reuses the VS Code pipeline's secret names; do not put tokens in source or logs. No Open VSX publishing is performed for this Visual Studio extension.
+5. Push the tag. Only a successful build permits the publish job to download and recheck the tested artifact, upload it with the overview/screenshots, and create the GitHub release. The publish job does not rebuild the package. The release uses `make_latest: false` so it does not replace the repository's main product release.
+
+Run `node visual-studio-extension/scripts/release-version.cjs` locally to check committed versions. Set the `RELEASE_TAG` environment variable to the intended tag to check the match, and use `Verify-Vsix.ps1 -Path <file.vsix> -ReleaseTag <tag>` to validate an actual artifact (Node.js is required for the tag check). Run the release regressions with `node --test visual-studio-extension/tests/release.test.mjs`.
+
+Do not move or reuse a published version tag for different code. Use a higher version for updates. If publishing fails, inspect the job logs and Marketplace state before retrying; uploading an existing version can overwrite it. Protect the `visualstudio-v*` tag namespace with repository rules as appropriate. If signing is used, follow Microsoft's current Sign CLI guidance rather than deprecated VSIXSignTool instructions and ensure the signed artifact is the one inspected and published. Keep signing/publisher credentials outside source control.
+
+### Marketplace overview and screenshots
+
+The user-facing listing is [docs/visual-studio-marketplace.md](../docs/visual-studio-marketplace.md), separate from this development README. It includes the original [Visual Studio screenshot](../docs/visual-studio-extension.png). The short description and tags come from `src/Bananify/source.extension.vsixmanifest`.
+
+[`vs-publish.json`](vs-publish.json) follows the same overview/assetFiles pattern as [FileView](https://github.com/madskristensen/FileView): `overview` points to the Markdown file, and `assetFiles` uploads the local screenshot under the name used by its Markdown image link. The paths on disk are relative to the publishing manifest. These are Marketplace assets, not documentation installed inside the VSIX; uploading only the VSIX does not automatically upload this overview.
+
+To add another screenshot, put it beside the overview in `docs`, reference its filename in the Markdown, and add a matching `assetFiles` entry with `pathOnDisk` set to `../docs/<filename>` and `targetPath` set to `<filename>`. Run `node --test visual-studio-extension/tests/package.test.mjs` from the repository root to check the listing and image mappings.
+
+The configured publisher ID is `vs-publisher-473885`, and the proposed internal listing name is `Bananify.VisualStudio`, separate from the VS Code product. Before the first upload, confirm that name; if updating an existing Visual Studio listing, use its existing internal name instead. Preserve the VSIX identity and use the appropriate next release version for an update.
+
+The manifest uses **`private: false`**: release-tag uploads are public. The publishing job locates the Visual Studio SDK's `VsixPublisher.exe` and passes the inspected VSIX as `-payload` and this manifest as `-publishManifest`, running from `visual-studio-extension`. See Microsoft's [publishing guide](https://learn.microsoft.com/visualstudio/extensibility/walkthrough-publishing-a-visual-studio-extension-via-command-line) for authentication and manual recovery options. Local builds and tests never call the publisher.
 
 Bananify uses bundled artwork and local party assets, exposes no general file/shell API to the party, and does not collect telemetry or upload code. Preferences live in Visual Studio's per-user settings store. WebView2 data lives beneath the owning IDE's local data directory, keeping experimental and normal IDE roots separate. WebView2 has its own browser data/runtime lifecycle; the extension's local-only behavior is not a promise about all Microsoft runtime/updater processes.
 

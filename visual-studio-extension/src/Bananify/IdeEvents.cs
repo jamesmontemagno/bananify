@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Bananify;
 
-internal sealed class IdeEvents : IVsUpdateSolutionEvents2, IVsRunningDocTableEvents, IDisposable
+internal sealed class IdeEvents : IVsUpdateSolutionEvents2, IVsRunningDocTableEvents3, IDisposable
 {
     private readonly IVsSolutionBuildManager2 _build;
     private readonly IVsRunningDocumentTable _documents;
@@ -80,6 +80,9 @@ internal sealed class IdeEvents : IVsUpdateSolutionEvents2, IVsRunningDocTableEv
 
     public int UpdateSolution_StartUpdate(ref int cancel) => VSConstants.S_OK;
     public int OnActiveProjectCfgChange(IVsHierarchy hierarchy) => VSConstants.S_OK;
+    public int OnBeforeSave(uint docCookie) => VSConstants.S_OK;
+    public int OnAfterAttributeChangeEx(uint docCookie, uint attributes, IVsHierarchy oldHierarchy,
+        uint oldItem, string oldMoniker, IVsHierarchy newHierarchy, uint newItem, string newMoniker) => VSConstants.S_OK;
     public int OnAfterAttributeChange(uint docCookie, uint attributes) => VSConstants.S_OK;
     public int OnAfterDocumentWindowHide(uint docCookie, IVsWindowFrame frame) => VSConstants.S_OK;
     public int OnAfterFirstDocumentLock(uint docCookie, uint lockType, uint readLocks, uint editLocks) => VSConstants.S_OK;

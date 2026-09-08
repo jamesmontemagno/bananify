@@ -3,11 +3,11 @@
   <Metadata>
     <Identity Id="Bananify.VisualStudio.34b4207e-5102-4332-96fa-ce788f830550" Version="0.1.0" Language="en-US" Publisher="James Montemagno" />
     <DisplayName>Bananify</DisplayName>
-    <Description xml:space="preserve">A local banana party for Visual Studio: editor decorations, three monkey companions, four optional themes, and opt-in badges for SDK-style C# and VB projects.</Description>
+    <Description xml:space="preserve">Bring a banana party to Visual Studio 2026 with playful editor decorations, monkey companions, dockable party panels, random encouragement, save and build celebrations, four optional IDE themes, and opt-in Solution Explorer badges.</Description>
     <MoreInfo>https://bananify.online</MoreInfo>
     <License>LICENSE</License>
     <Icon>Resources\banana-128.png</Icon>
-    <Tags>banana,monkey,theme,editor,fun</Tags>
+    <Tags>banana;monkey;theme;editor;fun;tool window;encouragement;celebrations</Tags>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.14,)">

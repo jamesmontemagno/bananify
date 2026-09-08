@@ -12,6 +12,7 @@ public sealed class BananifyOptions : DialogPage
     public bool Enabled { get; set; }
 
     [Category("Party"), DisplayName("Density (1-5)"), DefaultValue(5)]
+    [Description("The banana level shown in both party panels. More bananas cycles from 5 back to 1.")]
     public int Density { get; set; } = 5;
 
     [Category("Party"), DisplayName("Monkey"), DefaultValue("brown")]
@@ -27,9 +28,11 @@ public sealed class BananifyOptions : DialogPage
     public bool FileBadgesEnabled { get; set; }
 
     [Category("Celebrations"), DisplayName("Celebrate completed saves"), DefaultValue(false)]
+    [Description("Show Save completed feedback in visible Monkey Business or Banana Party panels after a document saves. Requires an active, unpaused party; shares a five-second cooldown with builds. Reduced motion uses text only. Never opens or focuses a panel.")]
     public bool CelebrateOnSave { get; set; }
 
     [Category("Celebrations"), DisplayName("Celebrate successful solution builds"), DefaultValue(false)]
+    [Description("Show Build succeeded feedback in visible party panels after a successful build, not a failed, canceled, or clean-only operation. Requires an active, unpaused party; shares a five-second cooldown with saves. Reduced motion uses text only. Never opens or focuses a panel.")]
     public bool CelebrateOnBuild { get; set; }
 
     protected override void OnApply(PageApplyEventArgs e)

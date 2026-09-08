@@ -16,6 +16,7 @@ public sealed class PartySession
     private bool _celebrateOnSave;
     private bool _celebrateOnBuild;
     private readonly CelebrationGate _celebrationGate = new CelebrationGate();
+    private readonly EncouragementProvider _encouragement = new EncouragementProvider();
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private IReadOnlyCollection<string> _visibleDocuments = Array.Empty<string>();
 
@@ -24,7 +25,7 @@ public sealed class PartySession
     public PartyState State { get; private set; } = new PartyState();
     public IReadOnlyCollection<string> VisibleDocuments => _visibleDocuments;
     public event EventHandler? Changed;
-    public event EventHandler? Celebrated;
+    public event EventHandler<CelebrationEventArgs>? Celebrated;
 
     public void ApplyOptions(BananifyOptions options)
     {
@@ -70,13 +71,19 @@ public sealed class PartySession
     {
         ThreadHelper.ThrowIfNotOnUIThread();
         Change(State.More());
-        Celebrated?.Invoke(this, EventArgs.Empty);
+        Celebrated?.Invoke(this, new CelebrationEventArgs(CelebrationKind.More));
     }
 
     public void SelectMonkey(string monkey)
     {
         ThreadHelper.ThrowIfNotOnUIThread();
         Change(State.With(monkey: monkey));
+    }
+
+    public string Encourage()
+    {
+        ThreadHelper.ThrowIfNotOnUIThread();
+        return State.MonkeyName + " says: " + _encouragement.Next();
     }
 
     public void SetVisibleDocuments(IEnumerable<string> documents)
@@ -91,19 +98,19 @@ public sealed class PartySession
     public void CelebrateSave()
     {
         ThreadHelper.ThrowIfNotOnUIThread();
-        Celebrate(_celebrateOnSave, true, false);
+        Celebrate(_celebrateOnSave, true, false, CelebrationKind.Save);
     }
     public void CelebrateBuild(bool succeeded, bool cancelled)
     {
         ThreadHelper.ThrowIfNotOnUIThread();
-        Celebrate(_celebrateOnBuild, succeeded, cancelled);
+        Celebrate(_celebrateOnBuild, succeeded, cancelled, CelebrationKind.Build);
     }
 
-    private void Celebrate(bool enabled, bool succeeded, bool cancelled)
+    private void Celebrate(bool enabled, bool succeeded, bool cancelled, CelebrationKind kind)
     {
         ThreadHelper.ThrowIfNotOnUIThread();
         if (_celebrationGate.TryCelebrate(enabled && State.IsDecorating, succeeded, cancelled, _clock.Elapsed))
-            Celebrated?.Invoke(this, EventArgs.Empty);
+            Celebrated?.Invoke(this, new CelebrationEventArgs(kind));
     }
 
     private void Change(PartyState next)
