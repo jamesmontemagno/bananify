@@ -19,7 +19,7 @@ This document is a publishing guide, not confirmation of a store submission. Sto
 | CI/CD | Checks, browser tests, Pages deployment, and tag-triggered GitHub Releases |
 | Store packaging | Separate root-manifest ZIP, CI artifact, and future release asset |
 | Store submission automation | Not implemented; upload packages manually |
-| Store listing identifiers | Recorded in the [submission kit](../store/README.md#5-keep-these-non-secret-details-for-later-api-setup); Edge is live, Chrome public URL still pending |
+| Store listing identifiers | Recorded in the [submission kit](../store/README.md#5-keep-these-non-secret-details-for-later-api-setup); Chrome and Edge are live |
 | Public privacy policy | Must be written, published, and linked before submission |
 
 **Use `bananify-store.zip` for store upload**, not the nested `bananify-extension.zip`. New builds create both; the already-published `v1.1.0` assets remain unchanged. The [store submission kit](../store/README.md) includes upload-sized graphics, runtime screenshots, listing text, and fields to fill in.
@@ -219,8 +219,8 @@ Microsoft's publishing guide says certification can take up to seven business da
 ## 8. After approval
 
 1. Install the actual store-distributed version in a clean browser profile and confirm the core flows.
-2. Update `index.html` with separate **Add to Chrome** and **Get for Microsoft Edge** links using the real approved listing URLs. Keep GitHub Releases as a clearly labeled manual-install alternative.
-3. Update installation copy, download-related structured data, README, and browser tests together. Never invent store URLs before IDs exist.
+2. Keep `index.html` updated with separate **Get for Google Chrome** and **Get for Microsoft Edge** links using the real public listing URLs. Keep GitHub Releases as a clearly labeled manual-install alternative.
+3. Update installation copy, download-related structured data, README, and browser tests together when a listing URL changes. Never invent store URLs before IDs exist.
 4. Tell existing unpacked-install users to remove or disable that copy before installing from a store, avoiding two simultaneous Bananify extensions.
 5. Monitor store reviews, support issues, and publisher email.
 

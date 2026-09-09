@@ -17,6 +17,7 @@ test("production build publishes only the website and reproducible manual-instal
   const html = await readFile(join(output, "index.html"), "utf8");
   assert.match(html, /<title>Bananify /);
   assert.match(html, /href="https:\/\/bananify\.online\/"/);
+  assert.match(html, /href="https:\/\/chromewebstore\.google\.com\/detail\/bananify\/ahlgjleaimihpbcpadijmmeeokpfnflc"/);
   assert.match(html, /href="https:\/\/github\.com\/jamesmontemagno\/bananify\/releases\/latest\/download\/bananify-extension\.zip" download/);
   assert.match(html, /Release notes &amp; previous versions/);
   const vscodePackage = JSON.parse(await readFile(new URL("../vscode-extension/package.json", import.meta.url), "utf8"));
@@ -28,7 +29,8 @@ test("production build publishes only the website and reproducible manual-instal
   assert.match(html, /href="https:\/\/github\.com\/jamesmontemagno\/bananify"/);
   const structuredData = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
   assert.equal(structuredData["@graph"][1].name, "Bananify");
-  assert.equal(structuredData["@graph"][1].installUrl, "https://microsoftedge.microsoft.com/addons/detail/iidhiomigjipgnembnbcndbliniciijh");
+  assert.equal(structuredData["@graph"][1].installUrl, "https://chromewebstore.google.com/detail/bananify/ahlgjleaimihpbcpadijmmeeokpfnflc");
+  assert.deepEqual(structuredData["@graph"][1].sameAs, ["https://microsoftedge.microsoft.com/addons/detail/iidhiomigjipgnembnbcndbliniciijh"]);
   assert.equal(structuredData["@graph"][1].downloadUrl, "https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip");
   const socialImage = await readFile(join(output, "social-card.png"));
   assert.equal(socialImage.readUInt32BE(16), 1200);

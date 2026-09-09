@@ -39,15 +39,17 @@ for (const viewport of [{ width: 1365, height: 1000 }, { width: 375, height: 812
       assert.match(await page.title(), /^Bananify /);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       const stores = page.getByRole("list", { name: "Browser store availability" });
-      assert.equal(await stores.getByRole("listitem").count(), 2);
-      assert.equal(await stores.getByRole("link").count(), 2);
+      assert.equal(await stores.getByRole("listitem").count(), 3);
+      assert.equal(await stores.getByRole("link").count(), 3);
+      assert.equal(await stores.getByRole("link", { name: "Get for Google Chrome" }).getAttribute("href"),
+        "https://chromewebstore.google.com/detail/bananify/ahlgjleaimihpbcpadijmmeeokpfnflc");
       assert.equal(await stores.getByRole("link", { name: "Get for Microsoft Edge" }).getAttribute("href"),
         "https://microsoftedge.microsoft.com/addons/detail/iidhiomigjipgnembnbcndbliniciijh");
-      const chrome = stores.getByRole("link", { name: "Download for Chrome" });
-      assert.equal(await chrome.getAttribute("href"),
+      const manual = stores.getByRole("link", { name: "Download for Chrome or Edge" });
+      assert.equal(await manual.getAttribute("href"),
         "https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip");
-      assert.equal(await chrome.getAttribute("download"), "");
-      await page.getByText("Chrome Web Store is coming soon.", { exact: false }).waitFor();
+      assert.equal(await manual.getAttribute("download"), "");
+      await page.getByText("Chrome Web Store and Edge Add-ons installs do not require Developer mode.", { exact: false }).waitFor();
       for (const row of await stores.getByRole("listitem").all()) {
         const bounds = await row.boundingBox();
         assert.ok(bounds && bounds.x >= 0 && bounds.x + bounds.width <= viewport.width);
@@ -116,7 +118,7 @@ for (const viewport of [{ width: 1365, height: 1000 }, { width: 375, height: 812
         });
       });
       const downloadReady = page.waitForEvent("download");
-      await page.getByRole("link", { name: "Download for Chrome" }).click();
+      await manual.click();
       const download = await downloadReady;
       assert.equal(await download.failure(), null);
       const bytes = await readFile(await download.path());
