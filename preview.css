@@ -90,13 +90,14 @@ footer { border-top: 1px solid #d2d7c2; margin: 0 6%; padding: 25px 0; display: 
   header { height: 82px; }
   .wordmark { font-size: 22px; }
   .wordmark > span:first-child { width: 32px; margin-right: 3px; }
-  .install-link { font-size: 12px; }
+  .install-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 12px; }
   .install-nav { gap: 16px; }
   .install-link span { margin-left: 2px; }
   .hero { grid-template-columns: 1fr; padding-top: 28px; padding-bottom: 30px; gap: 20px; }
-  h1 { font-size: clamp(56px, 12vw, 88px); }
+  .hero-copy, .hero-art { min-width: 0; }
+  h1 { font-size: clamp(44px, 13.5vw, 88px); }
   .hero-copy > p { font-size: 16px; }
-  .hero-art { height: 310px; width: 340px; max-width: 100%; }
+  .hero-art { height: 310px; width: min(340px, 100%); }
   .monkey-portrait { width: 83%; left: 8%; top: 0; }
   .art-caption { bottom: 0; font-size: 12px; left: 18%; }
   .orbit-one { width: 55px; top: 10px; }
