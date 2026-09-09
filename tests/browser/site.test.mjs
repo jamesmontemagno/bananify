@@ -21,7 +21,7 @@ after(async () => {
   if (server) await new Promise((resolve) => server.close(resolve));
 });
 
-for (const viewport of [{ width: 1365, height: 1000 }, { width: 375, height: 812 }]) {
+for (const viewport of [{ width: 1365, height: 1000 }, { width: 375, height: 812 }, { width: 320, height: 812 }]) {
   test(`published site and banana controls work at ${viewport.width}px`, async () => {
     const page = await browser.newPage({ viewport });
     const errors = [];
