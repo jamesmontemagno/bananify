@@ -2,7 +2,7 @@ import { before, after, test } from "node:test";
 import assert from "node:assert/strict";
 import { once } from "node:events";
 import { chromium } from "playwright";
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import { createPreviewServer } from "../../scripts/preview-server.mjs";
 
 let browser;
@@ -39,17 +39,14 @@ for (const viewport of [{ width: 1365, height: 1000 }, { width: 375, height: 812
       assert.match(await page.title(), /^Bananify /);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       const stores = page.getByRole("list", { name: "Browser store availability" });
-      assert.equal(await stores.getByRole("listitem").count(), 3);
-      assert.equal(await stores.getByRole("link").count(), 3);
+      assert.equal(await stores.getByRole("listitem").count(), 2);
+      assert.equal(await stores.getByRole("link").count(), 2);
       assert.equal(await stores.getByRole("link", { name: "Get for Google Chrome" }).getAttribute("href"),
         "https://chromewebstore.google.com/detail/bananify/ahlgjleaimihpbcpadijmmeeokpfnflc");
       assert.equal(await stores.getByRole("link", { name: "Get for Microsoft Edge" }).getAttribute("href"),
         "https://microsoftedge.microsoft.com/addons/detail/iidhiomigjipgnembnbcndbliniciijh");
-      const manual = stores.getByRole("link", { name: "Download for Chrome or Edge" });
-      assert.equal(await manual.getAttribute("href"),
-        "https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip");
-      assert.equal(await manual.getAttribute("download"), "");
       await page.getByText("Chrome Web Store and Edge Add-ons installs do not require Developer mode.", { exact: false }).waitFor();
+      assert.equal(await page.getByRole("heading", { name: "Installing the ZIP manually" }).count(), 0);
       for (const row of await stores.getByRole("listitem").all()) {
         const bounds = await row.boundingBox();
         assert.ok(bounds && bounds.x >= 0 && bounds.x + bounds.width <= viewport.width);
@@ -106,23 +103,6 @@ for (const viewport of [{ width: 1365, height: 1000 }, { width: 375, height: 812
       await page.evaluate(() => bananaFeed.stop());
       for (let count = 0; count < 5; count++) await page.evaluate(() => { bananaFeed.toggle(); bananaFeed.toggle(); });
       assert.equal(await page.locator("banana-feed-party").count(), 0);
-      // Keep CI independent of GitHub availability and whether this tag is published yet.
-      const releaseURL = "https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip";
-      await page.route(releaseURL, async (route) => {
-        const archive = await page.request.get(`${baseURL}/downloads/bananify-extension.zip`);
-        assert.equal(archive.status(), 200);
-        await route.fulfill({
-          status: 200, contentType: "application/zip",
-          headers: { "content-disposition": 'attachment; filename="bananify-extension.zip"' },
-          body: await archive.body(),
-        });
-      });
-      const downloadReady = page.waitForEvent("download");
-      await manual.click();
-      const download = await downloadReady;
-      assert.equal(await download.failure(), null);
-      const bytes = await readFile(await download.path());
-      assert.equal(bytes.subarray(0, 2).toString(), "PK");
       assert.deepEqual(errors, []);
     } finally {
       await page.close();
