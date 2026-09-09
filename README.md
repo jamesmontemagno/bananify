@@ -73,6 +73,10 @@ npm run package
 
 Maintainers can publish the tested VSIX to the Visual Studio Marketplace by adding the `VSCE_PAT` or `VSCE_TOKEN` repository secret, updating `vscode-extension/package.json`, and pushing a matching `vscode-vX.Y.Z` tag. The workflow also creates a GitHub Release and optionally publishes to Open VSX when `OVSX_PAT` is configured.
 
+## Bananify Visual Studio
+
+A native [Visual Studio 2026 extension](visual-studio-extension/README.md) is in development, with editor decorations, local monkey party windows, four optional IDE themes, and opt-in file badges scoped to SDK-style C# and VB projects. It has a separate C# solution and Windows VSIX workflow; it is not the VS Code extension repackaged. Windows experimental-instance qualification is required before release.
+
 ## Build your own banana party
 
 Contributions and bug reports are welcome. [Open an issue](https://github.com/jamesmontemagno/bananify/issues) with your browser, what happened, and how to reproduce it.

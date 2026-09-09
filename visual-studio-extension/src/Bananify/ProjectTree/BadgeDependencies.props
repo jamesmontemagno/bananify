@@ -1,0 +1,8 @@
+<Project>
+  <ItemGroup>
+    <!-- CPS is provided by Visual Studio, not shipped privately in the VSIX. -->
+    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem" Version="17.9.380" ExcludeAssets="runtime" PrivateAssets="all" />
+    <Reference Include="System.Drawing" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)..\..\..\..\icons\banana-128.png" LogicalName="Bananify.ProjectTree.Banana.png" />
+  </ItemGroup>
+</Project>

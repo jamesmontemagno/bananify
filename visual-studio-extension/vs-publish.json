@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/vsix-publish",
+  "categories": ["coding", "other"],
+  "identity": {
+    "internalName": "Bananify.VisualStudio"
+  },
+  "overview": "../docs/visual-studio-marketplace.md",
+  "assetFiles": [
+    {
+      "pathOnDisk": "../docs/visual-studio-extension.png",
+      "targetPath": "visual-studio-extension.png"
+    }
+  ],
+  "priceCategory": "free",
+  "publisher": "vs-publisher-473885",
+  "private": false,
+  "qna": true,
+  "repo": "https://github.com/jamesmontemagno/bananify"
+}
