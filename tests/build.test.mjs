@@ -47,9 +47,10 @@ test("production build publishes only the website and reproducible manual-instal
   const archives = [
     ["bananify-extension.zip", "bananify/"],
     ["bananify-store.zip", ""],
+    ["bananify-safari-web-extension.zip", "bananify-safari/"],
   ];
   assert.deepEqual((await readdir(join(output, "downloads"))).sort(), [
-    "SHA256SUMS.txt", "bananify-extension.zip", "bananify-store.zip",
+    "SHA256SUMS.txt", "bananify-extension.zip", "bananify-safari-web-extension.zip", "bananify-store.zip",
   ]);
   const originalArchives = new Map();
   const manualFiles = new Map();
@@ -62,12 +63,30 @@ test("production build publishes only the website and reproducible manual-instal
     assert.equal([...timestamps.matchAll(/\b20000101\.000000\b/g)].length, extensionFiles.length);
     for (const file of extensionFiles) {
       const content = execFileSync("unzip", ["-p", zip, `${prefix}${file}`]);
-      assert.deepEqual(content, await readFile(new URL(`../${file}`, import.meta.url)), `${name}: ${file} matches source`);
-      if (prefix) manualFiles.set(file, content);
-      else assert.deepEqual(content, manualFiles.get(file), `${file} is identical in both ZIPs`);
+      if (name === "bananify-safari-web-extension.zip" && file === "manifest.json") {
+        const safariManifest = JSON.parse(content);
+        assert.deepEqual(safariManifest, {
+          ...sourceManifest,
+          browser_specific_settings: { safari: { strict_min_version: "17.0" } },
+        });
+      } else {
+        assert.deepEqual(content, await readFile(new URL(`../${file}`, import.meta.url)), `${name}: ${file} matches source`);
+      }
+      if (prefix && name === "bananify-extension.zip") {
+        manualFiles.set(file, content);
+      } else if (name === "bananify-safari-web-extension.zip" && file !== "manifest.json") {
+        assert.deepEqual(content, manualFiles.get(file), `${file} is identical in Safari ZIP`);
+      } else if (name !== "bananify-safari-web-extension.zip") {
+        assert.deepEqual(content, manualFiles.get(file), `${file} is identical in both ZIPs`);
+      }
     }
     const manifest = JSON.parse(execFileSync("unzip", ["-p", zip, `${prefix}manifest.json`], { encoding: "utf8" }));
-    assert.deepEqual(manifest, sourceManifest);
+    if (name === "bananify-safari-web-extension.zip") {
+      assert.deepEqual(manifest.browser_specific_settings, { safari: { strict_min_version: "17.0" } });
+      assert.deepEqual({ ...manifest, browser_specific_settings: undefined }, { ...sourceManifest, browser_specific_settings: undefined });
+    } else {
+      assert.deepEqual(manifest, sourceManifest);
+    }
     assert.equal(manifest.name, "Bananify");
     assert.deepEqual(manifest.permissions, ["activeTab", "scripting"]);
     originalArchives.set(name, await readFile(zip));
@@ -78,7 +97,7 @@ test("production build publishes only the website and reproducible manual-instal
   assert.equal(await readFile(join(output, "downloads/SHA256SUMS.txt"), "utf8"), expectedChecksums);
   const release = await packageRelease();
   assert.deepEqual((await readdir(release)).sort(), [
-    "RELEASE_NOTES.md", "SHA256SUMS.txt", "bananify-extension.zip", "bananify-store.zip",
+    "RELEASE_NOTES.md", "SHA256SUMS.txt", "bananify-extension.zip", "bananify-safari-web-extension.zip", "bananify-store.zip",
   ]);
   for (const [name] of archives) {
     assert.deepEqual(await readFile(join(release, name)), originalArchives.get(name));
@@ -88,10 +107,11 @@ test("production build publishes only the website and reproducible manual-instal
   assert.match(notes, /Unpacked extensions do not update automatically/);
   assert.match(notes, /bananify-extension\.zip\*\* is for manual installation/);
   assert.match(notes, /bananify-store\.zip\*\* is for maintainers submitting manually/);
+  assert.match(notes, /bananify-safari-web-extension\.zip\*\* is for maintainers converting Bananify/);
   assert.match(notes, /Chrome Web Store/);
   assert.match(notes, /Microsoft Edge Add-ons/);
   assert.match(notes, /`manifest\.json` is at its root/);
-  assert.match(notes, /does not submit to either store/);
+  assert.match(notes, /does not submit to browser stores/);
   await buildSite();
   await packageRelease();
   for (const [name] of archives) {

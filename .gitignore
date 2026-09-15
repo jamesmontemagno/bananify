@@ -9,5 +9,7 @@ release/
 test-results/
 .vscode-test/
 *.vsix
+safari-source/
+safari-build/
 .impeccable/
 .vs/

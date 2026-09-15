@@ -1,0 +1,96 @@
+name: Safari Extension
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+      - "!vscode-v*"
+    paths:
+      - ".github/workflows/safari.yml"
+      - "artwork.js"
+      - "background.js"
+      - "icons/**"
+      - "manifest.json"
+      - "package-lock.json"
+      - "package.json"
+      - "party.js"
+      - "scripts/**"
+      - "tests/**"
+      - "toggle.js"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/safari.yml"
+      - "artwork.js"
+      - "background.js"
+      - "icons/**"
+      - "manifest.json"
+      - "package-lock.json"
+      - "package.json"
+      - "party.js"
+      - "scripts/**"
+      - "tests/**"
+      - "toggle.js"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: safari-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  package:
+    name: Convert and build Safari project
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install locked development dependencies
+        run: npm ci
+      - name: Verify extension and release versions
+        env:
+          RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+        run: npm run release:check
+      - name: Test reproducible Safari package
+        run: npm test
+      - name: Build Safari Web Extension source package
+        run: npm run build
+      - name: Extract tested Safari source package
+        run: unzip -q dist/downloads/bananify-safari-web-extension.zip -d safari-source
+      - name: Convert to a Safari app extension project
+        run: |
+          xcrun safari-web-extension-converter safari-source/bananify-safari \
+            --project-location safari-build \
+            --app-name Bananify \
+            --bundle-identifier online.bananify.Bananify \
+            --swift \
+            --macos-only \
+            --copy-resources \
+            --no-open \
+            --no-prompt \
+            --force
+      - name: Build generated Safari project without signing
+        run: |
+          xcodebuild \
+            -project safari-build/Bananify/Bananify.xcodeproj \
+            -scheme Bananify \
+            -destination 'platform=macOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+      - name: Save Safari Web Extension package
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: bananify-safari-web-extension
+          path: dist/downloads/bananify-safari-web-extension.zip
+          if-no-files-found: error

@@ -12,6 +12,7 @@ export async function packageRelease() {
   const archives = [
     ["bananify-extension.zip", "bananify/manifest.json"],
     ["bananify-store.zip", "manifest.json"],
+    ["bananify-safari-web-extension.zip", "bananify-safari/manifest.json"],
   ];
   for (const [name, manifestPath] of archives) {
     const archive = join(root, "dist/downloads", name);
@@ -39,8 +40,9 @@ Download **bananify-extension.zip** from the assets below, not GitHub's automati
 
 - **bananify-extension.zip** is for manual installation. Extract it to get a **bananify** folder, then load that folder as described below.
 - **bananify-store.zip** is for maintainers submitting manually to the **Chrome Web Store** or **Microsoft Edge Add-ons** dashboard. Upload this ZIP directly: \`manifest.json\` is at its root. It contains the same extension files as the manual-install ZIP, without the enclosing folder.
+- **bananify-safari-web-extension.zip** is for maintainers converting Bananify into a Safari app extension project with Apple's \`safari-web-extension-converter\`. Extract it before conversion; it is not uploaded directly to App Store Connect.
 
-CI only prepares these packages; it does not submit to either store or use store publishing APIs.
+CI only prepares these packages; it does not submit to browser stores or use store publishing APIs.
 
 ### Install in Chrome or Edge
 
@@ -55,7 +57,7 @@ Replace the files in your existing unpacked extension folder with this release, 
 
 This is a manual install, not a browser-store listing. Unpacked extensions do not update automatically.
 
-**SHA256SUMS.txt** contains the SHA-256 checksums of both ZIPs.
+**SHA256SUMS.txt** contains the SHA-256 checksums of all ZIPs.
 
 [Try Bananify](https://bananify.online/) · [All releases](https://github.com/jamesmontemagno/bananify/releases)
 `);

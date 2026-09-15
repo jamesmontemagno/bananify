@@ -1,10 +1,12 @@
 # Maintaining Bananify
 
-Release and hosting notes for project maintainers. For installation and features, see the [README](../README.md). For Chrome Web Store and Microsoft Edge Add-ons submissions, see the [store publishing guide](extension-store-publishing.md).
+Release and hosting notes for project maintainers. For installation and features, see the [README](../README.md). For Chrome Web Store and Microsoft Edge Add-ons submissions, see the [store publishing guide](extension-store-publishing.md). For Safari conversion and App Store submission, see the [Safari extension guide](safari-extension.md).
 
 ## CI/CD
 
-`.github/workflows/pages.yml` runs on pull requests, pushes to `main`, version tags (`v*`), and manual dispatches. It checks version consistency and JavaScript, tests the extension and reproducible ZIP, builds an allowlisted `dist/` directory, and exercises the production site in Chromium at desktop and mobile sizes, including reduced motion, cleanup, and downloads. Screenshots and the extension ZIP are retained as run artifacts.
+`.github/workflows/pages.yml` runs on pull requests, pushes to `main`, version tags (`v*`), and manual dispatches. It checks version consistency and JavaScript, tests the extension and reproducible ZIPs, builds an allowlisted `dist/` directory, and exercises the production site in Chromium at desktop and mobile sizes, including reduced motion, cleanup, and downloads. Screenshots and the extension ZIPs are retained as run artifacts.
+
+`.github/workflows/safari.yml` runs Safari-relevant changes on macOS. It builds the Safari Web Extension source package, converts it with `xcrun safari-web-extension-converter`, and builds the generated Xcode project with signing disabled. It proves the package remains convertible without storing Apple credentials or submitting to App Store Connect.
 
 Only passing builds on `main` deploy to GitHub Pages. Pull requests never deploy and receive read-only permissions. Deployment uses the `github-pages` environment and GitHub's short-lived OIDC token, not a stored personal access token. Actions are commit-pinned; Dependabot opens weekly dependency updates.
 
@@ -26,14 +28,14 @@ git push origin v1.2.0
 
 Replace `1.2.0` with the version being released. The tag must exactly match `manifest.json`, `package.json`, and both root versions in `package-lock.json`. Stable three-part versions are supported; prerelease tags are rejected.
 
-After all checks pass, the workflow publishes **bananify-extension.zip** (manual installation), **bananify-store.zip** (root-level manifest for store upload), **SHA256SUMS.txt** covering both ZIPs, installation/update instructions, and GitHub-generated change notes. It promotes the exact tested build artifact rather than rebuilding with publish permissions. Only the release job has `contents: write`; branch and PR builds cannot publish releases. Tag builds do not redeploy the website.
+After all checks pass, the workflow publishes **bananify-extension.zip** (manual installation), **bananify-store.zip** (root-level manifest for Chrome/Edge store upload), **bananify-safari-web-extension.zip** (Safari conversion source), **SHA256SUMS.txt** covering all ZIPs, installation/update instructions, and GitHub-generated change notes. It promotes the exact tested build artifact rather than rebuilding with publish permissions. Only the release job has `contents: write`; branch and PR builds cannot publish releases. Tag builds do not redeploy the website.
 
 The stable latest-download URL works without changing the website for each release:
 <https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip>
 
 Never move a published version tag or replace its assets. Fixes receive a new patch version. If a first-time publish fails after creating a draft, remove that unfinished draft before rerunning the failed job; an existing published release is never overwritten by this workflow.
 
-For local release packages, run `npm run build && npm run release:package`. The generated `release/` folder contains both ZIPs, checksums, and release notes. CI artifacts are temporary; published GitHub Release assets persist until a maintainer deletes them.
+For local release packages, run `npm run build && npm run release:package`. The generated `release/` folder contains all ZIPs, checksums, and release notes. CI artifacts are temporary; published GitHub Release assets persist until a maintainer deletes them.
 
 The [store submission kit](../store/README.md) contains listing text and upload-sized assets. CI uploads it separately as `bananify-store-listing`; it is not included in the installable extension. No workflow calls a store API or submits for review. Existing releases, including `v1.1.0`, are not modified by these packaging changes.
 

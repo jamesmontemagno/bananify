@@ -2,7 +2,7 @@
 
 [![Bananify: The internet. But bananas. A happy capuchin holding a banana.](social-card.png)](https://bananify.online)
 
-Turn everyday websites into a banana party. Bananify is a free, open-source **Chrome and Microsoft Edge extension** that fills your page with bananas and invites a dancing monkey to celebrate.
+Turn everyday websites into a banana party. Bananify is a free, open-source **Chrome, Microsoft Edge, and Safari-ready extension** that fills your page with bananas and invites a dancing monkey to celebrate.
 
 **[Try the live demo](https://bananify.online)** | **[Get Bananify for Chrome](https://chromewebstore.google.com/detail/bananify/ahlgjleaimihpbcpadijmmeeokpfnflc)** | **[Get Bananify for Edge](https://microsoftedge.microsoft.com/addons/detail/iidhiomigjipgnembnbcndbliniciijh)** | **[Download Bananify](https://github.com/jamesmontemagno/bananify/releases/latest/download/bananify-extension.zip)** | **[Release notes](https://github.com/jamesmontemagno/bananify/releases)**
 
@@ -48,6 +48,20 @@ The party stays on the page where you started it and resets when you navigate or
 Edge Add-ons installations receive updates through the browser automatically.
 
 Unpacked extensions do not update automatically. Download the [latest release](https://github.com/jamesmontemagno/bananify/releases/latest), replace the files in your existing extension folder, click **Reload** on the browser's Extensions page, and refresh your website tabs. Every release includes installation notes and a SHA-256 checksum.
+
+## Safari extension package
+
+Maintainers can build a Safari Web Extension source package from the shared Bananify runtime. It is converted into a signed macOS Safari app extension with Apple's tooling before App Store submission; the ZIP is not uploaded directly to App Store Connect.
+
+```sh
+npm ci
+npm run build
+rm -rf safari-source safari-build
+unzip -q dist/downloads/bananify-safari-web-extension.zip -d safari-source
+xcrun safari-web-extension-converter safari-source/bananify-safari --project-location safari-build --app-name Bananify --bundle-identifier online.bananify.Bananify --swift --macos-only --copy-resources --no-open --no-prompt --force
+```
+
+See the [Safari extension publishing guide](docs/safari-extension.md) for CI/CD, local testing, signing, and Safari Extensions Gallery submission steps.
 
 ## Runs locally. No tracking.
 
@@ -103,7 +117,7 @@ The extension has no runtime dependencies or build step. Playwright is only used
 
 `artwork.js` contains the original SVG artwork; `party.js` handles the party and cleanup. Website authors can add `data-bananify-protect` to an element or container to keep it from being disguised.
 
-For project maintenance, see the [release and deployment guide](docs/maintaining.md), [store submission kit with artwork and listing copy](store/README.md), and [extension store publishing guide](docs/extension-store-publishing.md).
+For project maintenance, see the [release and deployment guide](docs/maintaining.md), [store submission kit with artwork and listing copy](store/README.md), [extension store publishing guide](docs/extension-store-publishing.md), and [Safari extension publishing guide](docs/safari-extension.md).
 
 ## License
 

@@ -44,7 +44,7 @@ jobs:
         run: npm run check
       - name: Test extension and production package
         run: npm test
-      - name: Build deployable website, manual-install ZIP, and store ZIP
+      - name: Build deployable website, browser ZIPs, and Safari source ZIP
         run: npm run build
       - name: Install Chromium for browser tests
         run: npx playwright install --with-deps chromium
@@ -60,7 +60,7 @@ jobs:
           path: test-results/
           if-no-files-found: ignore
           retention-days: 7
-      - name: Save manual-install and store-submission packages
+      - name: Save browser and Safari extension packages
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: bananify-extension
@@ -121,7 +121,7 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           gh release create "$RELEASE_TAG" \
-            release/bananify-extension.zip release/bananify-store.zip release/SHA256SUMS.txt \
+            release/bananify-extension.zip release/bananify-store.zip release/bananify-safari-web-extension.zip release/SHA256SUMS.txt \
             --verify-tag \
             --title "Bananify $RELEASE_TAG" \
             --notes-file release/RELEASE_NOTES.md \

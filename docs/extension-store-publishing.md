@@ -2,7 +2,7 @@
 
 Last reviewed: September 6, 2026.
 
-This guide covers the **Chrome Web Store** and **Microsoft Edge Add-ons**. Publish the first version manually in each store, then automate updates after the listings and publisher accounts are established. GitHub Releases remain available for people who prefer installing an unpacked extension.
+This guide covers the **Chrome Web Store** and **Microsoft Edge Add-ons**. Safari uses a separate App Store packaging flow; see the [Safari extension guide](safari-extension.md). Publish the first version manually in each store, then automate updates after the listings and publisher accounts are established. GitHub Releases remain available for people who prefer installing an unpacked extension.
 
 This document is a publishing guide, not confirmation of a store submission. Store policies, dashboard fields, fees, and review times can change; consult the official references at the end when submitting.
 
@@ -18,6 +18,7 @@ This document is a publishing guide, not confirmation of a store submission. Sto
 | License | MIT; include the existing `LICENSE` in all distributions |
 | CI/CD | Checks, browser tests, Pages deployment, and tag-triggered GitHub Releases |
 | Store packaging | Separate root-manifest ZIP, CI artifact, and future release asset |
+| Safari packaging | Separate Safari Web Extension source ZIP plus macOS converter/build workflow |
 | Store submission automation | Not implemented; upload packages manually |
 | Store listing identifiers | Recorded in the [submission kit](../store/README.md#5-keep-these-non-secret-details-for-later-api-setup); Chrome and Edge are live |
 | Public privacy policy | Must be written, published, and linked before submission |
