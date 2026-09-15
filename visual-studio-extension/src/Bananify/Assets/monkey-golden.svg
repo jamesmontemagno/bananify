@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="capuchin" viewBox="-12 -12 314 304" overflow="visible" role="img" aria-label="Henry the monkey" data-monkey="golden">
+    <g class="monkey-body">
+      <path d="M185 209 C258 240 276 171 245 159 C227 151 216 171 232 179" fill="none" stroke="#50351f" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M110 219 L90 245 Q79 258 96 261 L119 260 L135 229" fill="#c39137" stroke="#50351f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M155 228 L166 258 L192 260 Q208 258 196 246 L178 218" fill="#c39137" stroke="#50351f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M98 159 C91 173 89 204 107 224 C121 240 163 242 180 222 C201 197 182 170 179 157" fill="#c39137" stroke="#50351f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <ellipse cx="142" cy="197" rx="28" ry="31" fill="#edba55"/>
+      <g class="monkey-arm left">
+        <path d="M104 172 Q72 178 52 137 L37 112" fill="none" stroke="#50351f" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M104 172 Q72 178 52 137 L37 112" fill="none" stroke="#c39137" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M38 122 Q24 123 23 112 L16 101 Q13 93 20 92 L30 104 L27 88 Q28 81 34 85 L41 103 L44 93 Q50 87 53 95 L53 112 Q51 122 38 122" fill="#edba55" stroke="#50351f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      <g class="monkey-arm right">
+        <path d="M177 172 Q210 178 221 143 L232 114" fill="none" stroke="#50351f" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M177 172 Q210 178 221 143 L232 114" fill="none" stroke="#c39137" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M223 120 Q212 110 220 102 L233 86 Q239 82 241 89 L237 103 L249 94 Q257 93 253 101 L244 113 Q242 124 230 124" fill="#edba55" stroke="#50351f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <g transform="translate(197 55) rotate(-22 40 40) scale(.8)"><svg class="held-banana" viewBox="0 0 80 80" width="80" height="80" overflow="visible" aria-hidden="true">
+    <path d="M19 12 C24 39 44 50 68 25 L73 29 C63 66 28 77 13 50 C6 37 8 24 14 13 Z" fill="#ffda35" stroke="#58351e" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M16 22 C13 48 36 64 61 41" fill="none" stroke="#fff29b" stroke-width="5" stroke-linecap="round"/>
+    <path d="M14 13 L14 7 L19 7 L20 15 M68 25 L73 22 L76 27 L73 30" fill="#754326" stroke="#58351e" stroke-width="2"/>
+  </svg></g>
+      </g>
+
+      <g class="monkey-head">
+        <ellipse cx="82" cy="111" rx="20" ry="25" fill="#c39137" stroke="#50351f" stroke-width="4"/>
+        <ellipse cx="199" cy="111" rx="20" ry="25" fill="#c39137" stroke="#50351f" stroke-width="4"/>
+        <ellipse cx="83" cy="111" rx="11" ry="15" fill="#edba55"/>
+        <ellipse cx="198" cy="111" rx="11" ry="15" fill="#edba55"/>
+        <path d="M81 105 C75 58 102 32 139 33 C178 30 204 61 201 108 L194 142 Q182 168 140 170 Q94 168 84 143 Z" fill="#7c8065" stroke="#50351f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M90 96 C89 69 115 60 139 83 C161 57 193 69 191 99 L187 133 Q182 155 140 157 Q101 155 93 135 Z" fill="#fff0cb" stroke="none"/>
+        <path d="M105 109 Q114 97 123 109 M155 109 Q164 97 173 109" fill="none" stroke="#50351f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <ellipse cx="139" cy="122" rx="7" ry="5" fill="#50351f"/>
+        <path d="M120 133 Q139 163 158 133 Z" fill="#50351f" stroke="#50351f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M129 145 Q139 136 150 145 Q141 155 129 145" fill="#e5867d" stroke="none"/>
+        <ellipse cx="106" cy="126" rx="10" ry="5" fill="#e5a26c"/>
+        <ellipse cx="174" cy="126" rx="10" ry="5" fill="#e5a26c"/>
+        <path d="M115 43 Q108 28 120 27 L135 38 Q132 17 143 22 L155 39" fill="#7c8065" stroke="#50351f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+    </g>
+  </svg>

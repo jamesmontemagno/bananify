@@ -1,0 +1,7 @@
+<Project>
+  <!-- The package targets discover .vstheme files, invoke /registerTheme and add
+       generated Themes/*.pkgdef files to VSIXSourceItem. Do not duplicate them. -->
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+    <PackageReference Include="Microsoft.VisualStudio.VsixColorCompiler" Version="17.11.35325.10" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

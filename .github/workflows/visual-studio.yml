@@ -1,0 +1,145 @@
+name: Visual Studio Extension
+
+on:
+  push:
+    branches: [main]
+    tags: ["visualstudio-v*"]
+    paths:
+      - "visual-studio-extension/**"
+      - "docs/visual-studio-*"
+      - ".github/workflows/visual-studio.yml"
+      - "vscode-extension/artwork.js"
+      - "vscode-extension/themes/**"
+      - "package.json"
+      - "package-lock.json"
+  pull_request:
+    paths:
+      - "visual-studio-extension/**"
+      - "docs/visual-studio-*"
+      - ".github/workflows/visual-studio.yml"
+      - "vscode-extension/artwork.js"
+      - "vscode-extension/themes/**"
+      - "package.json"
+      - "package-lock.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visual-studio-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Build and inspect VSIX (not an IDE runtime test)
+    runs-on: windows-2022
+    timeout-minutes: 20
+    env:
+      RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
+      - name: Verify release version
+        run: node visual-studio-extension/scripts/release-version.cjs
+      - name: Test portable behavior
+        run: dotnet test visual-studio-extension/tests/Bananify.Core.Tests/Bananify.Core.Tests.csproj --configuration Release --verbosity minimal
+      - name: Restore existing browser test dependencies
+        run: npm ci
+      - name: Install browser test runtime
+        run: npx playwright install chromium
+      - name: Check deterministic artwork and themes
+        run: node visual-studio-extension/scripts/check-generated.cjs
+      - name: Check package and browser party contracts
+        run: node --test visual-studio-extension/tests/package.test.mjs visual-studio-extension/tests/release.test.mjs visual-studio-extension/scripts/party.test.mjs
+      - name: Build SDK-style C# and VB runtime fixtures
+        run: dotnet build visual-studio-extension/tests/Fixtures/BadgeFixture.sln --configuration Release --verbosity minimal
+      - name: Build native VSIX with Windows MSBuild
+        run: msbuild visual-studio-extension/src/Bananify/Bananify.csproj /restore /t:Rebuild /p:Configuration=Release /p:DeployExtension=false /p:VsixDeployOnDebug=false /v:minimal
+      - name: Inspect packaged payload
+        shell: pwsh
+        run: |
+          $packages = @(Get-ChildItem visual-studio-extension/src/Bananify/bin/Release -Filter *.vsix -Recurse)
+          if ($packages.Count -ne 1) { throw "Expected one native VSIX; found $($packages.Count)." }
+          ./visual-studio-extension/Verify-Vsix.ps1 -Path $packages[0].FullName
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: bananify-visual-studio
+          path: visual-studio-extension/src/Bananify/bin/Release/**/*.vsix
+          if-no-files-found: error
+
+  publish:
+    name: Publish to Visual Studio Marketplace
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/visualstudio-v')
+    needs: build
+    runs-on: windows-2022
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ github.ref_name }}
+    steps:
+      - name: Check out release source and listing assets
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24
+      - name: Restore pinned publishing SDK (no rebuild)
+        run: dotnet restore visual-studio-extension/src/Bananify/Bananify.csproj --verbosity minimal
+      - name: Download tested VSIX
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: bananify-visual-studio
+          path: release/visual-studio
+      - name: Verify downloaded release package
+        id: package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $packages = @(Get-ChildItem release/visual-studio -Filter *.vsix -Recurse)
+          if ($packages.Count -ne 1) { throw "Expected one tested VSIX; found $($packages.Count)." }
+          ./visual-studio-extension/Verify-Vsix.ps1 -Path $packages[0].FullName -ReleaseTag $env:RELEASE_TAG
+          "path=$($packages[0].FullName.Replace('\', '/'))" >> $env:GITHUB_OUTPUT
+      - name: Publish tested VSIX and listing assets
+        shell: pwsh
+        working-directory: visual-studio-extension
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT || secrets.VSCE_TOKEN }}
+          VSIX_PATH: ${{ steps.package.outputs.path }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ([string]::IsNullOrWhiteSpace($env:VSCE_PAT)) { throw 'Set VSCE_PAT (or VSCE_TOKEN) with Marketplace publishing access.' }
+          $publishManifest = (Resolve-Path vs-publish.json).Path
+          $metadata = Get-Content $publishManifest -Raw | ConvertFrom-Json
+          if ($metadata.publisher -ne 'vs-publisher-473885' -or $metadata.private -ne $false) { throw 'Expected the public Bananify Marketplace publisher configuration.' }
+          $assets = Get-Content src/Bananify/obj/project.assets.json -Raw | ConvertFrom-Json
+          $sdk = @($assets.libraries.PSObject.Properties | Where-Object { $_.Name -like 'Microsoft.VSSDK.BuildTools/*' })
+          if ($sdk.Count -ne 1) { throw 'Expected one restored Microsoft.VSSDK.BuildTools package.' }
+          $publisher = $null
+          foreach ($folder in $assets.packageFolders.PSObject.Properties) {
+            $candidate = Join-Path $folder.Name "$($sdk[0].Value.path)/tools/vssdk/bin/VsixPublisher.exe"
+            if (Test-Path -LiteralPath $candidate) { $publisher = $candidate; break }
+          }
+          if (-not $publisher) { throw 'VsixPublisher.exe was not found in the pinned SDK package.' }
+          & $publisher publish -payload $env:VSIX_PATH -publishManifest $publishManifest -personalAccessToken $env:VSCE_PAT
+          if ($LASTEXITCODE -ne 0) { throw "Marketplace publishing failed with exit code $LASTEXITCODE." }
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          files: ${{ steps.package.outputs.path }}
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          make_latest: "false"

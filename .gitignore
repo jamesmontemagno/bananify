@@ -10,3 +10,4 @@ test-results/
 .vscode-test/
 *.vsix
 .impeccable/
+.vs/

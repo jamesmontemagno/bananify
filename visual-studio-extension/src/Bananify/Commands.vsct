@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable">
+  <Extern href="stdidcmd.h" />
+  <Extern href="vsshlids.h" />
+  <Commands package="guidBananifyPackage">
+    <Menus>
+      <Menu guid="guidBananifyCommands" id="BananifyMenu" priority="0x0800" type="Menu">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
+        <Strings><ButtonText>&amp;Bananify</ButtonText></Strings>
+      </Menu>
+    </Menus>
+    <Groups>
+      <Group guid="guidBananifyCommands" id="BananifyGroup" priority="0x0100">
+        <Parent guid="guidBananifyCommands" id="BananifyMenu" />
+      </Group>
+    </Groups>
+    <Buttons>
+      <Button guid="guidBananifyCommands" id="Toggle" priority="0x0100" type="Button">
+        <Parent guid="guidBananifyCommands" id="BananifyGroup" />
+        <Strings><ButtonText>Toggle Banana Party</ButtonText></Strings>
+      </Button>
+      <Button guid="guidBananifyCommands" id="More" priority="0x0101" type="Button">
+        <Parent guid="guidBananifyCommands" id="BananifyGroup" />
+        <Strings><ButtonText>More Bananas</ButtonText></Strings>
+      </Button>
+      <Button guid="guidBananifyCommands" id="Pause" priority="0x0102" type="Button">
+        <Parent guid="guidBananifyCommands" id="BananifyGroup" />
+        <Strings><ButtonText>Pause or Resume</ButtonText></Strings>
+      </Button>
+      <Button guid="guidBananifyCommands" id="Restore" priority="0x0103" type="Button">
+        <Parent guid="guidBananifyCommands" id="BananifyGroup" />
+        <Strings><ButtonText>Restore Editor</ButtonText></Strings>
+      </Button>
+      <Button guid="guidBananifyCommands" id="Open" priority="0x0104" type="Button">
+        <Parent guid="guidBananifyCommands" id="BananifyGroup" />
+        <Strings><ButtonText>Open Banana Party</ButtonText></Strings>
+      </Button>
+      <Button guid="guidBananifyCommands" id="OpenLarge" priority="0x0105" type="Button">
+        <Parent guid="guidBananifyCommands" id="BananifyGroup" />
+        <Strings><ButtonText>Open Large Banana Party</ButtonText></Strings>
+      </Button>
+      <Button guid="guidBananifyCommands" id="Options" priority="0x0106" type="Button">
+        <Parent guid="guidBananifyCommands" id="BananifyGroup" />
+        <Strings><ButtonText>Bananify Settings</ButtonText></Strings>
+      </Button>
+      <Button guid="guidBananifyCommands" id="Cheer" priority="0x0107" type="Button">
+        <Parent guid="guidBananifyCommands" id="BananifyGroup" />
+        <Strings><ButtonText>Ask a Monkey for Encouragement</ButtonText></Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+  <Symbols>
+    <GuidSymbol name="guidBananifyPackage" value="{34b4207e-5102-4332-96fa-ce788f830550}" />
+    <GuidSymbol name="guidBananifyCommands" value="{c2bfb169-1b41-4e8d-8975-87e81d5f890f}">
+      <IDSymbol name="BananifyMenu" value="0x1000" />
+      <IDSymbol name="BananifyGroup" value="0x1020" />
+      <IDSymbol name="Toggle" value="0x0100" />
+      <IDSymbol name="More" value="0x0101" />
+      <IDSymbol name="Pause" value="0x0102" />
+      <IDSymbol name="Restore" value="0x0103" />
+      <IDSymbol name="Open" value="0x0104" />
+      <IDSymbol name="OpenLarge" value="0x0105" />
+      <IDSymbol name="Options" value="0x0106" />
+      <IDSymbol name="Cheer" value="0x0107" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>
