@@ -1,5 +1,11 @@
 # Change Log
 
+## Unreleased
+
+- Refresh all four themes with coordinated frame palettes for VS Code's classic and modern layouts.
+- Add explicit Command Center, Secondary Side Bar, panel, tab, menu, notification, input, scrollbar, inactive-window, and keyboard-focus states.
+- Enable semantic highlighting while preserving the themes' existing TextMate syntax palettes.
+
 ## 0.1.1
 
 - Add selected-monkey encouragement on editor decoration hover and a banana icon on the Party tab.
