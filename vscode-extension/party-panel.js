@@ -281,12 +281,12 @@ function partyHtml(webview, surface) {
       <h1 id="party-title">Banana Party</h1>
       <p class="message" aria-live="polite">The party is ready when you are.</p>
       <div class="actions">
-        <button class="action-control" data-command="start" aria-label="Start banana party">
+        <button class="action-control" data-command="start" aria-label="Start party">
           <span class="icon" aria-hidden="true">▶</span>
           <span class="label">Start</span>
         </button>
-        <button data-burst aria-label="More bananas">More bananas</button>
-        <button class="secondary action-reset" data-command="stop" aria-label="Stop banana party">
+        <button data-burst aria-label="More bananas">${surface === "explorer" ? "More" : "More bananas"}</button>
+        <button class="secondary action-reset" data-command="stop" aria-label="${surface === "explorer" ? "Stop" : "Stop party"}">
           <span class="icon" aria-hidden="true">■</span>
           <span class="label">Stop</span>
         </button>
@@ -319,11 +319,17 @@ function partyHtml(webview, surface) {
     function syncPrimaryAction(data) {
       const active = Boolean(data.active);
       const paused = Boolean(data.paused);
+      const explorer = body.classList.contains("explorer");
       const action = active ? "pause" : "start";
       const icon = active ? (paused ? "▶" : "❚❚") : "▶";
       const label = active ? (paused ? "Resume" : "Pause") : "Start";
+      const actionName = !active
+        ? "Start party"
+        : paused
+          ? (explorer ? "Resume" : "Resume animation")
+          : (explorer ? "Pause" : "Pause animation");
       primaryAction.dataset.command = action;
-      primaryAction.setAttribute("aria-label", active ? (paused ? "Resume banana party" : "Pause banana party") : "Start banana party");
+      primaryAction.setAttribute("aria-label", actionName);
       primaryAction.innerHTML = '<span class="icon" aria-hidden="true">' + icon + '</span><span class="label">' + label + '</span>';
       stopAction.hidden = !active;
     }
