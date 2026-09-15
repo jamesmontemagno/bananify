@@ -22,7 +22,7 @@ Give your editor a harmless banana party. Bananify adds stable banana and illust
   bananas, and burst a small illustrated bunch wherever you click or tap inside the
   view. **More bananas** also spawns a bunch with the keyboard. Bursts stay inside
   the view, respect reduced motion, and stop while the party is paused.
-- Run **Bananify: Choose Banana Theme** to preview Banana Grove, Banana Cream, Midnight Banana, or Monkey Jungle. Bananify never changes your theme automatically.
+- Run **Bananify: Choose Banana Theme** to preview Banana Grove, Banana Cream, Midnight Banana, or Monkey Jungle. Each theme colors VS Code's classic and modern framed layouts, including the Command Center, Secondary Side Bar, panels, tabs, menus, notifications, and focus states. Bananify never changes your theme automatically.
 - Run **Restore Editor** to remove decorations, stop status animation, and close the Party tab. Source files are never modified.
 
 The extension performs no network requests and does not collect telemetry.

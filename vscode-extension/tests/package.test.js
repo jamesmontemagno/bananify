@@ -69,6 +69,38 @@ test("manifest contributes commands, a monkey view, and optional themes", async 
 });
 
 test("themes declare readable editor and workbench colors", async () => {
+  const modernFrameColors = [
+    "surface.background",
+    "surface.foreground",
+    "surface.border",
+    "editor.border",
+    "modernPanel.border",
+    "modernSash.gripForeground",
+    "modernTab.activeBackground",
+    "modernTab.activeForeground",
+    "modernEditorTab.activeBackground",
+    "modernEditorTab.activeForeground",
+    "modernActivityBar.background",
+    "modernActivityBar.border",
+    "modernActivityBarItem.activeBackground",
+    "modernActivityBarItem.activeForeground",
+    "modernUI.shellBackground",
+    "modernUI.inactiveShellBackground",
+  ];
+  const readableFramePairs = [
+    ["foreground", "surface.background"],
+    ["titleBar.activeForeground", "titleBar.activeBackground"],
+    ["commandCenter.foreground", "commandCenter.background"],
+    ["activityBar.foreground", "activityBar.background"],
+    ["sideBar.foreground", "sideBar.background"],
+    ["panelTitle.activeForeground", "panel.background"],
+    ["statusBar.foreground", "statusBar.background"],
+    ["tab.activeForeground", "tab.activeBackground"],
+    ["input.foreground", "input.background"],
+    ["menu.foreground", "menu.background"],
+    ["notifications.foreground", "notifications.background"],
+    ["modernActivityBarItem.activeForeground", "modernActivityBarItem.activeBackground"],
+  ];
   const themeFiles = [
     ["banana-grove-color-theme.json", "dark"],
     ["banana-cream-color-theme.json", "light"],
@@ -78,6 +110,7 @@ test("themes declare readable editor and workbench colors", async () => {
   for (const [file, type] of themeFiles) {
     const theme = JSON.parse(await readFile(path.join(root, "themes", file), "utf8"));
     assert.equal(theme.type, type);
+    assert.equal(theme.semanticHighlighting, true);
     for (const color of [
       "activityBar.background",
       "editor.background",
@@ -87,9 +120,18 @@ test("themes declare readable editor and workbench colors", async () => {
     ]) {
       assert.match(theme.colors[color], /^#[0-9A-F]{6}$/i);
     }
+    for (const color of modernFrameColors) {
+      assert.match(theme.colors[color], /^#[0-9A-F]{6}(?:[0-9A-F]{2})?$/i, `${file} is missing ${color}`);
+    }
     assert.ok(contrast(theme.colors["editor.foreground"], theme.colors["editor.background"]) >= 4.5);
-    assert.ok(contrast(theme.colors["activityBar.foreground"], theme.colors["activityBar.background"]) >= 4.5);
-    assert.ok(contrast(theme.colors["statusBar.foreground"], theme.colors["statusBar.background"]) >= 4.5);
+    for (const [foreground, background] of readableFramePairs) {
+      assert.ok(
+        contrast(theme.colors[foreground], theme.colors[background]) >= 4.5,
+        `${file} must keep ${foreground} readable on ${background}`,
+      );
+    }
+    assert.equal(theme.colors["modernActivityBar.activeBackground"], undefined);
+    assert.equal(theme.colors["modernActivityBar.activeForeground"], undefined);
     assert.ok(theme.tokenColors.length >= 5);
   }
 });
