@@ -249,7 +249,9 @@ class MonkeyViewProvider {
     @media (prefers-reduced-motion: reduce) { .monkey *, .stage { animation-play-state: paused !important; } }
     .actions, .troop { display: grid; gap: 8px; margin-top: 12px; }
     .troop { grid-template-columns: repeat(3, 1fr); }
-    button { color: var(--vscode-button-foreground); background: var(--vscode-button-background); border: 0; padding: 8px; cursor: pointer; border-radius: 3px; }
+    .command-button, .monkey-choice, button { color: var(--vscode-button-foreground); background: var(--vscode-button-background); border: 0; padding: 8px; cursor: pointer; border-radius: 3px; }
+    .command-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .command-button .icon { font-size: 1.05em; line-height: 1; }
     button:hover { background: var(--vscode-button-hoverBackground); }
     .monkey-choice { background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); }
     .monkey-choice.selected { outline: 2px solid var(--vscode-focusBorder); }
@@ -267,7 +269,10 @@ class MonkeyViewProvider {
     <button class="monkey-choice" data-monkey="golden">Henry</button>
   </div>
   <div class="actions">
-    <button data-command="toggle">Start banana party</button>
+    <button class="command-button" data-command="toggle">
+      <span class="icon" aria-hidden="true">▶</span>
+      <span class="label">Start banana party</span>
+    </button>
     <button data-command="party">Open Party tab</button>
     <button data-command="partyExplorer">Show Explorer Party</button>
     <button data-command="more">More bananas</button>
@@ -278,6 +283,8 @@ class MonkeyViewProvider {
     const vscode = acquireVsCodeApi();
     const status = document.querySelector(".status");
     const toggle = document.querySelector('[data-command="toggle"]');
+    const toggleIcon = toggle.querySelector(".icon");
+    const toggleLabel = toggle.querySelector(".label");
     const events = new AbortController();
     let celebrationTimer;
     document.addEventListener("click", (event) => {
@@ -299,7 +306,9 @@ class MonkeyViewProvider {
         });
         document.body.classList.toggle("motion-paused", data.reducedMotion);
         document.body.classList.toggle("hidden", !data.visible);
-        toggle.textContent = data.enabled ? "Restore editor" : "Start banana party";
+        toggleIcon.textContent = data.enabled ? "■" : "▶";
+        toggleLabel.textContent = data.enabled ? "Restore editor" : "Start banana party";
+        toggle.title = data.enabled ? "Restore editor" : "Start banana party";
         status.textContent = data.enabled ? "Banana party level " + data.density + " of 5" : "The troop is ready.";
         document.querySelectorAll("[data-monkey]").forEach((button) => button.classList.toggle("selected", button.dataset.monkey === data.monkey));
       }
