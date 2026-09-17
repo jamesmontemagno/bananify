@@ -55,10 +55,11 @@ public sealed class PartySession
         ThreadHelper.ThrowIfNotOnUIThread();
         Change(State.Start());
     }
-    public void PauseOrResume()
+    public void Toggle()
     {
         ThreadHelper.ThrowIfNotOnUIThread();
-        Change(State.PauseOrResume());
+        if (State.Active) Restore();
+        else Start();
     }
     public void Restore()
     {

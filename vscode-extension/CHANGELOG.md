@@ -1,12 +1,16 @@
 # Change Log
 
+## 0.1.3
+
+- Rename the Marketplace display name to **Bananify for VS Code**.
+- Replace separate pause and restore actions with one clear **Start or Stop Banana Party** action.
+- Show the current **1 banana** through **5 bananas** level directly on the density control.
+
 ## 0.1.2
 
 - Refresh all four themes with coordinated frame palettes for VS Code's classic and modern layouts.
 - Add explicit Command Center, Secondary Side Bar, panel, tab, menu, notification, input, scrollbar, inactive-window, and keyboard-focus states.
 - Enable semantic highlighting while preserving the themes' existing TextMate syntax palettes.
-
-## Unreleased
 
 ## 0.1.1
 

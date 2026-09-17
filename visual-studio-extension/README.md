@@ -6,15 +6,15 @@ A native Visual Studio 2026 companion to Bananify: banana and monkey editor deco
 
 ## The party
 
-Use **Tools > Bananify** to toggle decorations, change density, pause/resume, restore the editor, open either party window, or open settings. The compact window can dock alongside your tools; the larger party is registered for the document area. Visual Studio retains the layout you choose.
+Use **Tools > Bananify** to start or stop decorations, change the banana level, open either party window, or open settings. The compact window can dock alongside your tools; the larger party is registered for the document area. Visual Studio retains the layout you choose.
 
 Decorations never edit source text, dirty a document or add undo records. Illustrated gutter art uses a separate margin, not the breakpoint glyph margin. Very long lines omit EOL artwork when there is insufficient viewport space.
 
-**Pause** removes native decorations and badges while pausing the party. **Restore Editor** stops the party and hides its larger native window. Starting a new IDE session restores the enabled preference but not a transient paused state. **More Bananas** cycles density from 1 through 5 and back to 1; the party's burst control remains bounded.
+**Start or Stop Banana Party** controls the entire party and hides the larger native window when stopped. The banana-level control shows **1 banana** through **5 bananas** and cycles back to 1; its burst remains bounded.
 
 Both **Monkey Business** and **Banana Party** show the current **Banana level: N/5**, synchronized with settings and commands. Rain falls in front of the monkeys without intercepting clicks or obscuring the action buttons and messages.
 
-Use **Encourage me** in either panel for an inline phrase from the selected monkey, or **Tools > Bananify > Ask a Monkey for Encouragement** for a dialog. Both share 40 local phrases and avoid consecutive repeats. Encouragement works while paused or disabled and never starts decorations. Messages remain through unrelated state/theme updates; another message, a change of monkey, Start/Pause/Restore, or a visibility change replaces or clears them.
+Use **Encourage me** in either panel for an inline phrase from the selected monkey, or **Tools > Bananify > Ask a Monkey for Encouragement** for a dialog. Both share 40 local phrases and avoid consecutive repeats. Encouragement works while the party is stopped and never starts decorations. Messages remain through unrelated state/theme updates; another message, a change of monkey, Start/Stop, or a visibility change replaces or clears them.
 
 Choose **Banana Grove**, **Banana Cream**, **Midnight Banana**, or **Monkey Jungle** through Visual Studio's theme settings. Installing or starting Bananify never changes the selected theme. Restoring the editor does not undo a theme you deliberately selected.
 
@@ -32,14 +32,14 @@ Open **Tools > Options > Bananify > General**.
 | Celebrate completed saves | Off | Shows **Save completed!** feedback after a document has saved in a visible party panel. |
 | Celebrate successful solution builds | Off | Shows **Build succeeded!** feedback; ignores failed/canceled builds and clean-only operations. |
 
-Automatic celebrations require an active, unpaused party and a visible **Monkey Business** or **Banana Party** panel. They share a five-second cooldown and never open or focus a window. Hidden panels do not replay missed celebrations. A save just before a build can consume the shared cooldown, so a fast build may not produce a second celebration. With motion enabled, feedback includes a brief banana burst and monkey bounce; reduced motion and high contrast use readable text without movement. **More bananas** has its own manual feedback and does not consume the automatic cooldown. No audio, typing capture, usage tracking or all-tests-passed inference is included.
+Automatic celebrations require an active party and a visible **Monkey Business** or **Banana Party** panel. They share a five-second cooldown and never open or focus a window. Hidden panels do not replay missed celebrations. A save just before a build can consume the shared cooldown, so a fast build may not produce a second celebration. With motion enabled, feedback includes a brief banana burst and monkey bounce; reduced motion and high contrast use readable text without movement. Changing the banana level has its own manual feedback and does not consume the automatic cooldown. No audio, typing capture, usage tracking or all-tests-passed inference is included.
 
 To check celebrations in a VS2026 experimental instance:
 
-1. Choose **Tools > Bananify > Open Banana Party** to open **Monkey Business**, keep it visible, and ensure the party is not paused. Enable both celebration settings in **Tools > Options > Bananify > General**.
+1. Choose **Tools > Bananify > Open Banana Party** to open **Monkey Business** and keep it visible. Enable both celebration settings in **Tools > Options > Bananify > General**.
 2. Edit a source file and save it. Look for **Save completed!** in the panel; an unchanged file may not trigger a completed-save event.
 3. Wait more than five seconds, then build an already-saved project/solution that actually performs a build. Look for **Build succeeded!**. Avoid a pre-build save inside the cooldown when checking this separately.
-4. Repeat with **Reduce motion** enabled: messages still appear, but particles and bounce do not. Pause or hide the panel to check suppression; restoring visibility must not replay an old event.
+4. Repeat with **Reduce motion** enabled: messages still appear, but particles and bounce do not. Stop the party or hide the panel to check suppression; restoring visibility must not replay an old event.
 5. Check a failed build, a canceled build, and a clean-only operation: none should announce build success. Verify that rapid saves/builds share the cooldown.
 
 The native save listener exposes the documented `IVsRunningDocTableEvents3` fallback for modern RDT save notifications. Browser and core tests verify message handling and cooldown logic, not actual Visual Studio callback delivery.
@@ -87,11 +87,11 @@ The manifest's `[17.14,)` is an **API requirement**, not a claim that VS2022 has
 
 ## Required Windows release checklist
 
-Open `tests/Fixtures/BadgeFixture.sln` inside the VS2026 experimental instance for SDK-style C#/VB and linked-file exercises. Open each normal and linked source file, split a view, switch tabs, pause, restore and close the last visible view while observing Solution Explorer. The fixture is a reproducible scenario, not evidence the badges have already passed.
+Open `tests/Fixtures/BadgeFixture.sln` inside the VS2026 experimental instance for SDK-style C#/VB and linked-file exercises. Open each normal and linked source file, split a view, switch tabs, stop and restart the party, and close the last visible view while observing Solution Explorer. The fixture is a reproducible scenario, not evidence the badges have already passed.
 
 1. Install/uninstall/update the actual packaged VSIX in VS2026; verify commands, package and MEF discovery.
 2. Verify decorations across C#/VB, split/floating views, wrap/folding/zoom, long lines, CodeLens and mixed DPI without input or breakpoint interference.
-3. Confirm source snapshots, dirty flags, selections and undo stacks remain unchanged after Start/More/Pause/Restore.
+3. Confirm source snapshots, dirty flags, selections and undo stacks remain unchanged after Start/Stop and banana-level changes.
 4. Confirm SDK-style C#/VB badges preserve base icons and Git overlays, refresh on view membership/rename/settings changes, and restore without project reload or source-file writes.
 5. Install and switch among all four themes; check shell, menus, tool windows, Solution Explorer, tabs, editor classifications, diagnostic colors and high contrast. No automatic selection.
 6. Exercise compact/large party hosts, keyboard controls, hidden windows, reduced motion, browser initialization failure, repeated close/reopen and IDE shutdown.

@@ -11,14 +11,14 @@ FORM: Brief-pinned cartoon banana party. A live playground, not a marketing dash
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#ffdc45">
-  <title>Bananify - Free Banana Extensions for Chrome, Edge &amp; VS Code</title>
-  <meta name="description" content="Bananify your browser and your editor. Try banana showers and a dancing capuchin, then get Bananify for Chrome, Edge, and Visual Studio Code.">
+  <title>Bananify - Free Banana Extensions for Browsers and Visual Studio</title>
+  <meta name="description" content="Bananify your browser and your editor. Get the banana party for Chrome, Edge, Visual Studio Code, and Visual Studio.">
   <meta name="author" content="James Montemagno &amp; Mooch">
   <link rel="canonical" href="https://bananify.online/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bananify">
   <meta property="og:title" content="Bananify - The internet. But bananas.">
-  <meta property="og:description" content="Bananas everywhere. One very happy capuchin. Take the party to your browser and Visual Studio Code.">
+  <meta property="og:description" content="Bananas everywhere. One very happy capuchin. Take the party to your browser, Visual Studio Code, or Visual Studio.">
   <meta property="og:url" content="https://bananify.online/">
   <meta property="og:image" content="https://bananify.online/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -26,7 +26,7 @@ FORM: Brief-pinned cartoon banana party. A live playground, not a marketing dash
   <meta property="og:image:alt" content="Bananify: The internet. But bananas. A happy capuchin celebrates with a banana.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Bananify - The internet. But bananas.">
-  <meta name="twitter:description" content="Free extensions for Chrome, Edge, and Visual Studio Code. Bananas everywhere. One very happy capuchin.">
+  <meta name="twitter:description" content="Free extensions for Chrome, Edge, Visual Studio Code, and Visual Studio. Bananas everywhere. One very happy capuchin.">
   <meta name="twitter:image" content="https://bananify.online/social-card.png">
   <meta name="twitter:image:alt" content="Bananify: The internet. But bananas. A happy capuchin celebrates with a banana.">
   <script type="application/ld+json">
@@ -57,6 +57,26 @@ FORM: Brief-pinned cartoon banana party. A live playground, not a marketing dash
           "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
           "author": { "@type": "Person", "name": "James Montemagno", "url": "https://github.com/jamesmontemagno" },
           "creditText": "Made by James Montemagno & Mooch"
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://bananify.online/#vscode-extension",
+          "name": "Bananify for VS Code",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Windows, macOS, Linux",
+          "installUrl": "https://marketplace.visualstudio.com/items?itemName=vs-publisher-473885.bananify",
+          "description": "A Visual Studio Code extension with banana decorations, optional themes, and monkey party views.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://bananify.online/#visual-studio-extension",
+          "name": "Bananify for Visual Studio",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Windows",
+          "installUrl": "https://marketplace.visualstudio.com/items?itemName=vs-publisher-473885.Bananify-VisualStudio",
+          "description": "A Visual Studio extension with banana decorations, optional themes, and native monkey party windows.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
         }
       ]
     }
@@ -72,7 +92,7 @@ FORM: Brief-pinned cartoon banana party. A live playground, not a marketing dash
     <a class="wordmark" href="./" aria-label="Bananify home"><span data-banana></span>bananify<span class="wordmark-dot">.</span></a>
     <nav class="install-nav" aria-label="Get Bananify">
       <a class="install-link" href="#install">Chrome &amp; Edge</a>
-      <a class="install-link" href="#vscode">VS Code <span aria-hidden="true">&#8599;</span></a>
+      <a class="install-link" href="#editors">Editors <span aria-hidden="true">&#8595;</span></a>
     </nav>
   </header>
   <main>
@@ -125,13 +145,16 @@ FORM: Brief-pinned cartoon banana party. A live playground, not a marketing dash
         <p class="install-note">Free for desktop Chrome and Edge. More bananas brings a different monkey and transforms more of the page. Restore page brings it all back. Browser settings and extension stores are off-limits.</p>
       </div>
     </section>
-    <section class="vscode-section" id="vscode" aria-labelledby="vscode-heading">
+    <section class="vscode-section" id="editors" aria-labelledby="editors-heading">
       <div class="vscode-copy">
-        <h2 id="vscode-heading">Your VS Code.<br>Also bananas.</h2>
-        <p>Bring the party to your editor with banana decorations, four optional color themes, and a little troop of monkeys to keep you company.</p>
-        <a class="marketplace-link" href="https://marketplace.visualstudio.com/items?itemName=vs-publisher-473885.bananify">Get for VS Code <span aria-hidden="true">&#8599;</span></a>
-        <p class="vscode-note">Free on the Visual Studio Marketplace. Your source files stay untouched.</p>
-        <p class="vscode-tip">Once installed, open the Command Palette and run <strong>Bananify: Toggle Banana Party</strong>.</p>
+        <h2 id="editors-heading">Your editor.<br>Also bananas.</h2>
+        <p>Bring the party to VS Code or Visual Studio with banana decorations, four optional color themes, and a little troop of monkeys to keep you company.</p>
+        <div class="marketplace-actions">
+          <a class="marketplace-link" href="https://marketplace.visualstudio.com/items?itemName=vs-publisher-473885.bananify">Get Bananify for VS Code <span aria-hidden="true">&#8599;</span></a>
+          <a class="marketplace-link marketplace-link-secondary" href="https://marketplace.visualstudio.com/items?itemName=vs-publisher-473885.Bananify-VisualStudio">Get Bananify for Visual Studio <span aria-hidden="true">&#8599;</span></a>
+        </div>
+        <p class="vscode-note">Both are free on the Visual Studio Marketplace. Your source files stay untouched.</p>
+        <p class="vscode-tip">Once installed, run <strong>Start or Stop Banana Party</strong> from your editor's command menu.</p>
       </div>
       <figure class="vscode-preview">
         <a href="vscode-extension/media/bananify-vscode-screenshot.png" aria-label="View full-size Bananify screenshot in VS Code">

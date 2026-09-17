@@ -54,6 +54,7 @@ test("VSIX summary covers the listing features without bundling Marketplace-only
 
 test("VSIX has explicit API and architecture targets, package and MEF assets", async () => {
   const manifest = await readFile(new URL("source.extension.vsixmanifest", source), "utf8");
+  assert.match(manifest, /<DisplayName>Bananify for Visual Studio<\/DisplayName>/);
   assert.match(manifest, /Version="\[17\.14,\)"/);
   assert.match(manifest, /<ProductArchitecture>amd64<\/ProductArchitecture>/);
   assert.match(manifest, /<ProductArchitecture>arm64<\/ProductArchitecture>/);
@@ -68,7 +69,7 @@ test("native commands and VSCT registration agree", async () => {
     readFile(new URL("BananifyPackage.cs", source), "utf8"),
   ]);
   const ids = [...host.matchAll(/Add(?:Async)?Command\(commands, (0x[0-9a-f]+)/g)].map((match) => match[1]);
-  assert.equal(ids.length, 8);
+  assert.equal(ids.length, 6);
   for (const id of ids) assert.ok(commands.includes(`value="${id}"`), `Missing command ${id}`);
   assert.ok(host.includes('ProvideMenuResource("Menus.ctmenu", 1)'));
 });
@@ -527,7 +528,8 @@ test("native source wiring: encouragement shares a provider and commands enforce
   const dispatchIndex = message.indexOf("switch (command)");
   assert.ok(dispatchIndex > guard.index + guard[0].length);
   const dispatch = message.slice(dispatchIndex);
-  for (const command of ["ready", "start", "pause", "restore", "more", "encourage"]) assert.ok(dispatch.includes(`case "${command}":`));
+  for (const command of ["ready", "toggle", "more", "encourage"]) assert.ok(dispatch.includes(`case "${command}":`));
+  assert.doesNotMatch(dispatch, /case\s+"(?:pause|restore)"/);
   const encourage = /case\s+"encourage":([\s\S]*?)break\s*;/.exec(dispatch)?.[1];
   assert.ok(encourage);
   assert.match(encourage, /ready\s*&&\s*loaded\s*&&\s*IsVisible/);

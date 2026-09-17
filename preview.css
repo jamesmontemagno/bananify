@@ -71,8 +71,11 @@ input::placeholder { color: #636e5d; }
 .vscode-section { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.4fr); align-items: center; gap: 6%; padding: 72px 6%; background: var(--green); color: var(--paper); }
 .vscode-copy h2 { font-size: clamp(32px, 3.6vw, 48px); }
 .vscode-copy p { font: 15px/1.8 system-ui, sans-serif; max-width: 48ch; margin: 0 0 24px; }
+.marketplace-actions { display: grid; gap: 12px; align-items: start; justify-items: start; }
 .marketplace-link { display: inline-flex; justify-content: space-between; align-items: center; gap: 24px; padding: 16px 22px; min-height: 56px; border: 2px solid var(--banana); border-radius: 14px; background: var(--banana); color: var(--ink); font-size: 17px; font-weight: 800; text-decoration: none; box-shadow: 0 4px 0 #143c29; transition: transform .18s ease, background .18s ease; }
+.marketplace-link-secondary { background: transparent; color: var(--paper); }
 .marketplace-link:hover { background: #ffe777; transform: translateY(-2px); }
+.marketplace-link-secondary:hover { color: var(--ink); }
 .marketplace-link:active { transform: translateY(3px); box-shadow: none; }
 .vscode-section a:focus-visible { outline-color: var(--banana); }
 .vscode-copy .vscode-note { font-size: 12px; margin: 16px 0 24px; }
@@ -107,6 +110,7 @@ footer { border-top: 1px solid #d2d7c2; margin: 0 6%; padding: 25px 0; display: 
   .below { grid-template-columns: 1fr; gap: 42px; padding-top: 42px; padding-bottom: 40px; }
   .store-action { padding: 16px; gap: 12px; }
   .vscode-section { grid-template-columns: 1fr; gap: 32px; padding-top: 44px; padding-bottom: 44px; }
+  .marketplace-actions, .marketplace-link { width: 100%; }
   footer { flex-direction: column; gap: 7px; }
 }
 @media (max-width: 360px) {

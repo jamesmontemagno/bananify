@@ -1,7 +1,7 @@
 {
   "name": "bananify",
-  "displayName": "Bananify",
-  "version": "0.1.2",
+  "displayName": "Bananify for VS Code",
+  "version": "0.1.3",
   "publisher": "vs-publisher-473885",
   "description": "Bring a banana party, a warm optional theme, and a troop of tiny monkeys to Visual Studio Code.",
   "author": "James Montemagno & Mooch",
@@ -46,13 +46,13 @@
     "commands": [
       {
         "command": "bananify.toggle",
-        "title": "Toggle Banana Party",
+        "title": "Start or Stop Banana Party",
         "category": "Bananify",
         "icon": "$(sparkle)"
       },
       {
         "command": "bananify.moreBananas",
-        "title": "More Bananas",
+        "title": "Set 1-5 Bananas",
         "category": "Bananify",
         "icon": "$(add)"
       },
@@ -67,18 +67,6 @@
         "title": "Show Banana Party in Explorer",
         "category": "Bananify",
         "icon": "$(files)"
-      },
-      {
-        "command": "bananify.pause",
-        "title": "Pause or Resume Banana Decorations",
-        "category": "Bananify",
-        "icon": "$(debug-pause)"
-      },
-      {
-        "command": "bananify.restore",
-        "title": "Restore Editor",
-        "category": "Bananify",
-        "icon": "$(discard)"
       },
       {
         "command": "bananify.selectTheme",
@@ -114,11 +102,6 @@
           "command": "bananify.moreBananas",
           "when": "view == bananify.monkeys",
           "group": "navigation@2"
-        },
-        {
-          "command": "bananify.restore",
-          "when": "view == bananify.monkeys && config.bananify.decorations.enabled",
-          "group": "navigation@3"
         }
       ]
     },

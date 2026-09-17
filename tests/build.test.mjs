@@ -32,6 +32,12 @@ test("production build publishes only the website and reproducible manual-instal
   assert.equal(structuredData["@graph"][1].installUrl, "https://chromewebstore.google.com/detail/bananify/ahlgjleaimihpbcpadijmmeeokpfnflc");
   assert.deepEqual(structuredData["@graph"][1].sameAs, ["https://microsoftedge.microsoft.com/addons/detail/iidhiomigjipgnembnbcndbliniciijh"]);
   assert.equal(structuredData["@graph"][1].downloadUrl, undefined);
+  assert.equal(structuredData["@graph"][2].name, "Bananify for VS Code");
+  assert.equal(structuredData["@graph"][2].installUrl,
+    "https://marketplace.visualstudio.com/items?itemName=vs-publisher-473885.bananify");
+  assert.equal(structuredData["@graph"][3].name, "Bananify for Visual Studio");
+  assert.equal(structuredData["@graph"][3].installUrl,
+    "https://marketplace.visualstudio.com/items?itemName=vs-publisher-473885.Bananify-VisualStudio");
   const socialImage = await readFile(join(output, "social-card.png"));
   assert.equal(socialImage.readUInt32BE(16), 1200);
   assert.equal(socialImage.readUInt32BE(20), 630);

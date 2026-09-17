@@ -97,8 +97,10 @@ test("visible-line selection handles split editors without scanning hidden lines
 });
 
 test("webview messages accept only explicit commands and known monkey ids", () => {
-  assert.equal(isPartyMessage({ command: "pause" }), true);
+  assert.equal(isPartyMessage({ command: "start" }), true);
   assert.equal(isPartyMessage({ command: "stop" }), true);
+  assert.equal(isPartyMessage({ command: "more" }), true);
+  assert.equal(isPartyMessage({ command: "pause" }), false);
   assert.equal(isPartyMessage({ command: "stop", extra: true }), false);
   assert.equal(isPartyMessage({ command: "unknown" }), false);
   assert.equal(isMonkeyViewMessage({ command: "party" }), true);

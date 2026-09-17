@@ -10,7 +10,7 @@
   const template = document.querySelector("#banana-template");
   const level = document.querySelector(".banana-level");
   const message = document.querySelector(".message");
-  const pause = document.querySelector('[data-command="pause"]');
+  const toggle = document.querySelector('[data-command="toggle"]');
   const more = document.querySelector('[data-command="more"]');
   const motion = matchMedia("(prefers-reduced-motion: reduce)");
   const contrast = matchMedia("(forced-colors: active)");
@@ -44,8 +44,11 @@
     body.classList.toggle("paused", state.paused);
     body.classList.toggle("hidden", !state.visible || document.hidden);
     body.classList.toggle("reduced", reduced());
-    pause.textContent = state.paused ? "Resume" : "Pause";
-    more.disabled = !running();
+    toggle.textContent = state.active ? "Stop" : "Start";
+    toggle.setAttribute("aria-label", state.active ? "Stop banana party" : "Start banana party");
+    more.textContent = `${state.density} ${state.density === 1 ? "banana" : "bananas"}`;
+    more.setAttribute("aria-label", `Banana level ${state.density} of 5; choose next level`);
+    more.disabled = !state.visible;
     level.textContent = `Banana level: ${state.density}/5`;
     document.querySelectorAll(".monkey-choice").forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.monkey === state.monkey));
@@ -135,7 +138,7 @@
     if (!button || button.disabled) return;
     if (Object.hasOwn(names, button.dataset.monkey || "")) {
       bridge.postMessage({ command: "monkey", monkey: button.dataset.monkey });
-    } else if (["start", "pause", "more", "restore", "encourage"].includes(button.dataset.command)) {
+    } else if (["toggle", "more", "encourage"].includes(button.dataset.command)) {
       bridge.postMessage({ command: button.dataset.command });
     }
   }, { signal: events.signal });

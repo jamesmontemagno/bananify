@@ -30,11 +30,11 @@ test("manifest contributes commands, a monkey view, and optional themes", async 
     "bananify.moreBananas",
     "bananify.openParty",
     "bananify.showPartyExplorer",
-    "bananify.pause",
-    "bananify.restore",
     "bananify.selectTheme",
     "bananify.cheer",
   ]);
+  assert.equal(manifest.displayName, "Bananify for VS Code");
+  assert.equal(manifest.version, "0.1.3");
   assert.equal(manifest.contributes.views.bananify[0].type, "webview");
   assert.equal(manifest.contributes.views.explorer[0].id, "bananify.partyExplorer");
   assert.deepEqual(

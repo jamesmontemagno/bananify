@@ -169,7 +169,7 @@ test("Party editor receives the packaged banana icon and retains it when reveale
     window: { createWebviewPanel: () => { panelsCreated += 1; return panel; } },
   });
   const icon = uri("file:///extension/media/banana-128.png");
-  const surfaces = new BananaPartySurfaces(() => "brown", () => false, () => {}, icon);
+  const surfaces = new BananaPartySurfaces(() => "brown", () => false, () => 5, () => {}, () => {}, icon);
   surfaces.openEditor();
   assert.equal(panel.iconPath, icon);
   surfaces.openEditor();

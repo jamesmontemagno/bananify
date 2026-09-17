@@ -6,10 +6,12 @@ const { bananaSvg, monkeySvg } = require("./artwork");
 const { isPartyMessage, monkeyNames, PartyState } = require("./core");
 
 class BananaPartySurfaces {
-  constructor(getMonkey, getReducedMotion, setDecorationsEnabled, iconPath) {
+  constructor(getMonkey, getReducedMotion, getDensity, setDecorationsEnabled, cycleDensity, iconPath) {
     this.getMonkey = getMonkey;
     this.getReducedMotion = getReducedMotion;
+    this.getDensity = getDensity;
     this.setDecorationsEnabled = setDecorationsEnabled;
+    this.cycleDensity = cycleDensity;
     this.iconPath = iconPath;
     this.panel = undefined;
     this.explorerView = undefined;
@@ -85,16 +87,6 @@ class BananaPartySurfaces {
     this.update();
   }
 
-  setPaused(paused) {
-    if (!this.state.active && !paused) {
-      this.start();
-      return;
-    }
-    if (this.state.active && this.state.paused !== paused) this.state.togglePaused();
-    this.syncDecorations(!paused);
-    this.update();
-  }
-
   configureWebview(webview, surface) {
     webview.html = partyHtml(webview, surface);
     const disposables = webview === this.panel?.webview
@@ -103,10 +95,10 @@ class BananaPartySurfaces {
     disposables.push(webview.onDidReceiveMessage((message) => {
       if (!isPartyMessage(message)) return;
       if (message.command === "start") this.start();
-      if (message.command === "pause") {
-        this.state.togglePaused();
-        this.syncDecorations(!this.state.paused);
-        this.update();
+      if (message.command === "more") {
+        Promise.resolve(this.cycleDensity()).then(() => this.start()).catch((error) => {
+          vscode.window.showErrorMessage(`Bananify could not update the banana level: ${error.message}`);
+        });
       }
       if (message.command === "stop") this.stop();
     }));
@@ -132,6 +124,7 @@ class BananaPartySurfaces {
       monkey,
       monkeyName: monkeyNames[monkey] || monkeyNames.brown,
       paused: this.state.paused,
+      density: this.getDensity(),
       reducedMotion: this.state.reducedMotion,
       visible,
     });
@@ -285,11 +278,7 @@ function partyHtml(webview, surface) {
           <span class="icon" aria-hidden="true">▶</span>
           <span class="label">Start</span>
         </button>
-        <button data-burst aria-label="More bananas">${surface === "explorer" ? "More" : "More bananas"}</button>
-        <button class="secondary action-reset" data-command="stop" aria-label="${surface === "explorer" ? "Stop" : "Stop party"}">
-          <span class="icon" aria-hidden="true">■</span>
-          <span class="label">Stop</span>
-        </button>
+        <button data-burst data-command="more" aria-label="Banana level 5 of 5">5 bananas</button>
       </div>
       <button class="motion-note" data-motion-override>Animate anyway</button>
     </section>
@@ -299,7 +288,6 @@ function partyHtml(webview, surface) {
     const body = document.body;
     const message = document.querySelector(".message");
     const primaryAction = document.querySelector(".action-control");
-    const stopAction = document.querySelector(".action-reset");
     const motionOverride = document.querySelector("[data-motion-override]");
     const bursts = document.querySelector(".bursts");
     const bananaTemplate = document.querySelector("#banana-template");
@@ -318,26 +306,19 @@ function partyHtml(webview, surface) {
 
     function syncPrimaryAction(data) {
       const active = Boolean(data.active);
-      const paused = Boolean(data.paused);
-      const explorer = body.classList.contains("explorer");
-      const action = active ? "pause" : "start";
-      const icon = active ? (paused ? "▶" : "❚❚") : "▶";
-      const label = active ? (paused ? "Resume" : "Pause") : "Start";
-      const actionName = !active
-        ? "Start party"
-        : paused
-          ? (explorer ? "Resume" : "Resume animation")
-          : (explorer ? "Pause" : "Pause animation");
+      const action = active ? "stop" : "start";
+      const icon = active ? "■" : "▶";
+      const label = active ? "Stop" : "Start";
+      const actionName = active ? "Stop party" : "Start party";
       primaryAction.dataset.command = action;
       primaryAction.setAttribute("aria-label", actionName);
       primaryAction.innerHTML = '<span class="icon" aria-hidden="true">' + icon + '</span><span class="label">' + label + '</span>';
-      stopAction.hidden = !active;
     }
 
     document.addEventListener("click", (event) => {
       const button = event.target.closest("button");
       if (!button) return;
-      if (["start", "pause", "stop"].includes(button.dataset.command)) {
+      if (["start", "stop", "more"].includes(button.dataset.command)) {
         vscode.postMessage({ command: button.dataset.command });
       }
       if (button.hasAttribute("data-motion-override")) {
@@ -405,7 +386,9 @@ function partyHtml(webview, surface) {
         body.classList.toggle("hidden", !data.visible);
         body.classList.toggle("reduced", data.reducedMotion);
         syncPrimaryAction(data);
-        moreBananas.disabled = !data.active || data.paused || !data.visible;
+        moreBananas.textContent = data.density + (data.density === 1 ? " banana" : " bananas");
+        moreBananas.setAttribute("aria-label", "Banana level " + data.density + " of 5; choose next level");
+        moreBananas.disabled = !data.visible;
         if (!data.active || data.paused || !data.visible) clearBursts();
         message.textContent = data.active
           ? data.monkeyName + (data.paused ? " is saving some energy." : " brought the whole bunch.")

@@ -51,19 +51,22 @@ for (const viewport of [{ width: 1365, height: 1000 }, { width: 375, height: 812
         const bounds = await row.boundingBox();
         assert.ok(bounds && bounds.x >= 0 && bounds.x + bounds.width <= viewport.width);
       }
-      await page.getByRole("navigation", { name: "Get Bananify" }).getByRole("link", { name: "VS Code" }).click();
-      const vscode = page.getByRole("region", { name: "Your VS Code. Also bananas." });
-      await vscode.waitFor();
-      const marketplace = vscode.getByRole("link", { name: "Get for VS Code" });
-      assert.equal(await marketplace.getAttribute("href"),
+      await page.getByRole("navigation", { name: "Get Bananify" }).getByRole("link", { name: "Editors" }).click();
+      const editors = page.getByRole("region", { name: "Your editor. Also bananas." });
+      await editors.waitFor();
+      const vscode = editors.getByRole("link", { name: "Get Bananify for VS Code" });
+      const visualStudio = editors.getByRole("link", { name: "Get Bananify for Visual Studio", exact: true });
+      assert.equal(await vscode.getAttribute("href"),
         "https://marketplace.visualstudio.com/items?itemName=vs-publisher-473885.bananify");
-      await marketplace.focus();
+      assert.equal(await visualStudio.getAttribute("href"),
+        "https://marketplace.visualstudio.com/items?itemName=vs-publisher-473885.Bananify-VisualStudio");
+      await vscode.focus();
       await page.keyboard.press("Tab");
       await page.keyboard.press("Shift+Tab");
-      assert.equal(await marketplace.evaluate((node) => node.matches(":focus-visible")), true);
-      assert.equal(await marketplace.evaluate((node) => getComputedStyle(node).outlineStyle), "solid");
-      await vscode.getByRole("img").evaluate((node) => node.decode());
-      assert.equal(await vscode.getByRole("img").evaluate((node) => node.naturalWidth), 1400);
+      assert.equal(await vscode.evaluate((node) => node.matches(":focus-visible")), true);
+      assert.equal(await vscode.evaluate((node) => getComputedStyle(node).outlineStyle), "solid");
+      await editors.getByRole("img").evaluate((node) => node.decode());
+      assert.equal(await editors.getByRole("img").evaluate((node) => node.naturalWidth), 1400);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       await page.screenshot({ path: `test-results/site-${viewport.width}.png`, fullPage: true });
       const body = await page.locator("body").innerHTML();

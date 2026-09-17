@@ -9,8 +9,6 @@ const expectedCommands = [
   "bananify.moreBananas",
   "bananify.openParty",
   "bananify.showPartyExplorer",
-  "bananify.pause",
-  "bananify.restore",
   "bananify.selectTheme",
   "bananify.cheer",
 ];
@@ -29,7 +27,7 @@ async function run() {
 
   await vscode.commands.executeCommand("bananify.openParty");
   await vscode.commands.executeCommand("bananify.showPartyExplorer");
-  await vscode.commands.executeCommand("bananify.restore");
+  await vscode.commands.executeCommand("bananify.toggle");
 }
 
 module.exports = { run };

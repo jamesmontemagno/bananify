@@ -28,14 +28,14 @@ async function sendState(page, overrides = {}) {
   await page.evaluate((state) => {
     window.dispatchEvent(new MessageEvent("message", { data: {
       type: "state", active: true, paused: false, visible: true,
-      reducedMotion: false, monkey: "brown", monkeyName: "Mooch", ...state,
+      reducedMotion: false, density: 5, monkey: "brown", monkeyName: "Mooch", ...state,
     } }));
   }, overrides);
 }
 
 async function openParty(surface, viewport, reducedMotion = "no-preference") {
   const page = await browser.newPage({ viewport, reducedMotion, hasTouch: true });
-  const surfaces = new BananaPartySurfaces(() => "brown", () => false, () => {});
+  const surfaces = new BananaPartySurfaces(() => "brown", () => false, () => 5, () => {}, () => {});
   const webview = { cspSource: "'self'", onDidReceiveMessage: () => ({ dispose() {} }) };
   surfaces.configureWebview(webview, surface);
   await page.evaluate(() => {
@@ -77,10 +77,10 @@ for (const width of [220, 320]) {
       assert.equal(await page.locator(".bursts").evaluate((node) => getComputedStyle(node).pointerEvents), "none");
       await page.touchscreen.tap(width / 2, 40);
       assert.equal(await page.locator(".burst").count(), 12);
-      await page.getByRole("button", { name: "More bananas" }).focus();
+      await page.getByRole("button", { name: "Banana level 5 of 5; choose next level" }).focus();
       await page.keyboard.press("Enter");
       assert.equal(await page.locator(".burst").count(), 18);
-      assert.deepEqual(await page.evaluate(() => window.messages), []);
+      assert.deepEqual(await page.evaluate(() => window.messages), [{ command: "more" }]);
       await page.evaluate(() => {
         for (let index = 0; index < 100; index++) {
           document.body.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, clientX: 110, clientY: 40, button: 0 }));
@@ -91,10 +91,9 @@ for (const width of [220, 320]) {
       await page.waitForFunction(() => document.querySelector(".bursts").childElementCount === 0);
       assert.equal(await page.evaluate("burstTimers.size"), 0);
 
-      await page.getByRole("button", { name: "Pause", exact: true }).click();
-      assert.deepEqual(await page.evaluate(() => window.messages), [{ command: "pause" }]);
-      assert.equal(await page.locator(".burst").count(), 0);
-      for (const state of [{ paused: true }, { active: false }, { visible: false }]) {
+      await page.getByRole("button", { name: "Stop party", exact: true }).click();
+      assert.deepEqual(await page.evaluate(() => window.messages), [{ command: "more" }, { command: "stop" }]);
+      for (const state of [{ active: false }, { visible: false }, { paused: true }]) {
         await sendState(page);
         await page.mouse.click(width / 2, 40);
         assert.equal(await page.locator(".burst").count(), 6);
@@ -135,7 +134,7 @@ test("editor Party tab keeps its full-size layout and ten-banana bursts", async 
     assert.equal(await page.locator(".party-monkey:visible").count(), 1);
     assert.ok((await page.locator(".monkey-stage").boundingBox()).width >= 300);
     await page.getByRole("heading", { name: "Banana Party" }).waitFor();
-    await page.getByRole("button", { name: "Pause animation" }).waitFor();
+    await page.getByRole("button", { name: "Stop party" }).waitFor();
     await page.mouse.click(450, 200);
     assert.equal(await page.locator(".burst").count(), 10);
     await page.screenshot({ path: "test-results/editor-party.png" });

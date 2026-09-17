@@ -55,7 +55,7 @@ Bananify acts on the tab you choose when you click its toolbar button. It uses o
 
 The extension processes page content and click positions locally to place the bananas. It makes **no network requests**, sends no page content anywhere, and uses no analytics or persistent storage. The artwork is bundled with the extension. The separate demo website is hosted on GitHub Pages.
 
-## Bananify Visual Studio Code
+## Bananify for VS Code
 
 The repository also contains a companion [Visual Studio Code extension](vscode-extension/README.md). It adds opt-in banana and illustrated monkey decorations across visible split editors, four optional color themes, shared Banana Party views in Explorer and an editor tab, and an interactive Activity Bar panel featuring Mooch, Sebastian, and Henry. It never changes source files and makes no network requests.
 
@@ -73,7 +73,7 @@ npm run package
 
 Maintainers can publish the tested VSIX to the Visual Studio Marketplace by adding the `VSCE_PAT` or `VSCE_TOKEN` repository secret, updating `vscode-extension/package.json`, and pushing a matching `vscode-vX.Y.Z` tag. The workflow also creates a GitHub Release and optionally publishes to Open VSX when `OVSX_PAT` is configured.
 
-## Bananify Visual Studio
+## Bananify for Visual Studio
 
 A native [Visual Studio 2026 extension](visual-studio-extension/README.md) is in development, with editor decorations, local monkey party windows, four optional IDE themes, and opt-in file badges scoped to SDK-style C# and VB projects. It has a separate C# solution and Windows VSIX workflow; it is not the VS Code extension repackaged. Windows experimental-instance qualification is required before release.
 
