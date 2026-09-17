@@ -24,6 +24,10 @@ const reducedMotionKey = "reducedMotion";
 const saveCelebrationKey = "celebrations.onSave";
 const taskCelebrationKey = "celebrations.onSuccessfulTask";
 
+function nextPartyEnabled(configEnabled, partyActive) {
+  return !(configEnabled || partyActive);
+}
+
 class BananaDecorations {
   constructor(extensionUri) {
     this.lineDecorations = ["  🍌", "  🍌 🍌", "  🐒 🍌", "  🍌 🐒 🍌"].map((contentText) =>
@@ -450,7 +454,7 @@ function activate(context) {
     }),
     vscode.commands.registerCommand("bananify.toggle", async () => {
       const config = vscode.workspace.getConfiguration(section);
-      const enabled = !config.get(enabledKey, false);
+      const enabled = nextPartyEnabled(config.get(enabledKey, false), partySurfaces.state.active);
       if (!enabled) {
         await restore();
       } else {
@@ -534,4 +538,4 @@ function activate(context) {
 
 function deactivate() {}
 
-module.exports = { activate, deactivate };
+module.exports = { activate, deactivate, nextPartyEnabled };

@@ -177,3 +177,10 @@ test("Party editor receives the packaged banana icon and retains it when reveale
   assert.equal(panel.iconPath, icon);
   surfaces.dispose();
 });
+
+test("Start or Stop honors live party state before persisted settings catch up", () => {
+  const { nextPartyEnabled } = load("extension.js", {});
+  assert.equal(nextPartyEnabled(false, false), true);
+  assert.equal(nextPartyEnabled(true, false), false);
+  assert.equal(nextPartyEnabled(false, true), false);
+});
