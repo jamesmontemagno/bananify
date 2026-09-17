@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/vsix-publish",
   "categories": ["coding", "other"],
   "identity": {
-    "internalName": "Bananify.VisualStudio"
+    "internalName": "Bananify-VisualStudio"
   },
   "overview": "../docs/visual-studio-marketplace.md",
   "assetFiles": [

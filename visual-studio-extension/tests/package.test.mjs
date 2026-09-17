@@ -12,7 +12,7 @@ test("Marketplace overview images resolve locally and through publishing asset m
   const manifest = JSON.parse(await readFile(publishUrl, "utf8"));
   assert.equal(manifest.publisher, "vs-publisher-473885");
   assert.deepEqual(Object.keys(manifest.identity), ["internalName"]);
-  assert.equal(manifest.identity.internalName, "Bananify.VisualStudio");
+  assert.equal(manifest.identity.internalName, "Bananify-VisualStudio");
   assert.equal(manifest.priceCategory, "free");
   assert.equal(manifest.private, false);
   assert.ok(manifest.categories.length >= 1 && manifest.categories.length <= 3);
