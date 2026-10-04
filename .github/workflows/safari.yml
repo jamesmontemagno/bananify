@@ -6,6 +6,7 @@ on:
     tags:
       - "v*"
       - "!vscode-v*"
+      - "!visualstudio-v*"
     paths:
       - ".github/workflows/safari.yml"
       - "artwork.js"
