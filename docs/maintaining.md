@@ -28,6 +28,8 @@ git push origin v1.2.0
 
 Replace `1.2.0` with the version being released. The tag must exactly match `manifest.json`, `package.json`, and both root versions in `package-lock.json`. Stable three-part versions are supported; prerelease tags are rejected.
 
+The release job does not wait for `.github/workflows/safari.yml`. Before pushing the tag, confirm the Safari workflow is green for the version commit on `main`; otherwise a release can publish a Safari ZIP that no longer converts.
+
 After all checks pass, the workflow publishes **bananify-extension.zip** (manual installation), **bananify-store.zip** (root-level manifest for Chrome/Edge store upload), **bananify-safari-web-extension.zip** (Safari conversion source), **SHA256SUMS.txt** covering all ZIPs, installation/update instructions, and GitHub-generated change notes. It promotes the exact tested build artifact rather than rebuilding with publish permissions. Only the release job has `contents: write`; branch and PR builds cannot publish releases. Tag builds do not redeploy the website.
 
 The stable latest-download URL works without changing the website for each release:

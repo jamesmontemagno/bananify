@@ -8,7 +8,7 @@ Bananify's Safari build starts from the same WebExtension runtime as Chrome and 
 
 `npm run build` now creates:
 
-- `dist/downloads/bananify-safari-web-extension.zip` — reproducible archive of that source folder.
+- `dist/downloads/bananify-safari-web-extension.zip` — reproducible archive of a `bananify-safari/` source folder: the shared runtime files plus a manifest with Safari's `browser_specific_settings`.
 - `dist/downloads/SHA256SUMS.txt` — checksums for the Chrome/Edge manual ZIP, Chrome/Edge store ZIP, and Safari source ZIP.
 
 Tagged GitHub releases include the Safari ZIP beside the existing browser packages. The `.github/workflows/safari.yml` workflow runs on Safari-relevant pull requests, pushes to `main`, matching release tags, and manual dispatches. It builds the package on macOS, converts it with `xcrun safari-web-extension-converter`, and builds the generated Xcode project with code signing disabled. It does not upload to App Store Connect or require Apple credentials.
@@ -72,17 +72,21 @@ Choose the final bundle identifier and signing team before distribution. The `on
 
 Keep testing on Chrome and Edge too. Safari packaging must not change the shared runtime files, permissions, or Chrome/Edge store ZIP.
 
-## Publish to the Safari Extensions Gallery
+## Publish to the App Store
 
 Safari extensions are distributed through the App Store as an app that contains the Safari web extension. The first release is manual:
 
 1. Enroll in the Apple Developer Program and configure App Store Connect access outside this repository.
 2. Convert the tested `bananify-safari-web-extension.zip` source package into an Xcode project.
 3. Replace the CI placeholder bundle identifier with the real app and extension identifiers.
-4. Add signing, icons, localized app metadata, screenshots, age rating, support URL, marketing URL, and privacy details in Xcode and App Store Connect.
-5. Archive in Xcode, validate, and upload to App Store Connect.
-6. Complete App Review notes with the same reviewer flow used for Chrome and Edge: no account, payment, or external service is required; open a normal webpage, click Bananify, test More bananas, Pause/Resume, and Restore page.
-7. After approval, record the public App Store / Safari Extensions Gallery URL and update the website, README, structured data, and release docs together.
+4. Set the version on both the app and extension targets. The converter always writes `MARKETING_VERSION = 1.0` and `CURRENT_PROJECT_VERSION = 1`; change `MARKETING_VERSION` to the `manifest.json` version being released and `CURRENT_PROJECT_VERSION` to the build number for this upload.
+5. Choose the macOS deployment target. The converter sets the project-level `MACOSX_DEPLOYMENT_TARGET`, which the app target inherits, to the SDK of the Xcode that ran it (26.5 with Xcode 26.6) and gives the extension target 10.14. The app target's value, not the manifest's `strict_min_version`, limits which Macs can install Bananify, so lower it to the oldest macOS release you have tested.
+6. Add signing, icons, localized app metadata, screenshots, age rating, support URL, marketing URL, and privacy details in Xcode and App Store Connect.
+7. Archive in Xcode, validate, and upload to App Store Connect.
+8. Complete App Review notes with the same reviewer flow used for Chrome and Edge: no account, payment, or external service is required; open a normal webpage, click Bananify, test More bananas, Pause/Resume, and Restore page.
+9. After approval, record the public App Store URL and update the website, README, structured data, and release docs together.
+
+The Xcode project is regenerated from the release ZIP and never committed, so the bundle identifiers, signing, version, and deployment target must be reapplied after every conversion.
 
 Do not commit Apple certificates, provisioning profiles, API keys, App Store Connect keys, or generated Xcode build products. Future upload automation should use protected GitHub environments and an existing tested release artifact, not a rebuild of an unpinned branch.
 

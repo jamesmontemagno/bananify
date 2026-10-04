@@ -61,7 +61,7 @@ unzip -q dist/downloads/bananify-safari-web-extension.zip -d safari-source
 xcrun safari-web-extension-converter safari-source/bananify-safari --project-location safari-build --app-name Bananify --bundle-identifier online.bananify.Bananify --swift --macos-only --copy-resources --no-open --no-prompt --force
 ```
 
-See the [Safari extension publishing guide](docs/safari-extension.md) for CI/CD, local testing, signing, and Safari Extensions Gallery submission steps.
+See the [Safari extension publishing guide](docs/safari-extension.md) for CI/CD, local testing, signing, and App Store submission steps.
 
 ## Runs locally. No tracking.
 

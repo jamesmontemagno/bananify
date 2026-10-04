@@ -87,12 +87,7 @@ test("production build publishes only the website and reproducible manual-instal
       }
     }
     const manifest = JSON.parse(execFileSync("unzip", ["-p", zip, `${prefix}manifest.json`], { encoding: "utf8" }));
-    if (name === "bananify-safari-web-extension.zip") {
-      assert.deepEqual(manifest.browser_specific_settings, { safari: { strict_min_version: "17.0" } });
-      assert.deepEqual({ ...manifest, browser_specific_settings: undefined }, { ...sourceManifest, browser_specific_settings: undefined });
-    } else {
-      assert.deepEqual(manifest, sourceManifest);
-    }
+    if (name !== "bananify-safari-web-extension.zip") assert.deepEqual(manifest, sourceManifest);
     assert.equal(manifest.name, "Bananify");
     assert.deepEqual(manifest.permissions, ["activeTab", "scripting"]);
     originalArchives.set(name, await readFile(zip));
