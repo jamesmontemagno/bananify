@@ -12,6 +12,7 @@ const siteFiles = [
   "CNAME", "robots.txt", "sitemap.xml", "social-card.png", "LICENSE",
   "vscode-extension/media/bananify-vscode-screenshot.png",
 ];
+const safariMinimumVersion = "17.0";
 
 export async function buildSite() {
   await readReleaseVersion();
@@ -50,6 +51,34 @@ export async function buildSite() {
       const checksum = createHash("sha256").update(await readFile(archive)).digest("hex");
       checksums.push(`${checksum}  ${name}\n`);
     }
+    const safariFiles = extensionFiles.toSorted();
+    const safariRoot = join(temporary, "bananify-safari");
+    const safariManifest = {
+      ...manifest,
+      browser_specific_settings: {
+        safari: {
+          strict_min_version: safariMinimumVersion,
+        },
+      },
+    };
+    await mkdir(safariRoot, { recursive: true });
+    for (const file of extensionFiles) {
+      const destination = join(safariRoot, file);
+      await mkdir(dirname(destination), { recursive: true });
+      if (file === "manifest.json") {
+        await writeFile(destination, `${JSON.stringify(safariManifest, null, 2)}\n`);
+      } else {
+        await cp(join(root, file), destination);
+      }
+      await utimes(destination, new Date("2000-01-01T00:00:00Z"), new Date("2000-01-01T00:00:00Z"));
+    }
+    const safariArchive = join(output, "downloads", "bananify-safari-web-extension.zip");
+    execFileSync("zip", ["-X", "-q", safariArchive, ...safariFiles.map((file) => `bananify-safari/${file}`)], {
+      cwd: temporary,
+      env: { ...process.env, TZ: "UTC" },
+      stdio: "pipe",
+    });
+    checksums.push(`${createHash("sha256").update(await readFile(safariArchive)).digest("hex")}  bananify-safari-web-extension.zip\n`);
     await writeFile(join(output, "downloads/SHA256SUMS.txt"), checksums.join(""));
     return output;
   } finally {
@@ -58,5 +87,5 @@ export async function buildSite() {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  console.log(`Built Bananify site, manual-install ZIP, and store ZIP in ${await buildSite()}`);
+  console.log(`Built Bananify site and extension ZIPs in ${await buildSite()}`);
 }
