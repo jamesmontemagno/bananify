@@ -51,9 +51,9 @@
       "data-monkey": variant, "data-monkey-name": palette.name,
     });
     const body = element("g", { class: "monkey-body" }, [
-      path("M185 209 C258 240 276 171 245 159 C227 151 216 171 232 179", "none", { "stroke-width": 15 }),
-      path("M110 219 L90 245 Q79 258 96 261 L119 260 L135 229", "#765039"),
-      path("M155 228 L166 258 L192 260 Q208 258 196 246 L178 218", "#765039"),
+      path("M185 209 C258 240 276 171 245 159 C227 151 216 171 232 179", "none", { "stroke-width": 15, class: "monkey-tail" }),
+      path("M110 219 L90 245 Q79 258 96 261 L119 260 L135 229", "#765039", { class: "monkey-leg left" }),
+      path("M155 228 L166 258 L192 260 Q208 258 196 246 L178 218", "#765039", { class: "monkey-leg right" }),
       path("M98 159 C91 173 89 204 107 224 C121 240 163 242 180 222 C201 197 182 170 179 157", "#765039"),
       ellipse(142, 197, 28, 31, variant === "black-and-white" ? palette.face : palette.hands),
       element("g", { class: "monkey-arm left" }, [
@@ -76,8 +76,10 @@
         path("M90 96 C89 69 115 60 139 83 C161 57 193 69 191 99 L187 133 Q182 155 140 157 Q101 155 93 135 Z", "#f6dab0", { stroke: "none" }),
         path("M105 109 Q114 97 123 109 M155 109 Q164 97 173 109", "none", { "stroke-width": 5 }),
         ellipse(139, 122, 7, 5, "#482b21"),
-        path("M120 133 Q139 163 158 133 Z", "#482b21", { "stroke-width": 3 }),
-        path("M129 145 Q139 136 150 145 Q141 155 129 145", "#e5867d", { stroke: "none" }),
+        element("g", { class: "monkey-mouth" }, [
+          path("M120 133 Q139 163 158 133 Z", "#482b21", { "stroke-width": 3 }),
+          path("M129 145 Q139 136 150 145 Q141 155 129 145", "#e5867d", { stroke: "none" }),
+        ]),
         ellipse(106, 126, 10, 5, "#e8ab81"),
         ellipse(174, 126, 10, 5, "#e8ab81"),
         path("M115 43 Q108 28 120 27 L135 38 Q132 17 143 22 L155 39", palette.crown),

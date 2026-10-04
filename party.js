@@ -8,13 +8,38 @@
     *, *::before, *::after { box-sizing: border-box; }
     .scene { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
     canvas { display: block; width: 100%; height: 100%; }
-    .friend { position: absolute; right: 24px; bottom: 98px; width: clamp(145px, 19vw, 230px);
-      transform: rotate(-4deg); filter: drop-shadow(0 8px 4px #482b2125); }
-    .capuchin { display: block; width: 100%; overflow: visible; }
+    .friend { position: absolute; left: 0; top: 0; width: clamp(145px, 19vw, 230px);
+      filter: drop-shadow(0 8px 4px #482b2125); will-change: transform; }
+    .capuchin { display: block; width: 100%; overflow: visible; transform-origin: 50% 93%;
+      transform: scaleX(var(--face, 1)) rotate(var(--lean, -4deg)); transition: transform .18s ease-out; }
     .monkey-body { transform-origin: 140px 250px; animation: dance .7s ease-in-out infinite alternate; }
     .monkey-arm.left { transform-origin: 104px 172px; animation: wave .7s ease-in-out infinite alternate; }
     .monkey-arm.right { transform-origin: 177px 172px; animation: wave .7s ease-in-out infinite alternate-reverse; }
     .monkey-head { transform-origin: 140px 140px; animation: nod .7s ease-in-out infinite alternate; }
+    .monkey-leg.left { transform-origin: 122px 222px; }
+    .monkey-leg.right { transform-origin: 166px 222px; }
+    .monkey-tail { transform-origin: 186px 210px; }
+    .monkey-mouth { transform-origin: 139px 135px; }
+    .friend[data-mode="walk"] { --gait: .28s; }
+    .friend[data-mode="run"] { --gait: .16s; }
+    .friend:is([data-mode="walk"], [data-mode="run"]) .monkey-body { animation: scamper var(--gait) ease-in-out infinite alternate; }
+    .friend:is([data-mode="walk"], [data-mode="run"]) .monkey-leg.left { animation: stride var(--gait) ease-in-out infinite alternate; }
+    .friend:is([data-mode="walk"], [data-mode="run"]) .monkey-leg.right { animation: stride var(--gait) ease-in-out infinite alternate-reverse; }
+    .friend:is([data-mode="walk"], [data-mode="run"]) .monkey-tail { animation: swish calc(var(--gait) * 2) ease-in-out infinite alternate; }
+    .friend:is([data-mode="jump"], [data-mode="eat"]) .monkey-body { animation: none; }
+    .friend:is([data-mode="jump"], [data-mode="eat"], [data-mode="nap"]) :is(.monkey-arm, .monkey-head) { animation: none; }
+    .friend[data-mode="jump"] .monkey-arm.left { transform: rotate(12deg); }
+    .friend[data-mode="jump"] .monkey-arm.right { transform: rotate(-12deg); }
+    .friend[data-mode="jump"] .monkey-leg.left { transform: rotate(20deg); }
+    .friend[data-mode="jump"] .monkey-leg.right { transform: rotate(-20deg); }
+    .friend[data-mode="eat"] .monkey-head { animation: munch .17s ease-in-out infinite alternate; }
+    .friend[data-mode="eat"] .monkey-arm.right { transform: rotate(-24deg); }
+    .friend[data-mode="eat"] .monkey-mouth { animation: chew .17s ease-in-out infinite alternate; }
+    .friend[data-mode="nap"] .monkey-body { animation: breathe 2.4s ease-in-out infinite alternate; }
+    .friend[data-mode="nap"] .monkey-head { transform: rotate(11deg) translateY(7px); }
+    .friend[data-mode="nap"] .monkey-arm.left { transform: rotate(-105deg); }
+    .friend[data-mode="nap"] .monkey-arm.right { transform: rotate(105deg); }
+    .friend[data-mode="nap"] .monkey-mouth { transform: scale(.4, .3); }
     .speech { position: absolute; right: 32px; bottom: calc(100% - 12px); background: #fff9da;
       color: #482b21; border: 2px solid #482b21; border-radius: 18px 18px 2px 18px;
       padding: 10px 15px; white-space: nowrap; font: 800 16px/1.2 ui-rounded, "Arial Rounded MT Bold", system-ui, sans-serif;
@@ -40,14 +65,21 @@
     @keyframes dance { from { transform: translateY(0) rotate(-5deg); } to { transform: translateY(-12px) rotate(5deg); } }
     @keyframes wave { from { transform: rotate(-12deg); } to { transform: rotate(13deg); } }
     @keyframes nod { from { transform: rotate(4deg); } to { transform: rotate(-4deg); } }
+    @keyframes scamper { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-9px) rotate(3deg); } }
+    @keyframes stride { from { transform: rotate(-16deg); } to { transform: rotate(16deg); } }
+    @keyframes swish { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+    @keyframes munch { from { transform: translateY(0) rotate(-2deg); } to { transform: translateY(5px) rotate(2deg); } }
+    @keyframes chew { from { transform: scaleY(1); } to { transform: scaleY(.35); } }
+    @keyframes breathe { from { transform: scale(1); } to { transform: scale(1.025, .975); } }
     @media (max-width: 600px) {
       .dock { right: 16px; bottom: 16px; gap: 5px; padding: 7px; }
       .brand { display: none; }
       button { padding: 9px 11px; font-size: 12px; }
-      .friend { right: 15px; bottom: 94px; width: 150px; }
+      .friend { width: 150px; }
       .speech { font-size: 13px; right: 12px; padding: 8px 12px; }
     }
     @media (prefers-reduced-motion: reduce) {
+      .capuchin { transition: none; }
       .capuchin * { animation: none !important; }
       button { transition: none; }
     }
@@ -117,6 +149,14 @@
     let bursts = [];
     let layoutFrame = 0;
     const disguises = new Map();
+    const gravity = 1800;
+    const leans = { idle: -4, walk: -7, run: -11, jump: -4, eat: 0, nap: 5 };
+    const snackLines = ["Got it.", "Delicious.", "Worth the run.", "That's my limit."];
+    const monkey = { x: 0, feet: 0, vy: 0, face: 1, grounded: true, moving: false, placed: false,
+      mode: "idle", timer: 0, goal: 0, fast: false, cheer: false, target: null, snacks: 0 };
+    const stage = { width: 0, floor: 0, ledge: null, size: 0 };
+    let speechHold = 0;
+    let speechBox = null;
     const protectedElements = "a,button,input,textarea,select,label,form,nav,header,footer,summary,pre,code,[contenteditable]:not([contenteditable='false']),[tabindex],[role='button'],[role='link'],[role='navigation'],[role='menu'],[role='dialog'],[role='alertdialog'],[role='status'],[role='alert'],[aria-live],[aria-hidden='true'],[hidden],[inert],[data-bananify-protect]";
 
     function requestPaint() {
@@ -238,6 +278,177 @@
       paintDisguises();
     }
 
+    // Control messages hold the bubble for a moment so roaming chatter cannot replace them.
+    function say(text, hold = 0) {
+      if (!hold && speechHold > 0) return;
+      speech.textContent = text;
+      speechHold = hold;
+      speechBox = null;
+    }
+
+    // The monkey stands on the control dock where it overlaps it, and on the viewport floor elsewhere.
+    function groundAt(x) {
+      const { ledge, size } = stage;
+      return ledge && x + size * .2 > ledge.left && x - size * .2 < ledge.right ? ledge.top - 2 : stage.floor;
+    }
+
+    const clampX = (x) => Math.max(stage.size / 2, Math.min(stage.width - stage.size / 2, x));
+
+    function rest(seconds) {
+      Object.assign(monkey, { mode: "idle", timer: seconds, target: null });
+    }
+
+    function goHome() {
+      monkey.x = clampX(stage.ledge.right - stage.size / 2);
+      Object.assign(monkey, { feet: groundAt(monkey.x), vy: 0, face: 1, grounded: true, moving: false, placed: true });
+      rest(2.2);
+    }
+
+    function measure() {
+      const box = scene.getBoundingClientRect();
+      const dockBox = dock.getBoundingClientRect();
+      stage.width = box.width;
+      stage.floor = box.height - 6;
+      stage.size = friend.offsetWidth;
+      stage.ledge = { left: dockBox.left - box.left, right: dockBox.right - box.left, top: dockBox.top - box.top };
+      speechBox = null;
+      if (!monkey.placed || motion.matches) goHome();
+      monkey.x = clampX(monkey.x);
+      placeMonkey();
+    }
+
+    function placeMonkey() {
+      const { size } = stage;
+      const left = monkey.x - size / 2;
+      friend.style.transform = `translate3d(${left.toFixed(1)}px, ${(monkey.feet - size * .94).toFixed(1)}px, 0)`;
+      const pose = monkey.mode === "eat" || monkey.mode === "nap" ? monkey.mode
+        : !monkey.grounded ? "jump" : monkey.moving ? (monkey.fast ? "run" : "walk") : "idle";
+      if (friend.dataset.mode !== pose) {
+        friend.dataset.mode = pose;
+        friend.style.setProperty("--lean", `${leans[pose]}deg`);
+      }
+      if (friend.style.getPropertyValue("--face") !== String(monkey.face)) friend.style.setProperty("--face", monkey.face);
+      speechBox ??= { left: speech.offsetLeft, top: speech.offsetTop };
+      // Keep the bubble readable when the monkey reaches the left edge or jumps near the top.
+      const nudge = Math.max(0, 8 - (left + speechBox.left));
+      const drop = Math.max(0, 8 - (monkey.feet - size * .94 + speechBox.top));
+      speech.style.transform = `translate(${nudge.toFixed(1)}px, ${drop.toFixed(1)}px) rotate(4deg)`;
+    }
+
+    function leap(rise) {
+      if (!monkey.grounded) return;
+      monkey.vy = -Math.sqrt(2 * gravity * rise);
+      monkey.grounded = false;
+    }
+
+    function travel(goal, speed, delta) {
+      const distance = goal - monkey.x;
+      if (Math.abs(distance) < .5) return true;
+      monkey.face = distance < 0 ? 1 : -1;
+      const next = monkey.x + Math.sign(distance) * Math.min(Math.abs(distance), speed * delta);
+      const rise = monkey.feet - groundAt(next);
+      if (rise > 8) {
+        // The dock is in the way: jump, and only move over it once the feet clear its top.
+        leap(rise + stage.size * .15);
+        return false;
+      }
+      monkey.x = next;
+      monkey.moving = true;
+      return false;
+    }
+
+    function walkTo(goal, fast = false, cheer = false) {
+      Object.assign(monkey, { mode: "walk", goal: clampX(goal), fast, cheer, target: null });
+      monkey.timer = Math.abs(monkey.goal - monkey.x) / (stage.size * (fast ? 1.5 : .55)) + 2;
+    }
+
+    function pickDrop() {
+      const { size } = stage;
+      const hands = monkey.feet - size * .68;
+      const reachable = drops.filter((drop) => {
+        const eta = (hands - drop.y) / drop.speed;
+        const aim = drop.x + drop.drift * eta;
+        return drop.y > 0 && eta > .5 && eta < 5 && aim > size / 2 && aim < stage.width - size / 2
+          && Math.abs(aim - monkey.x) < size * 1.2 * eta;
+      });
+      return reachable[Math.floor(Math.random() * reachable.length)] ?? null;
+    }
+
+    function decide() {
+      if (monkey.snacks >= 4) {
+        Object.assign(monkey, { mode: "nap", timer: random(4, 6.5) });
+        say("Banana nap. Zzz.");
+        return;
+      }
+      const roll = Math.random();
+      const drop = roll < .7 ? pickDrop() : null;
+      if (drop) Object.assign(monkey, { mode: "chase", target: drop, timer: 7, fast: true });
+      else if (roll < .9) walkTo(monkey.x + random(-3, 3) * stage.size);
+      else rest(random(1.2, 2.6));
+    }
+
+    function chase(delta) {
+      const { size } = stage;
+      const drop = monkey.target;
+      const hands = monkey.feet - size * .68;
+      const eta = (hands - drop.y) / drop.speed;
+      if (monkey.timer <= 0 || eta < -.4 || !drops.includes(drop)) {
+        rest(random(.3, .8));
+        return;
+      }
+      const aim = clampX(drop.x + drop.drift * Math.max(0, eta));
+      travel(aim, size * 1.5, delta);
+      const above = hands - drop.y;
+      if (Math.hypot(drop.x - monkey.x, above) < size * .3 + drop.size / 2) {
+        drops[drops.indexOf(drop)] = makeDrop();
+        monkey.snacks += 1;
+        Object.assign(monkey, { mode: "eat", timer: 1.1, target: null });
+        say(snackLines[(monkey.snacks - 1) % snackLines.length]);
+      } else if (Math.abs(aim - monkey.x) < size * .25 && above > size * .2 && above < size * .75) {
+        leap(size * .4);
+      }
+    }
+
+    function attract(x) {
+      if (motion.matches || paused || monkey.mode === "eat") return;
+      if (monkey.mode === "nap") monkey.snacks = 0;
+      say(monkey.mode === "nap" ? "I was resting my eyes." : "Ooh. Over there.");
+      walkTo(x, true, true);
+    }
+
+    function stepMonkey(delta) {
+      speechHold = Math.max(0, speechHold - delta);
+      monkey.moving = false;
+      monkey.timer -= delta;
+      if (monkey.mode === "idle") {
+        if (monkey.timer <= 0 && monkey.grounded) decide();
+      } else if (monkey.mode === "walk") {
+        if (travel(monkey.goal, stage.size * (monkey.fast ? 1.5 : .55), delta) || monkey.timer <= 0) {
+          if (monkey.cheer) leap(stage.size * .25);
+          rest(random(.5, 1.6));
+        }
+      } else if (monkey.mode === "chase") {
+        chase(delta);
+      } else if (monkey.timer <= 0) {
+        if (monkey.mode === "nap") {
+          monkey.snacks = 0;
+          say("I was resting my eyes.");
+        }
+        rest(random(.4, 1));
+      }
+      const ground = groundAt(monkey.x);
+      if (!monkey.grounded || monkey.feet < ground) {
+        monkey.vy += gravity * delta;
+        monkey.feet += monkey.vy * delta;
+        monkey.grounded = monkey.vy >= 0 && monkey.feet >= ground;
+      }
+      if (monkey.grounded) {
+        monkey.feet = ground;
+        monkey.vy = 0;
+      }
+      placeMonkey();
+    }
+
     function animate(time) {
       frame = 0;
       if (removed || paused || motion.matches || document.hidden) return;
@@ -258,6 +469,7 @@
         item.life -= delta * .55;
       }
       bursts = bursts.filter((item) => item.life > 0);
+      stepMonkey(delta);
       paint();
       frame = requestAnimationFrame(animate);
     }
@@ -273,6 +485,7 @@
       pause.hidden = motion.matches;
       // Author styles set display, so use an explicit inline override for hidden.
       pause.style.display = motion.matches ? "none" : "";
+      measure();
       paint();
       if (!paused && !motion.matches && !document.hidden) frame = requestAnimationFrame(animate);
     }
@@ -290,6 +503,7 @@
         size: random(40, 85), angle: random(-1, 1),
       }));
       drops = Array.from({ length: showerCount }, () => makeDrop(true));
+      measure();
       paint();
     }
 
@@ -324,19 +538,22 @@
       lastMonkey = monkeyVariant;
       friend.querySelector(".capuchin").replaceWith(globalThis.bananaFeedArt.monkey(monkeyVariant));
       disguiseElements(3);
-      speech.textContent = next === 114 ? "Peak banana. No regrets." : "Yes. This is the life.";
+      say(next === 114 ? "Peak banana. No regrets." : "Yes. This is the life.", 3);
       burst(width * .5, height * .55);
+      if (!motion.matches && !paused) leap(stage.size * .25);
+      placeMonkey();
       paint();
     }, { signal: events.signal });
     pause.addEventListener("click", () => {
       paused = !paused;
-      speech.textContent = paused ? "Saving my energy." : "Back to monkey business.";
+      say(paused ? "Saving my energy." : "Back to monkey business.", 3);
       syncMotion();
     }, { signal: events.signal });
     restore.addEventListener("click", stop, { signal: events.signal });
     document.addEventListener("pointerdown", (event) => {
       if (event.composedPath().includes(host) || event.button !== 0) return;
       burst(event.clientX, event.clientY);
+      attract(event.clientX);
     }, { passive: true, signal: events.signal });
     window.addEventListener("resize", resize, { passive: true, signal: events.signal });
     document.addEventListener("scroll", requestPaint, { capture: true, passive: true, signal: events.signal });

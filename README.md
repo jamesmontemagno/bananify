@@ -11,7 +11,7 @@ Made by **James Montemagno & Mooch**.
 ## A little more banana, a little less ordinary
 
 - **Bananas everywhere.** A banana shower, floating decorations, and a little confetti when you click.
-- **A surprise party guest.** Each party invites a brown capuchin, black-and-white capuchin, or golden monkey.
+- **A monkey with places to be.** Each party invites a brown capuchin, black-and-white capuchin, or golden monkey that scampers along the bottom of the page, leaps for falling bananas, runs to wherever you click, and naps after a few snacks.
 - **Your page, bananified.** Random images and short text temporarily look like bananas without moving the page layout. Forms, links, navigation, and editable content are left alone.
 - **Easy on, easy off.** Add more bananas, pause the animation, or restore the page. Reduced-motion preferences get a static party.
 

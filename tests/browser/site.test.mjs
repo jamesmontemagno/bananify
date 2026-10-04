@@ -151,6 +151,77 @@ test("all monkey variants have distinct artwork and random selection avoids repe
   }
 });
 
+test("the monkey roams, catches bananas, follows clicks, and holds still when paused or motion is reduced", async () => {
+  const page = await browser.newPage({ viewport: { width: 1200, height: 800 } });
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.addInitScript(() => {
+    const original = Element.prototype.attachShadow;
+    Element.prototype.attachShadow = function (options) {
+      const root = original.call(this, options);
+      if (this.localName === "banana-feed-party") window.testPartyRoot = root;
+      return root;
+    };
+    window.monkeyState = () => {
+      const friend = window.testPartyRoot.querySelector(".friend");
+      const box = friend.getBoundingClientRect();
+      return {
+        mode: friend.dataset.mode, left: box.left, right: box.right, feet: box.top + box.width * .94,
+        dockRight: window.testPartyRoot.querySelector(".dock").getBoundingClientRect().right,
+        speechLeft: window.testPartyRoot.querySelector(".speech").getBoundingClientRect().left,
+      };
+    };
+  });
+  try {
+    await page.goto(baseURL);
+    await page.getByRole("button", { name: "Bananify this page" }).click();
+    const home = await page.evaluate(() => window.monkeyState());
+    assert.equal(home.mode, "idle");
+    assert.ok(Math.abs(home.right - home.dockRight) < 1);
+
+    await page.waitForFunction((left) => Math.abs(window.monkeyState().left - left) > 40, home.left, { timeout: 60000 });
+    await page.waitForFunction(() => window.monkeyState().mode === "eat", null, { timeout: 60000 });
+    const speech = () => page.evaluate(() => window.testPartyRoot.querySelector(".speech").textContent);
+    assert.notEqual(await speech(), "My kind of website.");
+
+    await page.evaluate(() => new Promise((resolve) => {
+      const click = () => {
+        // The monkey finishes its snack before it follows a click.
+        if (window.monkeyState().mode === "eat") return requestAnimationFrame(click);
+        document.body.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true, button: 0, clientX: 4, clientY: 300 }));
+        resolve();
+      };
+      click();
+    }));
+    const edge = await page.waitForFunction(() => {
+      const state = window.monkeyState();
+      return state.left <= 1 && state;
+    });
+    const atEdge = await edge.jsonValue();
+    assert.ok(atEdge.left >= 0 && atEdge.speechLeft >= 0);
+    assert.ok(atEdge.feet <= 800);
+
+    await page.evaluate(() => window.testPartyRoot.querySelector(".pause").click());
+    assert.equal(await speech(), "Saving my energy.");
+    const frozen = await page.evaluate(() => window.testPartyRoot.querySelector(".friend").style.transform);
+    await page.waitForTimeout(150);
+    assert.equal(await page.evaluate(() => window.testPartyRoot.querySelector(".friend").style.transform), frozen);
+    await page.evaluate(() => window.testPartyRoot.querySelector(".pause").click());
+
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.waitForFunction(() => {
+      const state = window.monkeyState();
+      return state.mode === "idle" && Math.abs(state.right - state.dockRight) < 1;
+    });
+    const still = await page.evaluate(() => window.testPartyRoot.querySelector(".friend").style.transform);
+    await page.waitForTimeout(150);
+    assert.equal(await page.evaluate(() => window.testPartyRoot.querySelector(".friend").style.transform), still);
+    assert.deepEqual(errors, []);
+  } finally {
+    await page.close();
+  }
+});
+
 test("page disguises preserve nodes, layout, controls, and live site updates", async () => {
   const page = await browser.newPage({ viewport: { width: 1000, height: 1200 }, reducedMotion: "reduce" });
   try {
