@@ -243,9 +243,7 @@ public sealed class PartyHostControl : UserControl, IDisposable
                     SendTheme();
                     SendSnapshot();
                     break;
-                case "start": PartySession.Instance.Start(); break;
-                case "pause": PartySession.Instance.PauseOrResume(); break;
-                case "restore": PartySession.Instance.Restore(); break;
+                case "toggle": PartySession.Instance.Toggle(); break;
                 case "more": PartySession.Instance.More(); break;
                 case "encourage":
                     if (ready && loaded && IsVisible)

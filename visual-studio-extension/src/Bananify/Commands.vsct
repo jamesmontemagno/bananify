@@ -17,19 +17,11 @@
     <Buttons>
       <Button guid="guidBananifyCommands" id="Toggle" priority="0x0100" type="Button">
         <Parent guid="guidBananifyCommands" id="BananifyGroup" />
-        <Strings><ButtonText>Toggle Banana Party</ButtonText></Strings>
+        <Strings><ButtonText>Start or Stop Banana Party</ButtonText></Strings>
       </Button>
       <Button guid="guidBananifyCommands" id="More" priority="0x0101" type="Button">
         <Parent guid="guidBananifyCommands" id="BananifyGroup" />
-        <Strings><ButtonText>More Bananas</ButtonText></Strings>
-      </Button>
-      <Button guid="guidBananifyCommands" id="Pause" priority="0x0102" type="Button">
-        <Parent guid="guidBananifyCommands" id="BananifyGroup" />
-        <Strings><ButtonText>Pause or Resume</ButtonText></Strings>
-      </Button>
-      <Button guid="guidBananifyCommands" id="Restore" priority="0x0103" type="Button">
-        <Parent guid="guidBananifyCommands" id="BananifyGroup" />
-        <Strings><ButtonText>Restore Editor</ButtonText></Strings>
+        <Strings><ButtonText>Set 1-5 Bananas</ButtonText></Strings>
       </Button>
       <Button guid="guidBananifyCommands" id="Open" priority="0x0104" type="Button">
         <Parent guid="guidBananifyCommands" id="BananifyGroup" />
@@ -56,8 +48,6 @@
       <IDSymbol name="BananifyGroup" value="0x1020" />
       <IDSymbol name="Toggle" value="0x0100" />
       <IDSymbol name="More" value="0x0101" />
-      <IDSymbol name="Pause" value="0x0102" />
-      <IDSymbol name="Restore" value="0x0103" />
       <IDSymbol name="Open" value="0x0104" />
       <IDSymbol name="OpenLarge" value="0x0105" />
       <IDSymbol name="Options" value="0x0106" />

@@ -71,8 +71,11 @@ input::placeholder { color: #636e5d; }
 .vscode-section { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.4fr); align-items: center; gap: 6%; padding: 72px 6%; background: var(--green); color: var(--paper); }
 .vscode-copy h2 { font-size: clamp(32px, 3.6vw, 48px); }
 .vscode-copy p { font: 15px/1.8 system-ui, sans-serif; max-width: 48ch; margin: 0 0 24px; }
+.marketplace-actions { display: grid; gap: 12px; align-items: start; justify-items: start; }
 .marketplace-link { display: inline-flex; justify-content: space-between; align-items: center; gap: 24px; padding: 16px 22px; min-height: 56px; border: 2px solid var(--banana); border-radius: 14px; background: var(--banana); color: var(--ink); font-size: 17px; font-weight: 800; text-decoration: none; box-shadow: 0 4px 0 #143c29; transition: transform .18s ease, background .18s ease; }
+.marketplace-link-secondary { background: transparent; color: var(--paper); }
 .marketplace-link:hover { background: #ffe777; transform: translateY(-2px); }
+.marketplace-link-secondary:hover { color: var(--ink); }
 .marketplace-link:active { transform: translateY(3px); box-shadow: none; }
 .vscode-section a:focus-visible { outline-color: var(--banana); }
 .vscode-copy .vscode-note { font-size: 12px; margin: 16px 0 24px; }
@@ -90,13 +93,14 @@ footer { border-top: 1px solid #d2d7c2; margin: 0 6%; padding: 25px 0; display: 
   header { height: 82px; }
   .wordmark { font-size: 22px; }
   .wordmark > span:first-child { width: 32px; margin-right: 3px; }
-  .install-link { font-size: 12px; }
+  .install-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 12px; }
   .install-nav { gap: 16px; }
   .install-link span { margin-left: 2px; }
   .hero { grid-template-columns: 1fr; padding-top: 28px; padding-bottom: 30px; gap: 20px; }
-  h1 { font-size: clamp(56px, 12vw, 88px); }
+  .hero-copy, .hero-art { min-width: 0; }
+  h1 { font-size: clamp(44px, 13.5vw, 88px); }
   .hero-copy > p { font-size: 16px; }
-  .hero-art { height: 310px; width: 340px; max-width: 100%; }
+  .hero-art { height: 310px; width: min(340px, 100%); }
   .monkey-portrait { width: 83%; left: 8%; top: 0; }
   .art-caption { bottom: 0; font-size: 12px; left: 18%; }
   .orbit-one { width: 55px; top: 10px; }
@@ -106,6 +110,7 @@ footer { border-top: 1px solid #d2d7c2; margin: 0 6%; padding: 25px 0; display: 
   .below { grid-template-columns: 1fr; gap: 42px; padding-top: 42px; padding-bottom: 40px; }
   .store-action { padding: 16px; gap: 12px; }
   .vscode-section { grid-template-columns: 1fr; gap: 32px; padding-top: 44px; padding-bottom: 44px; }
+  .marketplace-actions, .marketplace-link { width: 100%; }
   footer { flex-direction: column; gap: 7px; }
 }
 @media (max-width: 360px) {

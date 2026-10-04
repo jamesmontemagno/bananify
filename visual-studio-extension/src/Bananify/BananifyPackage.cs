@@ -15,7 +15,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 namespace Bananify;
 
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-[InstalledProductRegistration("Bananify", "A local banana party for Visual Studio.", "0.1.0")]
+[InstalledProductRegistration("Bananify for Visual Studio", "A local banana party for Visual Studio.", "0.1.0")]
 [ProvideMenuResource("Menus.ctmenu", 1)]
 [ProvideAutoLoad(VSConstants.UICONTEXT.ShellInitialized_string, PackageAutoLoadFlags.BackgroundLoad)]
 [ProvideOptionPage(typeof(BananifyOptions), "Bananify", "General", 0, 0, true)]
@@ -42,10 +42,8 @@ public sealed class BananifyPackage : ToolkitPackage
         PartySession.Instance.ApplyOptions((BananifyOptions)GetDialogPage(typeof(BananifyOptions)));
         PartySession.Instance.Changed += OnPartyStateChanged;
         SystemParameters.StaticPropertyChanged += OnSystemPreferenceChanged;
-        AddCommand(commands, 0x0100, Toggle);
+        AddCommand(commands, 0x0100, PartySession.Instance.Toggle);
         AddCommand(commands, 0x0101, PartySession.Instance.More);
-        AddCommand(commands, 0x0102, PartySession.Instance.PauseOrResume);
-        AddCommand(commands, 0x0103, Restore);
         AddAsyncCommand(commands, 0x0104, () => OpenPartyAsync(false));
         AddAsyncCommand(commands, 0x0105, () => OpenPartyAsync(true));
         AddCommand(commands, 0x0106, ShowSettings);
@@ -93,19 +91,6 @@ public sealed class BananifyPackage : ToolkitPackage
         ActivityLog.LogError("Bananify", message);
         VsShellUtilities.ShowMessageBox(this, message, "Bananify could not open the party",
             OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-    }
-
-    private void Toggle()
-    {
-        ThreadHelper.ThrowIfNotOnUIThread();
-        if (PartySession.Instance.State.Active) Restore();
-        else PartySession.Instance.Start();
-    }
-
-    private void Restore()
-    {
-        ThreadHelper.ThrowIfNotOnUIThread();
-        PartySession.Instance.Restore();
     }
 
     private void OnPartyStateChanged(object? sender, EventArgs e)

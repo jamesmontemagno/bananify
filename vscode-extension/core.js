@@ -13,7 +13,7 @@ const bananaThemes = Object.freeze([
   Object.freeze({ label: "Monkey Jungle", description: "Canopy greens with earthy capuchin warmth" }),
 ]);
 
-const partyMessageCommands = new Set(["start", "pause", "stop"]);
+const partyMessageCommands = new Set(["start", "stop", "more"]);
 const monkeyViewCommands = new Set([
   "toggle",
   "more",

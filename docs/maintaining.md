@@ -4,7 +4,7 @@ Release and hosting notes for project maintainers. For installation and features
 
 ## CI/CD
 
-`.github/workflows/pages.yml` runs on pull requests, pushes to `main`, version tags (`v*`), and manual dispatches. It checks version consistency and JavaScript, tests the extension and reproducible ZIPs, builds an allowlisted `dist/` directory, and exercises the production site in Chromium at desktop and mobile sizes, including reduced motion, cleanup, and downloads. Screenshots and the extension ZIPs are retained as run artifacts.
+`.github/workflows/pages.yml` runs on pull requests, pushes to `main`, browser-extension version tags (`v*`, excluding `vscode-v*` and `visualstudio-v*`), and manual dispatches. It checks version consistency and JavaScript, tests the extension and reproducible ZIPs, builds an allowlisted `dist/` directory, and exercises the production site in Chromium at desktop and mobile sizes, including reduced motion, cleanup, and downloads. Screenshots and the extension ZIPs are retained as run artifacts.
 
 `.github/workflows/safari.yml` runs Safari-relevant changes on macOS. It builds the Safari Web Extension source package, converts it with `xcrun safari-web-extension-converter`, and builds the generated Xcode project with signing disabled. It proves the package remains convertible without storing Apple credentials or submitting to App Store Connect.
 

@@ -24,6 +24,10 @@ const reducedMotionKey = "reducedMotion";
 const saveCelebrationKey = "celebrations.onSave";
 const taskCelebrationKey = "celebrations.onSuccessfulTask";
 
+function nextPartyEnabled(configEnabled, partyActive) {
+  return !(configEnabled || partyActive);
+}
+
 class BananaDecorations {
   constructor(extensionUri) {
     this.lineDecorations = ["  🍌", "  🍌 🍌", "  🐒 🍌", "  🍌 🐒 🍌"].map((contentText) =>
@@ -249,7 +253,9 @@ class MonkeyViewProvider {
     @media (prefers-reduced-motion: reduce) { .monkey *, .stage { animation-play-state: paused !important; } }
     .actions, .troop { display: grid; gap: 8px; margin-top: 12px; }
     .troop { grid-template-columns: repeat(3, 1fr); }
-    button { color: var(--vscode-button-foreground); background: var(--vscode-button-background); border: 0; padding: 8px; cursor: pointer; border-radius: 3px; }
+    .command-button, .monkey-choice, button { color: var(--vscode-button-foreground); background: var(--vscode-button-background); border: 0; padding: 8px; cursor: pointer; border-radius: 3px; }
+    .command-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .command-button .icon { font-size: 1.05em; line-height: 1; }
     button:hover { background: var(--vscode-button-hoverBackground); }
     .monkey-choice { background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); }
     .monkey-choice.selected { outline: 2px solid var(--vscode-focusBorder); }
@@ -267,10 +273,13 @@ class MonkeyViewProvider {
     <button class="monkey-choice" data-monkey="golden">Henry</button>
   </div>
   <div class="actions">
-    <button data-command="toggle">Start banana party</button>
+    <button class="command-button" data-command="toggle">
+      <span class="icon" aria-hidden="true">▶</span>
+      <span class="label">Start banana party</span>
+    </button>
     <button data-command="party">Open Party tab</button>
     <button data-command="partyExplorer">Show Explorer Party</button>
-    <button data-command="more">More bananas</button>
+    <button data-command="more">5 bananas</button>
     <button data-command="cheer">Encourage me</button>
     <button data-command="theme">Choose a banana theme</button>
   </div>
@@ -278,6 +287,9 @@ class MonkeyViewProvider {
     const vscode = acquireVsCodeApi();
     const status = document.querySelector(".status");
     const toggle = document.querySelector('[data-command="toggle"]');
+    const toggleIcon = toggle.querySelector(".icon");
+    const toggleLabel = toggle.querySelector(".label");
+    const bananaLevel = document.querySelector('[data-command="more"]');
     const events = new AbortController();
     let celebrationTimer;
     document.addEventListener("click", (event) => {
@@ -299,7 +311,11 @@ class MonkeyViewProvider {
         });
         document.body.classList.toggle("motion-paused", data.reducedMotion);
         document.body.classList.toggle("hidden", !data.visible);
-        toggle.textContent = data.enabled ? "Restore editor" : "Start banana party";
+        toggleIcon.textContent = data.enabled ? "■" : "▶";
+        toggleLabel.textContent = data.enabled ? "Stop" : "Start";
+        toggle.title = data.enabled ? "Stop banana party" : "Start banana party";
+        bananaLevel.textContent = data.density + (data.density === 1 ? " banana" : " bananas");
+        bananaLevel.setAttribute("aria-label", "Banana level " + data.density + " of 5; choose next level");
         status.textContent = data.enabled ? "Banana party level " + data.density + " of 5" : "The troop is ready.";
         document.querySelectorAll("[data-monkey]").forEach((button) => button.classList.toggle("selected", button.dataset.monkey === data.monkey));
       }
@@ -328,14 +344,22 @@ function activate(context) {
   const decorations = new BananaDecorations(context.extensionUri);
   const fileBadges = new BananaFileBadges();
   const celebrationGate = new CelebrationGate();
+  const cycleDensity = async () => {
+    const config = vscode.workspace.getConfiguration(section);
+    const current = clampDensity(config.get(densityKey, 5));
+    await config.update(enabledKey, true, vscode.ConfigurationTarget.Global);
+    await config.update(densityKey, current === 5 ? 1 : current + 1, vscode.ConfigurationTarget.Global);
+  };
   const partySurfaces = new BananaPartySurfaces(
     () => vscode.workspace.getConfiguration(section).get(monkeyKey, "brown"),
     () => vscode.workspace.getConfiguration(section).get(reducedMotionKey, false),
+    () => clampDensity(vscode.workspace.getConfiguration(section).get(densityKey, 5)),
     (enabled) => vscode.workspace.getConfiguration(section).update(
       enabledKey,
       enabled,
       vscode.ConfigurationTarget.Global,
     ),
+    cycleDensity,
     vscode.Uri.joinPath(context.extensionUri, "media", "banana-128.png"),
   );
   const monkeyViewProvider = new MonkeyViewProvider(
@@ -344,8 +368,8 @@ function activate(context) {
     () => vscode.commands.executeCommand("bananify.showPartyExplorer"),
   );
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 50);
-  status.name = "Bananify";
-  status.command = "bananify.pause";
+  status.name = "Bananify for VS Code";
+  status.command = "bananify.toggle";
   let statusTimer;
   let statusFrame = 0;
   let celebrationTimer;
@@ -377,8 +401,8 @@ function activate(context) {
     partySurfaces.update();
     status.text = enabled ? "$(sparkle) $(symbol-color) Bananas!" : "$(symbol-color) Bananify";
     status.tooltip = enabled
-      ? "Banana party is active. Click to pause or resume decorations; use Restore Editor to stop everything."
-      : "Bananify is ready. Run Toggle Banana Party to start.";
+      ? "Banana party is active. Click to stop."
+      : "Bananify is ready. Click to start.";
     status.show();
     syncStatusAnimation();
   };
@@ -430,7 +454,7 @@ function activate(context) {
     }),
     vscode.commands.registerCommand("bananify.toggle", async () => {
       const config = vscode.workspace.getConfiguration(section);
-      const enabled = !config.get(enabledKey, false);
+      const enabled = nextPartyEnabled(config.get(enabledKey, false), partySurfaces.state.active);
       if (!enabled) {
         await restore();
       } else {
@@ -452,21 +476,7 @@ function activate(context) {
       await vscode.commands.executeCommand("workbench.view.explorer");
       await vscode.commands.executeCommand("bananify.partyExplorer.focus");
     }),
-    vscode.commands.registerCommand("bananify.pause", async () => {
-      const config = vscode.workspace.getConfiguration(section);
-      const enabled = config.get(enabledKey, false);
-      partySurfaces.setPaused(enabled);
-      if (!partySurfaces.state.active) {
-        await config.update(enabledKey, !enabled, vscode.ConfigurationTarget.Global);
-      }
-    }),
-    vscode.commands.registerCommand("bananify.moreBananas", async () => {
-      const config = vscode.workspace.getConfiguration(section);
-      const current = clampDensity(config.get(densityKey, 5));
-      await config.update(enabledKey, true, vscode.ConfigurationTarget.Global);
-      await config.update(densityKey, current === 5 ? 1 : current + 1, vscode.ConfigurationTarget.Global);
-    }),
-    vscode.commands.registerCommand("bananify.restore", restore),
+    vscode.commands.registerCommand("bananify.moreBananas", cycleDensity),
     vscode.commands.registerCommand("bananify.selectTheme", async () => {
       const choice = await vscode.window.showQuickPick(bananaThemes, {
         placeHolder: "Preview a Bananify theme. Press Escape to keep your current theme.",
@@ -528,4 +538,4 @@ function activate(context) {
 
 function deactivate() {}
 
-module.exports = { activate, deactivate };
+module.exports = { activate, deactivate, nextPartyEnabled };

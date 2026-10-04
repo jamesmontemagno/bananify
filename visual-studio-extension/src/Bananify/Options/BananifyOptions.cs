@@ -12,7 +12,7 @@ public sealed class BananifyOptions : DialogPage
     public bool Enabled { get; set; }
 
     [Category("Party"), DisplayName("Density (1-5)"), DefaultValue(5)]
-    [Description("The banana level shown in both party panels. More bananas cycles from 5 back to 1.")]
+    [Description("The banana level shown in both party panels. The level cycles from 5 back to 1.")]
     public int Density { get; set; } = 5;
 
     [Category("Party"), DisplayName("Monkey"), DefaultValue("brown")]

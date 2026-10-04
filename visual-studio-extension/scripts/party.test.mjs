@@ -106,7 +106,7 @@ for (const [width, compact] of [[220, true], [320, true], [1100, false]]) {
       await page.getByRole("button", { name: "Choose Henry" }).focus();
       await page.keyboard.press("Enter");
       assert.deepEqual((await page.evaluate(() => window.chrome.webview.messages)).at(-1), { command: "monkey", monkey: "golden" });
-      await page.getByRole("button", { name: "More bananas" }).focus();
+      await page.locator('[data-command="more"]').focus();
       await page.keyboard.press("Space");
       assert.deepEqual((await page.evaluate(() => window.chrome.webview.messages)).at(-1), { command: "more" });
       await page.evaluate(() => {
@@ -116,10 +116,10 @@ for (const [width, compact] of [[220, true], [320, true], [1100, false]]) {
       await send(page, { visible: false, compact });
       assert.equal(await page.locator(".burst").count(), 0);
       assert.equal(await page.locator(".banana-drop").count(), 0);
-      await send(page, { paused: true, compact });
-      assert.equal(await page.getByRole("button", { name: "More bananas" }).isDisabled(), true);
+      await send(page, { visible: false, compact });
+      assert.equal(await page.locator('[data-command="more"]').isDisabled(), true);
       await send(page, { active: false, compact });
-      assert.equal(await page.getByRole("button", { name: "Start party" }).isVisible(), true);
+      assert.equal(await page.getByRole("button", { name: "Start banana party" }).isVisible(), true);
       await send(page, { compact, monkey: "golden" });
       await page.screenshot({ path: `visual-studio-extension/scripts/.inspection/party-${width}.png` });
       assert.deepEqual(errors, []);
@@ -154,7 +154,7 @@ test("invalid native density snapshots leave the previous state untouched", asyn
     for (const density of [0, 6, 100, 1.5, "5"]) {
       await send(page, { density, active: false });
       assert.equal(await page.locator(".banana-drop").count(), 6);
-      assert.equal(await page.getByRole("button", { name: "Pause", exact: true }).isVisible(), true);
+      assert.equal(await page.getByRole("button", { name: "Stop banana party", exact: true }).isVisible(), true);
     }
   } finally { await page.close(); }
 });
@@ -225,8 +225,8 @@ for (const [width, compact] of [[320, true], [1100, false]]) {
       }
       const controls = [
         ["Choose Henry", { command: "monkey", monkey: "golden" }],
-        ["Pause", { command: "pause" }], ["More bananas", { command: "more" }],
-        ["Encourage me", { command: "encourage" }], ["Restore", { command: "restore" }],
+        ["Stop banana party", { command: "toggle" }], ["Banana level 5 of 5; choose next level", { command: "more" }],
+        ["Encourage me", { command: "encourage" }],
       ];
       for (const [name, expected] of controls) {
         const button = page.getByRole("button", { name, exact: true });
@@ -239,6 +239,7 @@ for (const [width, compact] of [[320, true], [1100, false]]) {
         await button.click();
         assert.deepEqual(await page.evaluate((count) => window.chrome.webview.messages.slice(count), count), [expected]);
       }
+      assert.equal(await page.locator('[data-command="more"]').textContent(), "5 bananas");
       assert.deepEqual(consoleErrors, [], "Paint inspection and cleanup must not violate CSP");
     } finally { await page.close(); }
   });
@@ -259,9 +260,9 @@ test("live banana levels follow every snapshot, wrap 5 to 1, and remain labeled 
       await send(page, state);
       assert.equal(await level.textContent(), `Banana level: ${state.density}/5`);
       assert.equal(await level.isVisible(), true);
-      assert.equal(await page.getByRole("button", { name: "More bananas" }).isDisabled(), true);
+      assert.equal(await page.getByRole("button", { name: `Banana level ${state.density} of 5; choose next level` }).isDisabled(), false);
       assert.equal(await page.locator(".banana-drop").count(), 0);
-      assert.equal(await page.getByRole("button", { name: state.paused ? "Resume" : "Start party", exact: true }).isVisible(), true);
+      assert.equal(await page.getByRole("button", { name: state.active === false ? "Start banana party" : "Stop banana party", exact: true }).isVisible(), true);
     }
     await send(page, { density: 3 });
     await feedback(page, "Keep this feedback and the entire accepted snapshot.");
@@ -270,7 +271,7 @@ test("live banana levels follow every snapshot, wrap 5 to 1, and remain labeled 
       message: document.querySelector(".message").textContent, rain: document.querySelector(".sky").childElementCount,
       choices: [...document.querySelectorAll(".monkey-choice")].map((node) => node.getAttribute("aria-pressed")),
       disabled: document.querySelector('[data-command="more"]').disabled,
-      pause: document.querySelector('[data-command="pause"]').textContent,
+      toggle: document.querySelector('[data-command="toggle"]').textContent,
     }));
     const before = await view();
     const invalid = [
@@ -464,7 +465,7 @@ for (const source of ["snapshot", "media"]) {
 test("live themes apply all normal, hover, pressed, disabled, and keyboard focus colors", async () => {
   const page = await open(1100, false);
   try {
-    const primary = page.getByRole("button", { name: "More bananas", exact: true });
+    const primary = page.locator('[data-command="more"]');
     const secondary = page.getByRole("button", { name: "Encourage me", exact: true });
     await feedback(page, "Theme changes must keep feedback.");
     for (const theme of themes) {
@@ -507,7 +508,7 @@ test("live themes apply all normal, hover, pressed, disabled, and keyboard focus
     // Change the palette while each pseudo-class is held, not just between interactions.
     for (const state of ["hover", "pressed", "focus", "disabled"]) {
       await page.mouse.move(0, 0);
-      await send(page, { paused: state === "disabled" });
+      await send(page, { visible: state !== "disabled" });
       if (state === "focus") {
         await page.keyboard.press("Tab");
         await primary.focus();
@@ -577,7 +578,7 @@ test("invalid themes are rejected atomically, including every required color and
 test("host high contrast uses system colors, stays static, and restores the live palette", async () => {
   const page = await open(1100, false);
   try {
-    const primary = page.getByRole("button", { name: "More bananas", exact: true });
+    const primary = page.locator('[data-command="more"]');
     const secondary = page.getByRole("button", { name: "Encourage me", exact: true });
     await native(page, { ...themes[0], highContrast: true });
     // Resolve system colors in this browser instead of assuming an OS palette.
@@ -623,7 +624,7 @@ test("host high contrast uses system colors, stays static, and restores the live
       assert.equal(await page.locator(".message").textContent(), `Mooch says: ${celebrationText[reason]}`);
       await assertStatic(page);
     }
-    await send(page, { paused: true, compact: false });
+    await send(page, { visible: false, compact: false });
     const disabled = await colors(primary);
     assert.equal(disabled.background, system.ButtonFace);
     assert.equal(disabled.foreground, system.GrayText);

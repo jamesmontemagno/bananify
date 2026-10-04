@@ -6,6 +6,7 @@ on:
     tags:
       - "v*"
       - "!vscode-v*"
+      - "!visualstudio-v*"
   pull_request:
     branches: [main]
   workflow_dispatch:

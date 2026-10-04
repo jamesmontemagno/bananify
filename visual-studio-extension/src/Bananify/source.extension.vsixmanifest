@@ -2,7 +2,7 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
     <Identity Id="Bananify.VisualStudio.34b4207e-5102-4332-96fa-ce788f830550" Version="0.1.0" Language="en-US" Publisher="James Montemagno" />
-    <DisplayName>Bananify</DisplayName>
+    <DisplayName>Bananify for Visual Studio</DisplayName>
     <Description xml:space="preserve">Bring a banana party to Visual Studio 2026 with playful editor decorations, monkey companions, dockable party panels, random encouragement, save and build celebrations, four optional IDE themes, and opt-in Solution Explorer badges.</Description>
     <MoreInfo>https://bananify.online</MoreInfo>
     <License>LICENSE</License>

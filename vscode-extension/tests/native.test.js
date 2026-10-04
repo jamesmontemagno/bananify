@@ -169,11 +169,18 @@ test("Party editor receives the packaged banana icon and retains it when reveale
     window: { createWebviewPanel: () => { panelsCreated += 1; return panel; } },
   });
   const icon = uri("file:///extension/media/banana-128.png");
-  const surfaces = new BananaPartySurfaces(() => "brown", () => false, () => {}, icon);
+  const surfaces = new BananaPartySurfaces(() => "brown", () => false, () => 5, () => {}, () => {}, icon);
   surfaces.openEditor();
   assert.equal(panel.iconPath, icon);
   surfaces.openEditor();
   assert.equal(panelsCreated, 1);
   assert.equal(panel.iconPath, icon);
   surfaces.dispose();
+});
+
+test("Start or Stop honors live party state before persisted settings catch up", () => {
+  const { nextPartyEnabled } = load("extension.js", {});
+  assert.equal(nextPartyEnabled(false, false), true);
+  assert.equal(nextPartyEnabled(true, false), false);
+  assert.equal(nextPartyEnabled(false, true), false);
 });

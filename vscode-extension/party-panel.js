@@ -6,10 +6,12 @@ const { bananaSvg, monkeySvg } = require("./artwork");
 const { isPartyMessage, monkeyNames, PartyState } = require("./core");
 
 class BananaPartySurfaces {
-  constructor(getMonkey, getReducedMotion, setDecorationsEnabled, iconPath) {
+  constructor(getMonkey, getReducedMotion, getDensity, setDecorationsEnabled, cycleDensity, iconPath) {
     this.getMonkey = getMonkey;
     this.getReducedMotion = getReducedMotion;
+    this.getDensity = getDensity;
     this.setDecorationsEnabled = setDecorationsEnabled;
+    this.cycleDensity = cycleDensity;
     this.iconPath = iconPath;
     this.panel = undefined;
     this.explorerView = undefined;
@@ -85,16 +87,6 @@ class BananaPartySurfaces {
     this.update();
   }
 
-  setPaused(paused) {
-    if (!this.state.active && !paused) {
-      this.start();
-      return;
-    }
-    if (this.state.active && this.state.paused !== paused) this.state.togglePaused();
-    this.syncDecorations(!paused);
-    this.update();
-  }
-
   configureWebview(webview, surface) {
     webview.html = partyHtml(webview, surface);
     const disposables = webview === this.panel?.webview
@@ -103,10 +95,10 @@ class BananaPartySurfaces {
     disposables.push(webview.onDidReceiveMessage((message) => {
       if (!isPartyMessage(message)) return;
       if (message.command === "start") this.start();
-      if (message.command === "pause") {
-        this.state.togglePaused();
-        this.syncDecorations(!this.state.paused);
-        this.update();
+      if (message.command === "more") {
+        Promise.resolve(this.cycleDensity()).then(() => this.start()).catch((error) => {
+          vscode.window.showErrorMessage(`Bananify could not update the banana level: ${error.message}`);
+        });
       }
       if (message.command === "stop") this.stop();
     }));
@@ -132,6 +124,7 @@ class BananaPartySurfaces {
       monkey,
       monkeyName: monkeyNames[monkey] || monkeyNames.brown,
       paused: this.state.paused,
+      density: this.getDensity(),
       reducedMotion: this.state.reducedMotion,
       visible,
     });
@@ -226,16 +219,18 @@ function partyHtml(webview, surface) {
     h1 { margin: 4px 0 8px; font-size: clamp(26px, 6vw, 52px); line-height: 1; }
     .message { min-height: 1.5em; margin: 0 auto 22px; color: var(--vscode-descriptionForeground); font-size: 16px; }
     .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-    button { min-height: 40px; border: 0; border-radius: 4px; padding: 9px 16px; color: var(--vscode-button-foreground); background: var(--vscode-button-background); cursor: pointer; font: inherit; }
+    .action-control, .action-reset, button { min-height: 40px; border: 0; border-radius: 4px; padding: 9px 16px; color: var(--vscode-button-foreground); background: var(--vscode-button-background); cursor: pointer; font: inherit; }
+    .action-control, .action-reset { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .action-control .icon, .action-reset .icon { font-size: 1.05em; line-height: 1; }
     button:hover { background: var(--vscode-button-hoverBackground); }
     button:disabled { opacity: .5; cursor: default; }
     button:focus-visible { outline: 2px solid var(--vscode-focusBorder); outline-offset: 2px; }
-    .secondary { color: var(--vscode-button-secondaryForeground); background: var(--vscode-button-secondaryBackground); }
-    .secondary:hover { background: var(--vscode-button-secondaryHoverBackground); }
+    .secondary, .action-reset { color: var(--vscode-button-secondaryForeground); background: var(--vscode-button-secondaryBackground); }
+    .secondary:hover, .action-reset:hover { background: var(--vscode-button-secondaryHoverBackground); }
     .motion-note { display: none; margin: 18px auto 0; color: var(--vscode-button-secondaryForeground); background: var(--vscode-button-secondaryBackground); }
     body:not(.active) .sky { display: none; }
     body:not(.active) .party-monkey * { animation-play-state: paused !important; }
-    body:not(.active) [data-command="pause"], body.active [data-command="start"] { display: none; }
+    body:not(.active) [data-command="stop"] { display: none; }
     body:not(.active) [data-burst] { display: none; }
     body.reduced .motion-note { display: block; }
     body.paused .banana-drop, body.paused .party-monkey *, body.hidden .banana-drop, body.hidden .party-monkey *, body.reduced:not(.motion-override) .banana-drop, body.reduced:not(.motion-override) .party-monkey *, body.reduced:not(.motion-override) .party-card { animation-play-state: paused !important; }
@@ -279,10 +274,11 @@ function partyHtml(webview, surface) {
       <h1 id="party-title">Banana Party</h1>
       <p class="message" aria-live="polite">The party is ready when you are.</p>
       <div class="actions">
-        <button data-command="start">Start party</button>
-        <button data-command="pause">${surface === "explorer" ? "Pause" : "Pause animation"}</button>
-        <button data-burst>More bananas</button>
-        <button class="secondary" data-command="stop">${surface === "explorer" ? "Stop" : "Stop party"}</button>
+        <button class="action-control" data-command="start" aria-label="Start party">
+          <span class="icon" aria-hidden="true">▶</span>
+          <span class="label">Start</span>
+        </button>
+        <button data-burst data-command="more" aria-label="Banana level 5 of 5">5 bananas</button>
       </div>
       <button class="motion-note" data-motion-override>Animate anyway</button>
     </section>
@@ -291,7 +287,7 @@ function partyHtml(webview, surface) {
     const vscode = acquireVsCodeApi();
     const body = document.body;
     const message = document.querySelector(".message");
-    const pause = document.querySelector('[data-command="pause"]');
+    const primaryAction = document.querySelector(".action-control");
     const motionOverride = document.querySelector("[data-motion-override]");
     const bursts = document.querySelector(".bursts");
     const bananaTemplate = document.querySelector("#banana-template");
@@ -308,10 +304,21 @@ function partyHtml(webview, surface) {
       motionOverride.textContent = motionOverrideEnabled ? "Use reduced motion" : "Animate anyway";
     }
 
+    function syncPrimaryAction(data) {
+      const active = Boolean(data.active);
+      const action = active ? "stop" : "start";
+      const icon = active ? "■" : "▶";
+      const label = active ? "Stop" : "Start";
+      const actionName = active ? "Stop party" : "Start party";
+      primaryAction.dataset.command = action;
+      primaryAction.setAttribute("aria-label", actionName);
+      primaryAction.innerHTML = '<span class="icon" aria-hidden="true">' + icon + '</span><span class="label">' + label + '</span>';
+    }
+
     document.addEventListener("click", (event) => {
       const button = event.target.closest("button");
       if (!button) return;
-      if (["start", "pause", "stop"].includes(button.dataset.command)) {
+      if (["start", "stop", "more"].includes(button.dataset.command)) {
         vscode.postMessage({ command: button.dataset.command });
       }
       if (button.hasAttribute("data-motion-override")) {
@@ -378,8 +385,10 @@ function partyHtml(webview, surface) {
         body.classList.toggle("paused", data.paused);
         body.classList.toggle("hidden", !data.visible);
         body.classList.toggle("reduced", data.reducedMotion);
-        pause.textContent = (data.paused ? "Resume" : "Pause") + (body.classList.contains("explorer") ? "" : " animation");
-        moreBananas.disabled = !data.active || data.paused || !data.visible;
+        syncPrimaryAction(data);
+        moreBananas.textContent = data.density + (data.density === 1 ? " banana" : " bananas");
+        moreBananas.setAttribute("aria-label", "Banana level " + data.density + " of 5; choose next level");
+        moreBananas.disabled = !data.visible;
         if (!data.active || data.paused || !data.visible) clearBursts();
         message.textContent = data.active
           ? data.monkeyName + (data.paused ? " is saving some energy." : " brought the whole bunch.")
