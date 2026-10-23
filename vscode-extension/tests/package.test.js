@@ -68,6 +68,17 @@ test("manifest contributes commands, a monkey view, and optional themes", async 
   ]);
 });
 
+test("executable extension opts into the Agents window without proposed APIs", async () => {
+  const manifest = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
+  assert.ok(manifest.main, "Bananify is not a declarative-only theme extension.");
+  assert.equal(
+    manifest.capabilities?.agentsWindow?.supported,
+    true,
+    "The Agents window otherwise filters out Bananify, including its themes.",
+  );
+  assert.equal(manifest.enabledApiProposals, undefined);
+});
+
 test("themes declare readable editor and workbench colors", async () => {
   const modernFrameColors = [
     "surface.background",

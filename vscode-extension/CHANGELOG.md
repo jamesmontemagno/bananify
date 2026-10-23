@@ -1,5 +1,10 @@
 # Change Log
 
+## Unreleased
+
+- Declare Agents window compatibility so supported VS Code builds include all four Bananify themes instead of filtering out the extension.
+- Add an Agents window activation smoke test and document the explicit user opt-in needed by older builds.
+
 ## 0.1.3
 
 - Rename the Marketplace display name to **Bananify for VS Code**.

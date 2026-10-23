@@ -54,6 +54,8 @@ jobs:
         run: npm test
       - name: Test in VS Code Extension Host
         run: xvfb-run -a npm run test:smoke
+      - name: Test in VS Code Insiders Agents window
+        run: xvfb-run -a npm run test:smoke:agents
       - name: Package VSIX
         run: npm run package
       - name: Save tested VSIX

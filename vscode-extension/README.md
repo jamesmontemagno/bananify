@@ -38,6 +38,35 @@ controls so more room is left for your files. VS Code controls the pane's outer
 height: drag the **Banana Party** divider to resize it, or collapse the view.
 The editor Party tab keeps its larger layout.
 
+### Themes in the Agents window
+
+All four themes are available in the Agents window in current VS Code Insiders
+builds that honor extension-declared Agents window support. Open **Preferences:
+Color Theme** in that window and select Banana Grove, Banana Cream, Midnight
+Banana, or Monkey Jungle. Installing Bananify never selects a theme for you.
+The Activity Bar, Explorer party view, and status item are editor-window features;
+the Agents window does not provide those surfaces.
+
+Bananify includes executable party features as well as themes. Without an
+explicit compatibility declaration, VS Code disables the entire extension in the
+Agents window, including its declarative themes. Bananify now declares that
+compatibility without requiring proposed APIs.
+
+Older builds, including VS Code 1.141.2, do not yet honor that declaration for
+Marketplace extensions. Update to a build that supports it, or explicitly enable
+Bananify in your **User Settings (JSON)** and reload the Agents window:
+
+```json
+"extensions.supportAgentsWindow": {
+  "vs-publisher-473885.bananify": true
+}
+```
+
+Merge this entry with any existing entries in that setting. On newer builds,
+also check that `extensions.experimental.enableAgentsWindowCapability` has not
+been disabled and that Bananify has not been explicitly disabled for the Agents
+window. Bananify does not change these settings automatically.
+
 ## Settings
 
 | Setting | Default | Purpose |
@@ -63,8 +92,14 @@ npm run lint
 npm run check
 npm test
 npm run test:smoke
+npm run test:smoke:agents
 npm run package
 ```
+
+The standard smoke test runs against the minimum supported VS Code version.
+The Agents smoke test uses current Insiders and an isolated profile, without a
+per-extension enablement override. Set `VSCODE_EXECUTABLE_PATH` to test an
+already-installed VS Code executable instead of downloading one.
 
 Press **F5** from this directory in VS Code to launch an Extension Development Host.
 

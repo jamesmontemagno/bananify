@@ -6,13 +6,17 @@ const path = require("node:path");
 const { runTests } = require("@vscode/test-electron");
 
 async function main() {
+  const agents = process.argv.includes("--agents");
   const profilePath = mkdtempSync(path.join(tmpdir(), "bananify-vscode-"));
   try {
     await runTests({
-      version: "1.96.4",
+      version: agents ? "insiders" : "1.96.4",
+      vscodeExecutablePath: process.env.VSCODE_EXECUTABLE_PATH,
       extensionDevelopmentPath: path.resolve(__dirname, "../.."),
       extensionTestsPath: path.resolve(__dirname, "suite.js"),
+      extensionTestsEnv: { BANANIFY_SMOKE_AGENTS: agents ? "1" : "0" },
       launchArgs: [
+        ...(agents ? ["--agents"] : []),
         "--disable-extensions",
         "--disable-workspace-trust",
         `--extensions-dir=${path.join(profilePath, "extensions")}`,
