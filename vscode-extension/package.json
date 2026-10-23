@@ -1,7 +1,7 @@
 {
   "name": "bananify",
   "displayName": "Bananify for VS Code",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "publisher": "vs-publisher-473885",
   "description": "Bring a banana party, a warm optional theme, and a troop of tiny monkeys to Visual Studio Code.",
   "author": "James Montemagno & Mooch",

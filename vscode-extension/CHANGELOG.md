@@ -1,6 +1,6 @@
 # Change Log
 
-## Unreleased
+## 0.2.0
 
 - Declare Agents window compatibility so supported VS Code builds include all four Bananify themes instead of filtering out the extension.
 - Add an Agents window activation smoke test and document the explicit user opt-in needed by older builds.
