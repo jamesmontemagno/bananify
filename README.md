@@ -91,6 +91,16 @@ Maintainers can publish the tested VSIX to the Visual Studio Marketplace by addi
 
 A native [Visual Studio 2026 extension](visual-studio-extension/README.md) is in development, with editor decorations, local monkey party windows, four optional IDE themes, and opt-in file badges scoped to SDK-style C# and VB projects. It has a separate C# solution and Windows VSIX workflow; it is not the VS Code extension repackaged. Windows experimental-instance qualification is required before release.
 
+## Bananify for the GitHub Universe badge
+
+Take the banana party to [GitHub Universe](https://githubuniverse.com). The [GitHub badger app](github-badger/README.md) brings Mooch, Sebastian, and Henry to the 2026 Universe badge with an interactive playground, four party modes, live public GitHub stats, and **Banana Catch**: a 60-second mini-game you play with the badge flipped over like a gamepad.
+
+<p align="center">
+  <img src="github-badger/images/banana-catch.gif" width="360" alt="Banana Catch on the GitHub Universe badge: a monkey catches falling bananas and leaps for a bonus bunch.">
+  <img src="github-badger/images/playground-mooch.png" width="360" alt="Mooch dancing in the Disco party on the badge playground.">
+</p>
+
+Copy [`github-badger/bananify`](github-badger/bananify) to the badge's `apps` folder in USB Disk Mode. See the [badge app guide](github-badger/README.md) for install steps, controls, screenshots, and tests.
 ## Build your own banana party
 
 Contributions and bug reports are welcome. [Open an issue](https://github.com/jamesmontemagno/bananify/issues) with your browser, what happened, and how to reproduce it.
