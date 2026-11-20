@@ -34,7 +34,7 @@ test("manifest contributes commands, a monkey view, and optional themes", async 
     "bananify.cheer",
   ]);
   assert.equal(manifest.displayName, "Bananify for VS Code");
-  assert.equal(manifest.version, "0.2.0");
+  assert.equal(manifest.version, "0.2.1");
   assert.equal(manifest.contributes.views.bananify[0].type, "webview");
   assert.equal(manifest.contributes.views.explorer[0].id, "bananify.partyExplorer");
   assert.deepEqual(
@@ -158,6 +158,21 @@ test("themes declare readable editor and workbench colors", async () => {
       assert.match(theme.colors[color], /^#[0-9A-F]{6}(?:[0-9A-F]{2})?$/i, `${file} is missing ${color}`);
     }
     assert.ok(contrast(theme.colors["editor.foreground"], theme.colors["editor.background"]) >= 4.5);
+    assert.equal(
+      theme.colors["activeSessionView.background"],
+      theme.colors["editor.background"],
+      `${file} active Agents chat must use the editor surface instead of a selection color`,
+    );
+    assert.equal(
+      theme.colors["activeSessionView.foreground"],
+      theme.colors["editor.foreground"],
+      `${file} active Agents chat must use the editor foreground`,
+    );
+    assert.equal(
+      theme.colors["chat.list.background"],
+      theme.colors["editor.background"],
+      `${file} Agents chat list must use the editor surface`,
+    );
     for (const [foreground, background] of readableFramePairs) {
       assert.ok(
         contrast(theme.colors[foreground], theme.colors[background]) >= 4.5,
