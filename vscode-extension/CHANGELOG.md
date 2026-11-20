@@ -2,6 +2,7 @@
 
 ## 0.2.0
 
+- Add coordinated Agents window active/inactive chat, session, chat bubble, status indicator, and merge/error status colors across all themes.
 - Declare Agents window compatibility so supported VS Code builds include all four Bananify themes instead of filtering out the extension.
 - Add an Agents window activation smoke test and document the explicit user opt-in needed by older builds.
 
