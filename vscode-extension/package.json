@@ -224,9 +224,9 @@
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@vscode/test-electron": "3.1.0",
-    "@vscode/vsce": "4.0.0",
-    "eslint": "10.13.0",
-    "globals": "17.13.0",
-    "ovsx": "1.2.0"
+    "@vscode/vsce": "4.1.1",
+    "eslint": "10.15.0",
+    "globals": "17.14.0",
+    "ovsx": "1.4.0"
   }
 }
